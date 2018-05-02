@@ -9,7 +9,6 @@ namespace IndexDataEngineLibrary
 {
     internal sealed class IndexRow
     {
-
         private double mWeight; 
         private bool mWeightIsMktValue;
         private double mRateOfReturn; 

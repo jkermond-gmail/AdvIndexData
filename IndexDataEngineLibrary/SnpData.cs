@@ -233,6 +233,10 @@ namespace IndexDataEngineLibrary
                         FileName = FilePath + oProcessDate.ToString("yyyyMMdd") + "_SP1500_ADJ.SDC";
                         if (File.Exists(FileName))
                             AddSnpOpeningData(FileName, oProcessDate);
+                        FileName = FilePath + oProcessDate.ToString("yyyyMMdd") + "_SPMLP_ADJ.SDC";
+                        if (File.Exists(FileName))
+                            AddSnpOpeningData(FileName, oProcessDate);
+
                     }
 
                     if (bCloseFiles)
@@ -255,6 +259,10 @@ namespace IndexDataEngineLibrary
                         FileName = FilePath + oProcessDate.ToString("yyyyMMdd") + "_SP1500_CLS.SDC";
                         if (File.Exists(FileName))
                             AddSnpClosingData(FileName, oProcessDate);
+                        FileName = FilePath + oProcessDate.ToString("yyyyMMdd") + "_SPMLP_CLS.SDC";
+                        if (File.Exists(FileName))
+                            AddSnpClosingData(FileName, oProcessDate);
+
                     }
                     if (bTotalReturnFiles)
                     {
@@ -273,7 +281,7 @@ namespace IndexDataEngineLibrary
                         FileName = FilePath + oProcessDate.ToString("yyyyMMdd") + "_SP1000.SDL";
                         if (File.Exists(FileName))
                             AddSnpTotalReturnData(FileName, oProcessDate);
-                        FileName = FilePath + oProcessDate.ToString("yyyyMMdd") + "_SP1500.SDL";
+                        FileName = FilePath + oProcessDate.ToString("yyyyMMdd") + "_SPMLP.SDL";
                         if (File.Exists(FileName))
                             AddSnpTotalReturnData(FileName, oProcessDate);
                     }
@@ -295,25 +303,29 @@ namespace IndexDataEngineLibrary
             // Handle the opening file eg: 20180102_SP500_ADJ.SDC to extract 500
             if (Filename.Contains("SP"))
             {
+                int IndexBegin = 0;
+                int IndexEnd = 0;
+
+                if (Filename.Contains("MLP"))
+                    IndexBegin = Filename.IndexOf("SP");
+                else
+                    IndexBegin = Filename.IndexOf("SP") + 2;
+
                 if (Filename.Contains("_ADJ"))
                 {
-                    int IndexBegin = Filename.IndexOf("SP") + 2;
-                    int IndexEnd = Filename.IndexOf("_ADJ");
+                    IndexEnd = Filename.IndexOf("_ADJ");
                     IndexCode = Filename.Substring(IndexBegin, IndexEnd - IndexBegin);
                 }
                 else if (Filename.Contains("_CLS"))
                 {
-                    int IndexBegin = Filename.IndexOf("SP") + 2;
-                    int IndexEnd = Filename.IndexOf("_CLS");
+                    IndexEnd = Filename.IndexOf("_CLS");
                     IndexCode = Filename.Substring(IndexBegin, IndexEnd - IndexBegin);
                 }
                 else if (Filename.Contains("SDL"))
                 {
-                    int IndexBegin = Filename.IndexOf("SP") + 2;
-                    int IndexEnd = Filename.IndexOf(".");
+                    IndexEnd = Filename.IndexOf(".");
                     IndexCode = Filename.Substring(IndexBegin, IndexEnd - IndexBegin);
                 }
-
             }
             return (IndexCode);
         }
@@ -411,14 +423,15 @@ namespace IndexDataEngineLibrary
 
             foreach (DataRow dr in dt.Rows)
             {
-                sValue = ParseColumn(dr, "INDEX NAME");
+                string IndexnameParsed = ParseColumn(dr, "INDEX NAME");
+                string IndexCodeParsed = ParseColumn(dr, "INDEX CODE");
+                if (IndexCode.Equals("1000") && (IndexCodeParsed.Equals("400") || IndexCodeParsed.Equals("600")))
+                    IndexCodeParsed = "1000";
 
-                if (sValue.StartsWith("S&P "))
+                if (IndexnameParsed.StartsWith("S&P ") && IndexCodeParsed.Equals(IndexCode))
                 {
-
                     CurrentRowCount += 1;
-                    sValue = ParseColumn(dr, "INDEX CODE");
-                    cmd.Parameters["@IndexCode"].Value = sValue;
+                    cmd.Parameters["@IndexCode"].Value = IndexCodeParsed;
 
                     sValue = ParseColumn(dr, "STOCK KEY");    // NUMERIC but stored as String
                     cmd.Parameters["@StockKey"].Value = sValue;
@@ -538,14 +551,15 @@ namespace IndexDataEngineLibrary
 
             foreach (DataRow dr in dt.Rows)
             {
-                sValue = ParseColumn(dr, "INDEX NAME");
+                string IndexnameParsed = ParseColumn(dr, "INDEX NAME");
+                string IndexCodeParsed = ParseColumn(dr, "INDEX CODE");
+                if (IndexCode.Equals("1000") && (IndexCodeParsed.Equals("400") || IndexCodeParsed.Equals("600")))
+                    IndexCodeParsed = "1000";
 
-                if (sValue.StartsWith("S&P "))
+                if (IndexnameParsed.StartsWith("S&P ") && IndexCodeParsed.Equals(IndexCode))
                 {
-
                     CurrentRowCount += 1;
-                    sValue = ParseColumn(dr, "INDEX CODE");
-                    cmd.Parameters["@IndexCode"].Value = sValue;
+                    cmd.Parameters["@IndexCode"].Value = IndexCodeParsed;
 
                     sValue = ParseColumn(dr, "STOCK KEY");    // NUMERIC but stored as String
                     cmd.Parameters["@StockKey"].Value = sValue;
@@ -622,7 +636,11 @@ namespace IndexDataEngineLibrary
 
             string IndexCode = GetIndexCodeFromFilename(Filename);
             IndexCodeList.Add(IndexCode);
-            SearchCodeList.Add(IndexCode + "TR");
+            if (IndexCode.Equals("SPMLP"))
+                SearchCodeList.Add(IndexCode + "T");
+            else
+                SearchCodeList.Add(IndexCode + "TR");
+
             if (IndexCode.Equals("500"))
             {
                 IndexCodeList.Add("100");
@@ -769,7 +787,12 @@ namespace IndexDataEngineLibrary
             indexRowsSectorLevel4RollUp.Clear();
             indexRowsSectorLevel4RollUp.TrimExcess();
 
-            string sIndexCode = sIndexName.Replace("sp", "");
+            string sIndexCode = "";
+
+            if (sIndexName.Equals("SPMLP"))
+                sIndexCode = sIndexName;
+            else
+                sIndexCode = sIndexName.Replace("sp", "");
 
             try
             {
@@ -813,6 +836,11 @@ namespace IndexDataEngineLibrary
                         hopen.EffectiveDate = @EffectiveDate and 
                         hopen.IndexCode = @IndexCode
                 ";
+
+                if (sIndexCode.Equals("900"))
+                {
+                    SqlSelect += @" or hopen.IndexCode = '400' or hopen.IndexCode = '500'";
+                }
 
                 string SqlOrderBy = "";
                 switch (OutputType)

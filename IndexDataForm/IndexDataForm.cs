@@ -120,27 +120,28 @@ namespace IndexDataForm
         }
         private void btnGenerateReturns_Click(object sender, EventArgs e)
         {
+            string Indexname = (string)cbRussellIndices.SelectedItem;
+            Indexname = Indexname.ToUpper();
             if (cboVendor.SelectedItem.Equals("Russell"))
             {
                 if (cboOutputType.Text.Equals("Constituent"))
                 { 
-                    russellData.GenerateConstituentReturnsForDate(lnkEndDate.Text, (string)cbRussellIndices.SelectedItem);
-                    russellData.GenerateAxmlFileConstituents(lnkEndDate.Text, (string)cbRussellIndices.SelectedItem);
+                    russellData.GenerateConstituentReturnsForDate(lnkEndDate.Text, Indexname);
+                    russellData.GenerateAxmlFileConstituents(lnkEndDate.Text, Indexname);
                 }
                 else if (cboOutputType.Text.Equals("Sector"))
                 { 
-                    russellData.GenerateIndustryReturnsForDate(lnkEndDate.Text, (string)cbRussellIndices.SelectedItem);
-                    russellData.GenerateAxmlFileSectors(lnkEndDate.Text, (string)cbRussellIndices.SelectedItem);
+                    russellData.GenerateIndustryReturnsForDate(lnkEndDate.Text, Indexname);
+                    russellData.GenerateAxmlFileSectors(lnkEndDate.Text, Indexname);
                 }
             }
             else if (cboVendor.SelectedItem.Equals("S&P"))
             {
                 if (cboOutputType.Text.Equals("Constituent"))
-                    snpData.GenerateReturnsForDateRange(lnkStartDate.Text, lnkEndDate.Text, (string)cbRussellIndices.SelectedItem, AdventOutputType.Constituent);
+                    snpData.GenerateReturnsForDateRange(lnkStartDate.Text, lnkEndDate.Text, Indexname, AdventOutputType.Constituent);
                 else if (cboOutputType.Text.Equals("Sector"))
-                    snpData.GenerateReturnsForDateRange(lnkStartDate.Text, lnkEndDate.Text, (string)cbRussellIndices.SelectedItem, AdventOutputType.Sector);
+                    snpData.GenerateReturnsForDateRange(lnkStartDate.Text, lnkEndDate.Text, Indexname, AdventOutputType.Sector);
             }
-
 
             //russellData.GenerateIndustryReturnsForDate(lnkEndDate.Text, (string)cbRussellIndices.SelectedItem);
         }

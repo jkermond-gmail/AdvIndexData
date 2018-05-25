@@ -4,15 +4,62 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Diagnostics;
+using System.IO;
 
 namespace AdventUtilityLibrary
 {
     public class LogHelper
     {
+        private StreamWriter swLogFile = null;
+        private string LogFileName;
+        private string OutputPath = @"C:\A_Development\visual studio 2017\AdventProjects\IndexDataForm\IndexDataForm\Output\";
+
         public LogHelper()
         {
-
+            StartLog();
         }
+
+        private void StartLog()
+        {
+            LogFileName = OutputPath + "AdvIndexDataLog.txt";
+            if (File.Exists(LogFileName))
+                File.Delete(LogFileName);
+            swLogFile = File.CreateText(LogFileName);
+            swLogFile.WriteLine(LogFileName + DateTime.Now);
+            swLogFile.Flush();
+        }
+
+        private void StartLog(string logFileName)
+        {
+            if (swLogFile.BaseStream != null)
+                CloseAndFlush(ref swLogFile);
+            LogFileName = /* OutputPath + */ logFileName;
+            if (File.Exists(LogFileName))
+                File.Delete(LogFileName);
+            swLogFile = File.CreateText(LogFileName);
+            swLogFile.Flush();
+        }
+
+        private void EndLog()
+        {
+            if (swLogFile.BaseStream != null)
+            {
+                swLogFile.Flush();
+                swLogFile.Close();
+            }
+        }
+
+        private void CloseAndFlush(ref StreamWriter WriteFile)
+        {
+            if (WriteFile.BaseStream != null)
+            {
+
+                WriteFile.Flush();
+                WriteFile.Close();
+                WriteFile = null;
+            }
+        }
+
         public static void Error(string message, string module)
         {
             WriteEntry(message, "error", module);
@@ -36,7 +83,11 @@ namespace AdventUtilityLibrary
         public void WriteLine(string message)
         {
             Trace.WriteLine(message);
+            Trace.TraceInformation(message);
+            Trace.Flush();
             Console.WriteLine(message);
+            swLogFile.WriteLine(message);
+            swLogFile.Flush();
         }
 
 
@@ -47,7 +98,9 @@ namespace AdventUtilityLibrary
                                   type,
                                   module,
                                   message);
-            Trace.WriteLine(formattedMsg);
+            //Trace.WriteLine(formattedMsg);
+            Trace.TraceInformation(formattedMsg);
+            Trace.Flush();
             Console.WriteLine(formattedMsg);
         }
 

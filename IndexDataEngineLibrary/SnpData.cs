@@ -215,54 +215,61 @@ namespace IndexDataEngineLibrary
                 {
                     if (bOpenFiles || bSymbolChanges)
                     {
+                        
                         FileName = FilePath + oProcessDate.ToString("yyyyMMdd") + "_SP100_ADJ.SDC";
                         if (File.Exists(FileName))
                             AddSnpOpeningData(FileName, oProcessDate);
                         FileName = FilePath + oProcessDate.ToString("yyyyMMdd") + "_SP400_ADJ.SDC";
                         if (File.Exists(FileName))
-                            AddSnpOpeningData(FileName, oProcessDate);
+                            AddSnpOpeningData(FileName, oProcessDate);                        
                         FileName = FilePath + oProcessDate.ToString("yyyyMMdd") + "_SP500_ADJ.SDC";
                         if (File.Exists(FileName))
                             AddSnpOpeningData(FileName, oProcessDate);
+                        
                         FileName = FilePath + oProcessDate.ToString("yyyyMMdd") + "_SP600_ADJ.SDC";
                         if (File.Exists(FileName))
                             AddSnpOpeningData(FileName, oProcessDate);
+                        /*
                         FileName = FilePath + oProcessDate.ToString("yyyyMMdd") + "_SP1000_ADJ.SDC";
                         if (File.Exists(FileName))
                             AddSnpOpeningData(FileName, oProcessDate);
                         FileName = FilePath + oProcessDate.ToString("yyyyMMdd") + "_SP1500_ADJ.SDC";
                         if (File.Exists(FileName))
                             AddSnpOpeningData(FileName, oProcessDate);
+                        */
                         FileName = FilePath + oProcessDate.ToString("yyyyMMdd") + "_SPMLP_ADJ.SDC";
                         if (File.Exists(FileName))
                             AddSnpOpeningData(FileName, oProcessDate);
-
+                            
                     }
 
                     if (bCloseFiles)
                     {
+                        
                         FileName = FilePath + oProcessDate.ToString("yyyyMMdd") + "_SP100_CLS.SDC";
                         if (File.Exists(FileName))
                             AddSnpClosingData(FileName, oProcessDate);
                         FileName = FilePath + oProcessDate.ToString("yyyyMMdd") + "_SP400_CLS.SDC";
                         if (File.Exists(FileName))
-                            AddSnpClosingData(FileName, oProcessDate);
+                            AddSnpClosingData(FileName, oProcessDate);                        
                         FileName = FilePath + oProcessDate.ToString("yyyyMMdd") + "_SP500_CLS.SDC";
                         if (File.Exists(FileName))
                             AddSnpClosingData(FileName, oProcessDate);
                         FileName = FilePath + oProcessDate.ToString("yyyyMMdd") + "_SP600_CLS.SDC";
                         if (File.Exists(FileName))
                             AddSnpClosingData(FileName, oProcessDate);
+                        /*
                         FileName = FilePath + oProcessDate.ToString("yyyyMMdd") + "_SP1000_CLS.SDC";
                         if (File.Exists(FileName))
                             AddSnpClosingData(FileName, oProcessDate);
                         FileName = FilePath + oProcessDate.ToString("yyyyMMdd") + "_SP1500_CLS.SDC";
                         if (File.Exists(FileName))
                             AddSnpClosingData(FileName, oProcessDate);
+                        */
                         FileName = FilePath + oProcessDate.ToString("yyyyMMdd") + "_SPMLP_CLS.SDC";
                         if (File.Exists(FileName))
                             AddSnpClosingData(FileName, oProcessDate);
-
+                        
                     }
                     if (bTotalReturnFiles)
                     {
@@ -278,12 +285,15 @@ namespace IndexDataEngineLibrary
                         FileName = FilePath + oProcessDate.ToString("yyyyMMdd") + "_SP600.SDL";
                         if (File.Exists(FileName))
                             AddSnpTotalReturnData(FileName, oProcessDate);
+                        /*
                         FileName = FilePath + oProcessDate.ToString("yyyyMMdd") + "_SP1000.SDL";
                         if (File.Exists(FileName))
                             AddSnpTotalReturnData(FileName, oProcessDate);
+                        */
                         FileName = FilePath + oProcessDate.ToString("yyyyMMdd") + "_SPMLP.SDL";
                         if (File.Exists(FileName))
                             AddSnpTotalReturnData(FileName, oProcessDate);
+                        
                     }
                 }
             }
@@ -787,18 +797,86 @@ namespace IndexDataEngineLibrary
             indexRowsSectorLevel4RollUp.Clear();
             indexRowsSectorLevel4RollUp.TrimExcess();
 
-            string sIndexCode = "";
+            string sIndexCode1 = "";
+            string sIndexCode2 = "";
+            string sIndexCode3 = "";
 
             if (sIndexName.Equals("SPMLP"))
-                sIndexCode = sIndexName;
+            {
+                sIndexCode1 = sIndexName;
+                sIndexCode2 = sIndexName;
+                sIndexCode3 = sIndexName;
+            }
             else
-                sIndexCode = sIndexName.Replace("sp", "");
+            {
+                sIndexCode1 = sIndexName.Replace("SP", "");
+                if (sIndexCode1.Equals("900"))
+                {
+                    sIndexCode1 = "400";
+                    sIndexCode2 = "500";
+                    sIndexCode3 = "500";
+                }
+                else if (sIndexCode1.Equals("1500"))
+                {
+                    sIndexCode1 = "400";
+                    sIndexCode2 = "500";
+                    sIndexCode3 = "600";
+                }
+                else
+                {
+                    sIndexCode2 = sIndexCode1;
+                    sIndexCode3 = sIndexCode1;
+                }
+            }
 
             try
             {
                 sMsg = "GenerateReturnsForDate: " + sDate + " Index: " + sIndexName;
                 logHelper.WriteLine(sMsg + sDate);
+
                 /*
+                USE IndexData
+                    DECLARE @FileDate nvarchar(10);
+                DECLARE @EffectiveDate nvarchar(10);
+                DECLARE @IndexCode1 nvarchar(10);
+                DECLARE @IndexCode2 nvarchar(10);
+                DECLARE @IndexCode3 nvarchar(10);
+                SET @FileDate = '01/04/2017';
+                SET @EffectiveDate = '01/04/2018'
+                    SET @IndexCode1 = '500'
+                    SET @IndexCode2 = '400'
+                    SET @IndexCode3 = '600'
+                */
+                /*
+                string SqlSelect = @"
+                    SELECT distinct hclose.EffectiveDate, hopen.IndexCode, hclose.CUSIP, lower(hclose.Ticker) as Ticker, hopen.StockKey,
+                    cast(hclose.TotalReturn as float) * 100 as TotalReturn, 
+                    LEFT(hclose.GicsCode, 2) As Sector, LEFT(hclose.GicsCode, 4) As IndustryGroup, LEFT(hclose.GicsCode, 6) As Industry, hclose.GicsCode As SubIndustry,
+                        ROUND((((cast(hopen.MarketCap as float)) /
+                        (SELECT
+                            sum(cast(hopen.MarketCap as float))
+                            FROM         dbo.SnpDailyClosingHoldings hclose
+                            inner join dbo.SnpDailyOpeningHoldings hopen on
+                            hclose.EffectiveDate = hopen.EffectiveDate and
+                            hclose.StockKey = hopen.StockKey
+                            WHERE
+                            hopen.EffectiveDate = @EffectiveDate and
+                            (hopen.IndexCode = @IndexCode1 OR hopen.IndexCode = @IndexCode2 OR hopen.IndexCode = @IndexCode3))
+                        ) *100 ),12) As Weight
+                    FROM SnpDailyClosingHoldings hclose inner join
+                            dbo.SnpDailyOpeningHoldings hopen on
+                            hclose.EffectiveDate = hopen.EffectiveDate and
+                            hclose.StockKey = hopen.StockKey and 
+							hclose.IndexCode = hopen.IndexCode
+                    WHERE
+                        hopen.EffectiveDate = @EffectiveDate and
+                        (hopen.IndexCode = @IndexCode1 OR hopen.IndexCode = @IndexCode2 OR hopen.IndexCode = @IndexCode3)
+                    ";
+                */
+
+
+                /*
+                 
                 declare
                     @FileDate datetime,
                     @IndexName varchar(12)   
@@ -813,6 +891,7 @@ namespace IndexDataEngineLibrary
 										
 
                  */
+
                 string SqlSelect = @"
                     SELECT hclose.EffectiveDate, hopen.IndexCode, hclose.CUSIP, lower(hclose.Ticker) as Ticker, 
                     cast(hclose.TotalReturn as float) * 100 as TotalReturn, 
@@ -823,7 +902,8 @@ namespace IndexDataEngineLibrary
                             FROM         dbo.SnpDailyClosingHoldings hclose 
                             inner join dbo.SnpDailyOpeningHoldings hopen on 
                             hclose.EffectiveDate = hopen.EffectiveDate and 
-                            hclose.StockKey = hopen.StockKey
+                            hclose.StockKey = hopen.StockKey and 
+							hclose.IndexCode = hopen.IndexCode
                             WHERE 
                             hopen.EffectiveDate = @EffectiveDate and 
                             hopen.IndexCode = @IndexCode)
@@ -831,16 +911,13 @@ namespace IndexDataEngineLibrary
                     FROM         SnpDailyClosingHoldings hclose inner join
                             dbo.SnpDailyOpeningHoldings hopen on 
                             hclose.EffectiveDate = hopen.EffectiveDate and 
-                            hclose.StockKey = hopen.StockKey
+                            hclose.StockKey = hopen.StockKey and 
+							hclose.IndexCode = hopen.IndexCode
                     WHERE 
                         hopen.EffectiveDate = @EffectiveDate and 
                         hopen.IndexCode = @IndexCode
                 ";
-
-                if (sIndexCode.Equals("900"))
-                {
-                    SqlSelect += @" or hopen.IndexCode = '400' or hopen.IndexCode = '500'";
-                }
+                
 
                 string SqlOrderBy = "";
                 switch (OutputType)
@@ -863,8 +940,14 @@ namespace IndexDataEngineLibrary
                 mSqlConn.Open();
                 SqlCommand cmd = new SqlCommand(SqlSelect + SqlOrderBy, mSqlConn);
                 cmd.Parameters.Add("@IndexCode", SqlDbType.VarChar, 20);
+                //cmd.Parameters.Add("@IndexCode1", SqlDbType.VarChar, 20);
+                //cmd.Parameters.Add("@IndexCode2", SqlDbType.VarChar, 20);
+                //cmd.Parameters.Add("@IndexCode3", SqlDbType.VarChar, 20);
                 cmd.Parameters.Add("@EffectiveDate", SqlDbType.DateTime);
-                cmd.Parameters["@IndexCode"].Value = sIndexCode;
+                cmd.Parameters["@IndexCode"].Value = sIndexCode1;
+                //cmd.Parameters["@IndexCode1"].Value = sIndexCode1;
+                //cmd.Parameters["@IndexCode2"].Value = sIndexCode2;
+                //cmd.Parameters["@IndexCode3"].Value = sIndexCode3;
                 DateTime oDate = DateTime.MinValue;
                 oDate = DateTime.Parse(sDate);
                 cmd.Parameters["@EffectiveDate"].Value = oDate;
@@ -1204,6 +1287,8 @@ namespace IndexDataEngineLibrary
             if (GenerateReturnsForDate(sDate, sIndexName, AdventOutputType.Constituent) == true)
             {
                 indexRowsTickerSort.Clear();
+                int i = 0;
+
                 for (bool GotNext = true; GotNext;)
                 {
                     string sCusip = null;
@@ -1224,6 +1309,7 @@ namespace IndexDataEngineLibrary
                                                          sSector, sIndustryGroup, sIndustry, sSubIndustry,
                                                          sWeight, sSecurityReturn, IndexRow.VendorFormat.CONSTITUENT);
                         indexRowsTickerSort.Add(indexRow);
+                        i = i + 1;
                     }
                 }
                 CalculateAdventTotalReturnForDate(indexRowsTickerSort, sDate, sIndexName, sVendorFormats[(int)IndexRow.VendorFormat.CONSTITUENT]);

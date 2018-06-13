@@ -229,14 +229,14 @@ namespace IndexDataEngineLibrary
                         FileName = FilePath + oProcessDate.ToString("yyyyMMdd") + "_SP600_ADJ.SDC";
                         if (File.Exists(FileName))
                             AddSnpOpeningData(FileName, oProcessDate);
-                        /*
+                        
                         FileName = FilePath + oProcessDate.ToString("yyyyMMdd") + "_SP1000_ADJ.SDC";
                         if (File.Exists(FileName))
                             AddSnpOpeningData(FileName, oProcessDate);
                         FileName = FilePath + oProcessDate.ToString("yyyyMMdd") + "_SP1500_ADJ.SDC";
                         if (File.Exists(FileName))
                             AddSnpOpeningData(FileName, oProcessDate);
-                        */
+                        
                         FileName = FilePath + oProcessDate.ToString("yyyyMMdd") + "_SPMLP_ADJ.SDC";
                         if (File.Exists(FileName))
                             AddSnpOpeningData(FileName, oProcessDate);
@@ -258,14 +258,14 @@ namespace IndexDataEngineLibrary
                         FileName = FilePath + oProcessDate.ToString("yyyyMMdd") + "_SP600_CLS.SDC";
                         if (File.Exists(FileName))
                             AddSnpClosingData(FileName, oProcessDate);
-                        /*
+                        
                         FileName = FilePath + oProcessDate.ToString("yyyyMMdd") + "_SP1000_CLS.SDC";
                         if (File.Exists(FileName))
                             AddSnpClosingData(FileName, oProcessDate);
                         FileName = FilePath + oProcessDate.ToString("yyyyMMdd") + "_SP1500_CLS.SDC";
                         if (File.Exists(FileName))
                             AddSnpClosingData(FileName, oProcessDate);
-                        */
+                        
                         FileName = FilePath + oProcessDate.ToString("yyyyMMdd") + "_SPMLP_CLS.SDC";
                         if (File.Exists(FileName))
                             AddSnpClosingData(FileName, oProcessDate);
@@ -285,11 +285,11 @@ namespace IndexDataEngineLibrary
                         FileName = FilePath + oProcessDate.ToString("yyyyMMdd") + "_SP600.SDL";
                         if (File.Exists(FileName))
                             AddSnpTotalReturnData(FileName, oProcessDate);
-                        /*
-                        FileName = FilePath + oProcessDate.ToString("yyyyMMdd") + "_SP1000.SDL";
+                        
+                        FileName = FilePath + oProcessDate.ToString("yyyyMMdd") + "_SP1500.SDL";
                         if (File.Exists(FileName))
                             AddSnpTotalReturnData(FileName, oProcessDate);
-                        */
+                        
                         FileName = FilePath + oProcessDate.ToString("yyyyMMdd") + "_SPMLP.SDL";
                         if (File.Exists(FileName))
                             AddSnpTotalReturnData(FileName, oProcessDate);
@@ -316,10 +316,7 @@ namespace IndexDataEngineLibrary
                 int IndexBegin = 0;
                 int IndexEnd = 0;
 
-                if (Filename.Contains("MLP"))
-                    IndexBegin = Filename.IndexOf("SP");
-                else
-                    IndexBegin = Filename.IndexOf("SP") + 2;
+                IndexBegin = Filename.IndexOf("SP");
 
                 if (Filename.Contains("_ADJ"))
                 {
@@ -337,7 +334,7 @@ namespace IndexDataEngineLibrary
                     IndexCode = Filename.Substring(IndexBegin, IndexEnd - IndexBegin);
                 }
             }
-            return (IndexCode);
+            return (IndexCode.ToLower());
         }
 
 
@@ -435,8 +432,14 @@ namespace IndexDataEngineLibrary
             {
                 string IndexnameParsed = ParseColumn(dr, "INDEX NAME");
                 string IndexCodeParsed = ParseColumn(dr, "INDEX CODE");
-                if (IndexCode.Equals("1000") && (IndexCodeParsed.Equals("400") || IndexCodeParsed.Equals("600")))
-                    IndexCodeParsed = "1000";
+
+                if (IndexCodeParsed.Equals("SPMLP"))
+                    IndexCodeParsed = IndexCodeParsed.ToLower();
+                else
+                    IndexCodeParsed = "sp" + IndexCodeParsed;
+
+                if (IndexCode.Equals("sp1000") && (IndexCodeParsed.Equals("sp400") || IndexCodeParsed.Equals("sp600")))
+                    IndexCodeParsed = "sp1000";
 
                 if (IndexnameParsed.StartsWith("S&P ") && IndexCodeParsed.Equals(IndexCode))
                 {
@@ -563,8 +566,14 @@ namespace IndexDataEngineLibrary
             {
                 string IndexnameParsed = ParseColumn(dr, "INDEX NAME");
                 string IndexCodeParsed = ParseColumn(dr, "INDEX CODE");
-                if (IndexCode.Equals("1000") && (IndexCodeParsed.Equals("400") || IndexCodeParsed.Equals("600")))
-                    IndexCodeParsed = "1000";
+
+                if (IndexCodeParsed.Equals("SPMLP"))
+                    IndexCodeParsed = IndexCodeParsed.ToLower();
+                else
+                    IndexCodeParsed = "sp" + IndexCodeParsed;
+
+                if (IndexCode.Equals("sp1000") && (IndexCodeParsed.Equals("sp400") || IndexCodeParsed.Equals("sp600")))
+                    IndexCodeParsed = "sp1000";
 
                 if (IndexnameParsed.StartsWith("S&P ") && IndexCodeParsed.Equals(IndexCode))
                 {
@@ -645,22 +654,29 @@ namespace IndexDataEngineLibrary
             List<string> IndexCodeList = new List<string>();
 
             string IndexCode = GetIndexCodeFromFilename(Filename);
+            string SearchIndexCode = "";
             IndexCodeList.Add(IndexCode);
-            if (IndexCode.Equals("SPMLP"))
-                SearchCodeList.Add(IndexCode + "T");
-            else
-                SearchCodeList.Add(IndexCode + "TR");
-
-            if (IndexCode.Equals("500"))
+            if (IndexCode.Equals("spmlp"))
             {
-                IndexCodeList.Add("100");
+                SearchIndexCode = IndexCode.ToUpper() + "T";
+                SearchCodeList.Add(SearchIndexCode);
+            }
+            else
+            {
+                SearchIndexCode = IndexCode.Replace("sp", "") + "TR"; 
+                SearchCodeList.Add(SearchIndexCode);
+            }
+
+            if (IndexCode.Equals("sp500"))
+            {
+                IndexCodeList.Add("sp100");
                 SearchCodeList.Add("100TR");    // The Return for the S&P 100 is in the 500's .sdl file
             }
-            else if (IndexCode.Equals("1500"))
+            else if (IndexCode.Equals("sp1500"))
             {
-                IndexCodeList.Add("900");
+                IndexCodeList.Add("sp900");
                 SearchCodeList.Add("900TR");    // The Return for the S&P 900 is in the 1500's .sdl file
-                IndexCodeList.Add("1000");
+                IndexCodeList.Add("sp1000");
                 SearchCodeList.Add("1000TR");   // The Return for the S&P 1000 is in the 1500's .sdl file
             }
             int CurrentRowCount = 0;
@@ -685,6 +701,7 @@ namespace IndexDataEngineLibrary
                         AddSnpTotalReturnForIndex(FileDate, IndexCodeList[i], sValue);
                         string sStartAndEndDate = FileDate.ToString("MM/dd/yyyy");
                         CalculateVendorTotalReturnsForPeriod(sStartAndEndDate, sStartAndEndDate, IndexCodeList[i]);
+                        break;
                     }
                 }
                 i += 1;
@@ -798,36 +815,27 @@ namespace IndexDataEngineLibrary
             indexRowsSectorLevel4RollUp.TrimExcess();
 
             string sIndexCode1 = "";
-            string sIndexCode2 = "";
-            string sIndexCode3 = "";
+//            string sIndexCode2 = "";
+//            string sIndexCode3 = "";
 
-            if (sIndexName.Equals("SPMLP"))
-            {
+            //if (sIndexName.Equals("sp900"))
+            //{
+            //    sIndexCode1 = "sp400";
+            //    sIndexCode2 = "sp500";
+            //    sIndexCode3 = "sp500";
+            //}
+            //else if (sIndexName.Equals("1500"))
+            //{
+            //    sIndexCode1 = "sp400";
+            //    sIndexCode2 = "sp500";
+            //    sIndexCode3 = "sp600";
+            //}
+            //else
+            //{
                 sIndexCode1 = sIndexName;
-                sIndexCode2 = sIndexName;
-                sIndexCode3 = sIndexName;
-            }
-            else
-            {
-                sIndexCode1 = sIndexName.Replace("SP", "");
-                if (sIndexCode1.Equals("900"))
-                {
-                    sIndexCode1 = "400";
-                    sIndexCode2 = "500";
-                    sIndexCode3 = "500";
-                }
-                else if (sIndexCode1.Equals("1500"))
-                {
-                    sIndexCode1 = "400";
-                    sIndexCode2 = "500";
-                    sIndexCode3 = "600";
-                }
-                else
-                {
-                    sIndexCode2 = sIndexCode1;
-                    sIndexCode3 = sIndexCode1;
-                }
-            }
+            //    sIndexCode2 = sIndexCode1;
+            //    sIndexCode3 = sIndexCode1;
+            //}
 
             try
             {
@@ -1277,7 +1285,6 @@ namespace IndexDataEngineLibrary
                     GenerateIndustryReturnsForDate(processDate.ToString("MM/dd/yyyy"), sIndexName);
                     GenerateAxmlFileSectors(processDate.ToString("MM/dd/yyyy"), sIndexName);
                 }
-
             }
         }
 
@@ -1507,8 +1514,7 @@ namespace IndexDataEngineLibrary
             double AdventTotalReturn = indexRows[0].AdventTotalReturn;
             AdventTotalReturn = Math.Round(AdventTotalReturn, totalReturnPrecision, MidpointRounding.AwayFromZero);
 
-            string sIndexCode = sIndexName.Substring(2);  // strip off the leading sp for now
-            sharedData.AddTotalReturn(sDate, sIndexCode, sVendorFormat, AdventTotalReturn, "AdvReturn");
+            sharedData.AddTotalReturn(sDate, sIndexName, sVendorFormat, AdventTotalReturn, "AdvReturn");
 
             //double AdventVsVendorDiff = VendorTotalReturn - AdventTotalReturn;
 
@@ -1769,10 +1775,7 @@ namespace IndexDataEngineLibrary
                 logHelper.WriteLine(sMsg + "finished " + DateTime.Now);
                 //logHelper.Flush();
             }
-
             return;
         }
-
-
     }
 }

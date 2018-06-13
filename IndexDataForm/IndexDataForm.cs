@@ -121,9 +121,10 @@ namespace IndexDataForm
         private void btnGenerateReturns_Click(object sender, EventArgs e)
         {
             string Indexname = (string)cbRussellIndices.SelectedItem;
-            Indexname = Indexname.ToUpper();
             if (cboVendor.SelectedItem.Equals("Russell"))
             {
+                Indexname = Indexname.ToUpper();
+
                 if (cboOutputType.Text.Equals("Constituent"))
                 { 
                     russellData.GenerateConstituentReturnsForDate(lnkEndDate.Text, Indexname);

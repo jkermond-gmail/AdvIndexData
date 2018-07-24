@@ -432,6 +432,7 @@ namespace IndexDataEngineLibrary
             {
                 string IndexnameParsed = ParseColumn(dr, "INDEX NAME");
                 string IndexCodeParsed = ParseColumn(dr, "INDEX CODE");
+                string IndexCodeParsed2;
 
                 if (IndexCodeParsed.Equals("SPMLP"))
                     IndexCodeParsed = IndexCodeParsed.ToLower();
@@ -440,6 +441,13 @@ namespace IndexDataEngineLibrary
 
                 if (IndexCode.Equals("sp1000") && (IndexCodeParsed.Equals("sp400") || IndexCodeParsed.Equals("sp600")))
                     IndexCodeParsed = "sp1000";
+
+                if (IndexCodeParsed.Equals("sp500"))
+                    IndexCodeParsed2 = "sp900";
+                else if (IndexCodeParsed.Equals("sp400"))
+                    IndexCodeParsed2 = "sp900";
+                else
+                    IndexCodeParsed2 = "";
 
                 if (IndexnameParsed.StartsWith("S&P ") && IndexCodeParsed.Equals(IndexCode))
                 {
@@ -470,16 +478,27 @@ namespace IndexDataEngineLibrary
 
                     try
                     {
-                        SqlSelect = "select count(*) from" + Tablename;
-                        cmd.CommandText = SqlSelect + SqlWhere;
-                        int iCount = (int)cmd.ExecuteScalar();
-                        if (iCount == 0)
+                        int iterations = 1;
+                        if (IndexCodeParsed2.Length > 0)
+                            iterations = 2;
+
+                        for (int iteration = 1; iteration <= iterations; iteration++)
                         {
-                            cmd.CommandText =
-                                "insert into " + Tablename + " (FileDate,IndexCode,StockKey,EffectiveDate,CUSIP,Ticker,GicsCode,MarketCap,Weight) " +
-                                "Values (@FileDate,@IndexCode,@StockKey,@EffectiveDate,@CUSIP,@Ticker,@GicsCode,@MarketCap,@Weight)";
-                            cmd.ExecuteNonQuery();
-                            AddCount += 1;
+                            if (iteration == 2)
+                            {
+                                cmd.Parameters["@IndexCode"].Value = IndexCodeParsed2;
+                            }
+                            SqlSelect = "select count(*) from" + Tablename;
+                            cmd.CommandText = SqlSelect + SqlWhere;
+                            int iCount = (int)cmd.ExecuteScalar();
+                            if (iCount == 0)
+                            {
+                                cmd.CommandText =
+                                    "insert into " + Tablename + " (FileDate,IndexCode,StockKey,EffectiveDate,CUSIP,Ticker,GicsCode,MarketCap,Weight) " +
+                                    "Values (@FileDate,@IndexCode,@StockKey,@EffectiveDate,@CUSIP,@Ticker,@GicsCode,@MarketCap,@Weight)";
+                                cmd.ExecuteNonQuery();
+                                AddCount += 1;
+                            }
                         }
                     }
                     catch (SqlException ex)
@@ -566,6 +585,7 @@ namespace IndexDataEngineLibrary
             {
                 string IndexnameParsed = ParseColumn(dr, "INDEX NAME");
                 string IndexCodeParsed = ParseColumn(dr, "INDEX CODE");
+                string IndexCodeParsed2;
 
                 if (IndexCodeParsed.Equals("SPMLP"))
                     IndexCodeParsed = IndexCodeParsed.ToLower();
@@ -574,6 +594,13 @@ namespace IndexDataEngineLibrary
 
                 if (IndexCode.Equals("sp1000") && (IndexCodeParsed.Equals("sp400") || IndexCodeParsed.Equals("sp600")))
                     IndexCodeParsed = "sp1000";
+
+                if (IndexCodeParsed.Equals("sp500"))
+                    IndexCodeParsed2 = "sp900";
+                else if (IndexCodeParsed.Equals("sp400"))
+                    IndexCodeParsed2 = "sp900";
+                else
+                    IndexCodeParsed2 = "";
 
                 if (IndexnameParsed.StartsWith("S&P ") && IndexCodeParsed.Equals(IndexCode))
                 {
@@ -607,16 +634,28 @@ namespace IndexDataEngineLibrary
 
                     try
                     {
-                        SqlSelect = "select count(*) from" + Tablename;
-                        cmd.CommandText = SqlSelect + SqlWhere;
-                        int iCount = (int)cmd.ExecuteScalar();
-                        if (iCount == 0)
+                        int iterations = 1;
+                        if (IndexCodeParsed2.Length > 0)
+                            iterations = 2;
+
+                        for (int iteration = 1; iteration <= iterations; iteration++)
                         {
-                            cmd.CommandText =
-                                "insert into " + Tablename + " (FileDate,IndexCode,StockKey,EffectiveDate,CUSIP,Ticker,GicsCode,MarketCap,Weight,TotalReturn) " +
-                                "Values (@FileDate,@IndexCode,@StockKey,@EffectiveDate,@CUSIP,@Ticker,@GicsCode,@MarketCap,@Weight,@TotalReturn)";
-                            cmd.ExecuteNonQuery();
-                            AddCount += 1;
+                            if (iteration == 2)
+                            {
+                                cmd.Parameters["@IndexCode"].Value = IndexCodeParsed2;
+                            }
+
+                            SqlSelect = "select count(*) from" + Tablename;
+                            cmd.CommandText = SqlSelect + SqlWhere;
+                            int iCount = (int)cmd.ExecuteScalar();
+                            if (iCount == 0)
+                            {
+                                cmd.CommandText =
+                                    "insert into " + Tablename + " (FileDate,IndexCode,StockKey,EffectiveDate,CUSIP,Ticker,GicsCode,MarketCap,Weight,TotalReturn) " +
+                                    "Values (@FileDate,@IndexCode,@StockKey,@EffectiveDate,@CUSIP,@Ticker,@GicsCode,@MarketCap,@Weight,@TotalReturn)";
+                                cmd.ExecuteNonQuery();
+                                AddCount += 1;
+                            }
                         }
                     }
                     catch (SqlException ex)

@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Diagnostics;
 using System.IO;
+using System.Configuration;
 
 namespace AdventUtilityLibrary
 {
@@ -12,7 +13,8 @@ namespace AdventUtilityLibrary
     {
         private StreamWriter swLogFile = null;
         private string LogFileName;
-        private string OutputPath = @"C:\A_Development\visual studio 2017\AdventProjects\IndexDataForm\IndexDataForm\Output\";
+//        private string OutputPath = @"C:\A_Development\visual studio 2017\AdventProjects\IndexDataForm\IndexDataForm\Output\";
+        private string OutputPath = @"";
 
         public LogHelper()
         {

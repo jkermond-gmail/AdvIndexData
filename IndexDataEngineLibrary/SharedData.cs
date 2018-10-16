@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using System.Data.SqlClient;
 using System.Data;
 using AdventUtilityLibrary;
+using System.Configuration;
+
 
 namespace IndexDataEngineLibrary
 {
@@ -31,8 +33,9 @@ namespace IndexDataEngineLibrary
 
     internal sealed class SharedData
     {
-        //        private string mConnectionString = "server=VSTGMDDB2-1;database=IndexData;uid=sa;pwd=M@gichat!";
-        private string mConnectionString = @"server=JKERMOND-NEW\SQLEXPRESS2014;database=IndexData;uid=sa;pwd=M@gichat!";
+        //private string mConnectionString = "server=VSTGMDDB2-1;database=IndexData;uid=sa;pwd=M@gichat!";
+        //private string mConnectionString = @"server=JKERMOND-NEW\SQLEXPRESS2014;database=IndexData;uid=sa;pwd=M@gichat!";
+        private string mConnectionString = null;
 
         private LogHelper logHelper;
 
@@ -47,7 +50,7 @@ namespace IndexDataEngineLibrary
             set { mVendor = value; }
         }
 
-        internal string ConnectionString
+        public string ConnectionString
         {
             get { return mConnectionString; }
         }
@@ -55,6 +58,7 @@ namespace IndexDataEngineLibrary
         public SharedData(LogHelper appLogHelper)
         {
             logHelper = appLogHelper;
+            mConnectionString = ConfigurationManager.ConnectionStrings["dbConnectionIndexData"].ConnectionString;
         }
 
 

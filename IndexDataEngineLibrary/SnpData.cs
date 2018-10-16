@@ -56,7 +56,19 @@ namespace IndexDataEngineLibrary
             DateHelper.ConnectionString = sharedData.ConnectionString;
             sharedData.Vendor = Vendors.Snp;
             mSqlConn = new SqlConnection(sharedData.ConnectionString);
-            mSqlConn.Open();
+            try
+            {
+                mSqlConn.Open();
+            }
+            catch( SqlException ex)
+            {
+                Console.WriteLine(sharedData.ConnectionString);
+                Console.WriteLine(ex.Message);
+            }
+            finally
+            {
+            }
+
             CultureInfo mEnUS = new CultureInfo("en-US");
         }
 

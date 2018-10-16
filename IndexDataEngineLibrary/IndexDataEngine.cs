@@ -8,6 +8,7 @@ using AdventUtilityLibrary;
 using System.Data;
 using System.Data.SqlClient;
 using System.Globalization;
+using System.Configuration;
 
 
 namespace IndexDataEngineLibrary
@@ -15,16 +16,12 @@ namespace IndexDataEngineLibrary
     public class IndexDataEngine
     {
         private LogHelper logHelper;
-        //private string sConnectionIndexData = "server=VSTGMDDB2-1;database=IndexData;uid=sa;pwd=M@gichat!";
-        //            //connectionString = ConfigurationManager.AppSettings["AdoConnectionString"];
 
-        private string sConnectionIndexData = @"server=JKERMOND-NEW\SQLEXPRESS2014;database=IndexData;uid=sa;pwd=M@gichat!";
-
-        //private string sConnectionAmdVifsDB = "server=VSTGMDDB2-1;database=AmdVifsDB;uid=sa;pwd=M@gichat!";
-        private string sConnectionAmdVifsDB = @"server=JKERMOND-NEW\SQLEXPRESS2014;database=AmdVifsDB;uid=sa;pwd=M@gichat!";
+        private string sConnectionIndexData = null;
+        private string sConnectionAmdVifs = null;
 
         private SqlConnection cnSqlIndexData = null;
-        private SqlConnection cnSqlAmdVifsDB = null;
+        private SqlConnection cnSqlAmdVifs = null;
         //private string sProcessDate ;
         //private DateTime ProcessDate;
 
@@ -44,7 +41,10 @@ namespace IndexDataEngineLibrary
         public void Run()
         {
             logHelper.Info("IndexDataEngine.Run", "IndexDataEngineLibrary");
-            //BeginSql();
+            sConnectionIndexData = ConfigurationManager.ConnectionStrings["dbConnectionIndexData"].ConnectionString;
+            sConnectionAmdVifs = ConfigurationManager.ConnectionStrings["dbConnectionAmdVifs"].ConnectionString;
+
+            BeginSql();
 
             //sProcessDate = VIFLastProcessDate();
 
@@ -63,8 +63,8 @@ namespace IndexDataEngineLibrary
         {
             cnSqlIndexData = new SqlConnection(sConnectionIndexData);
             cnSqlIndexData.Open();
-            cnSqlAmdVifsDB = new SqlConnection(sConnectionAmdVifsDB);
-            cnSqlAmdVifsDB.Open();
+            cnSqlAmdVifs = new SqlConnection(sConnectionAmdVifs);
+            cnSqlAmdVifs.Open();
             /*
              * https://www.codeproject.com/Tips/555870/SQL-Helper-Class-Microsoft-NET-Utility
              * http://www.blackbeltcoder.com/Articles/ado/an-ado-net-sql-helper-class
@@ -98,7 +98,7 @@ namespace IndexDataEngineLibrary
                     WHERE SettingName = @SettingName
                     ";
             string sColumn = "SettingValue";
-            using (AdoHelper db = new AdoHelper(sConnectionAmdVifsDB))
+            using (AdoHelper db = new AdoHelper(sConnectionAmdVifs))
             using (SqlDataReader dr = db.ExecDataReader(SqlSelect, "@SettingName", SettingName))
             {
                 sSettingValue = db.ReadDataReader(dr, sColumn);
@@ -119,7 +119,7 @@ namespace IndexDataEngineLibrary
                     WHERE SettingName = @SettingName
                     ";
 
-                SqlCommand cmd1 = new SqlCommand(SqlSelect, cnSqlAmdVifsDB);
+                SqlCommand cmd1 = new SqlCommand(SqlSelect, cnSqlAmdVifs);
                 cmd1.Parameters.Add("@SettingName", SqlDbType.VarChar);
                 cmd1.Parameters["@SettingName"].Value = SettingName;
                 dr1 = cmd1.ExecuteReader();
@@ -142,7 +142,7 @@ namespace IndexDataEngineLibrary
             finally
             {
                 dr1.Close();
-                //cnSqlAmdVifsDB.Close();
+                //cnSqlAmdVifs.Close();
             }
 
             return (SettingValue);
@@ -168,7 +168,7 @@ namespace IndexDataEngineLibrary
         private void EndSql()
         {
             cnSqlIndexData.Close();
-            cnSqlAmdVifsDB.Close();
+            cnSqlAmdVifs.Close();
         }
 
 

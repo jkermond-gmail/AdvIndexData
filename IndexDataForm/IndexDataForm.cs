@@ -18,13 +18,17 @@ namespace IndexDataForm
     public partial class IndexDataForm : Form
     {
         internal int TIMER_INTERVAL = 1000 * 2;                         // 2 seconds
+        //internal int TIMER_INTERVAL = 1000 * 20;                         // 20 seconds
         //internal int TIMER_INTERVAL = 60 * 1000 * 2;                         // 2 min
         //internal int TIMER_HOLD_WHILE_WORKING_INTERVAL = 60 * 1000 * 200 ;   // 200 min
+
+        //private System.Timers.Timer timer1 = new System.Timers.Timer();
 
         private IndexDataEngine indexDataEngine;
         private LogHelper logHelper;
         private RussellData russellData = null;
         private SnpData snpData = null;
+
 
         public IndexDataForm()
         {

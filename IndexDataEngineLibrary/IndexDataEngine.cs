@@ -22,8 +22,10 @@ namespace IndexDataEngineLibrary
 
         private SqlConnection cnSqlIndexData = null;
         private SqlConnection cnSqlAmdVifs = null;
-        //private string sProcessDate ;
-        //private DateTime ProcessDate;
+        private string sAmdVifsProcessDate ;
+        private DateTime AmdVifsProcessDate;
+        private string sIndexDataProcessDate;
+        private DateTime IndexDataProcessDate;
 
         public IndexDataEngine()
         {
@@ -46,9 +48,17 @@ namespace IndexDataEngineLibrary
 
             BeginSql();
 
-            //sProcessDate = VIFLastProcessDate();
+            sAmdVifsProcessDate = getVIFsProcessDate();
+            AmdVifsProcessDate = DateTime.ParseExact(sAmdVifsProcessDate, "MM/dd/yyyy", CultureInfo.InvariantCulture);
+            sIndexDataProcessDate = getIndexDataProcessDate();
+            IndexDataProcessDate = DateTime.ParseExact(sIndexDataProcessDate, "MM/dd/yyyy", CultureInfo.InvariantCulture);
 
-            //ProcessDate = DateTime.ParseExact(sProcessDate, "MM/dd/yyyy", CultureInfo.InvariantCulture);
+            if( AmdVifsProcessDate > IndexDataProcessDate)
+            {
+                // Initialize everything cuz its a new day
+                setIndexDataProcessDate(sAmdVifsProcessDate);
+            }
+            ProcessIndexDataWork();
             //RussellData russellData = new RussellData(logHelper);
             //russellData.SetConnectionString(sConnectionIndexData);
             //DateTime StartDate = DateTime.ParseExact("01/03/2017", "MM/dd/yyyy", CultureInfo.InvariantCulture);
@@ -56,6 +66,11 @@ namespace IndexDataEngineLibrary
             //russellData.ProcessRussellHoldingsFiles(StartDate, EndDate, true, true);
 
             //EndSql();
+
+        }
+
+        private void ProcessIndexDataWork()
+        {
 
         }
 
@@ -81,33 +96,33 @@ namespace IndexDataEngineLibrary
         /// getVIFLastProcessDate
         /// </summary>
         /// <returns></returns>
-        private string VIFLastProcessDateOld()
-        {
-                return(getSystemSettingValue("VIFLastProcessDate"));
-        }
+        //private string VIFLastProcessDateOld()
+        //{
+        //        return(getSystemSettingValue("VIFLastProcessDate"));
+        //}
         
 
 
-        private string getSystemSettingValue(string SettingName)
+        private string getSystemSettingValue(string SettingName, SqlConnection sqlConnection)
         {
 
-            string sSettingValue = "";
-            string SqlSelect = @"
-                    SELECT SettingValue 
-                    FROM SystemSettings 
-                    WHERE SettingName = @SettingName
-                    ";
-            string sColumn = "SettingValue";
-            using (AdoHelper db = new AdoHelper(sConnectionAmdVifs))
-            using (SqlDataReader dr = db.ExecDataReader(SqlSelect, "@SettingName", SettingName))
-            {
-                sSettingValue = db.ReadDataReader(dr, sColumn);
-                dr.Close();
-            }
-            return (sSettingValue);
+            //string sSettingValue = "";
+            //string SqlSelect = @"
+            //        SELECT SettingValue 
+            //        FROM SystemSettings 
+            //        WHERE SettingName = @SettingName
+            //        ";
+            //string sColumn = "SettingValue";
+            //using (AdoHelper db = new AdoHelper(sConnection))
+            //using (SqlDataReader dr = db.ExecDataReader(SqlSelect, "@SettingName", SettingName))
+            //{
+            //    sSettingValue = db.ReadDataReader(dr, sColumn);
+            //    dr.Close();
+            //}
+            //return (sSettingValue);
 
 
-            /*
+
             string SettingValue = "";
             SqlDataReader dr1 = null;
 
@@ -119,7 +134,7 @@ namespace IndexDataEngineLibrary
                     WHERE SettingName = @SettingName
                     ";
 
-                SqlCommand cmd1 = new SqlCommand(SqlSelect, cnSqlAmdVifs);
+                SqlCommand cmd1 = new SqlCommand(SqlSelect, sqlConnection);
                 cmd1.Parameters.Add("@SettingName", SqlDbType.VarChar);
                 cmd1.Parameters["@SettingName"].Value = SettingName;
                 dr1 = cmd1.ExecuteReader();
@@ -142,25 +157,60 @@ namespace IndexDataEngineLibrary
             finally
             {
                 dr1.Close();
-                //cnSqlAmdVifs.Close();
             }
 
             return (SettingValue);
-            */
+
         }
 
-        public static void setSystemSettingValue(string SettingName, string SettingValue)
+        public static void setSystemSettingValue(string SettingName, string SettingValue, SqlConnection sqlConnection)
         {
-            string sSql = "update SystemSettings set SettingValue = '" +
-                SettingValue.ToString() + "' WHERE SettingName = '" + SettingName.ToString() + "'";
+
+
+            SqlCommand cmd = null;
+
+            try
+            {
+                cmd = new SqlCommand
+                {
+                    Connection = sqlConnection,
+                    CommandText =
+                        "update SystemSettings set SettingValue = '" + SettingValue.ToString() + "' WHERE SettingName = '" + SettingName.ToString() + "'"
+                };
+
+                cmd.ExecuteNonQuery();
+            }
+            catch (SqlException ex)
+            {
+                Console.WriteLine(ex.Message);
+                //LogHelper.WriteLine(logFuncName + " " + colName + " " + ex.Message);
+            }
+            finally
+            {
+                //LogHelper.WriteLine(logFuncName + "Rows Updated " + updateCount + " " + colName);
+            }
         }
 
 
-        private string VIFLastProcessDate()
+
+
+        private string getVIFsProcessDate()
         {
             string sDate = "";
-            sDate = getSystemSettingValue("VIFLastProcessDate");
+            sDate = getSystemSettingValue("VIFLastProcessDate", cnSqlAmdVifs);
             return (sDate);
+        }
+
+        private string getIndexDataProcessDate()
+        {
+            string sDate = "";
+            sDate = getSystemSettingValue("IndexDataProcessDate", cnSqlIndexData);
+            return (sDate);
+        }
+
+        private void setIndexDataProcessDate(string sDate)
+        {
+            setSystemSettingValue("IndexDataProcessDate", sDate, cnSqlIndexData);
         }
 
 

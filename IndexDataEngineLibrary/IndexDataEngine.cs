@@ -22,7 +22,7 @@ namespace IndexDataEngineLibrary
 
         private SqlConnection cnSqlIndexData = null;
         private SqlConnection cnSqlAmdVifs = null;
-        private string sAmdVifsProcessDate ;
+        private string sAmdVifsProcessDate;
         private DateTime AmdVifsProcessDate;
         private string sIndexDataProcessDate;
         private DateTime IndexDataProcessDate;
@@ -32,7 +32,7 @@ namespace IndexDataEngineLibrary
             Trace.WriteLine("IndexDataEngine()");
         }
 
-        public IndexDataEngine( LogHelper appLogHelper)
+        public IndexDataEngine(LogHelper appLogHelper)
         {
             logHelper = appLogHelper;
             logHelper.Info("IndexDataEngine()", "IndexDataEngineLibrary");
@@ -53,12 +53,12 @@ namespace IndexDataEngineLibrary
             sIndexDataProcessDate = getIndexDataProcessDate();
             IndexDataProcessDate = DateTime.ParseExact(sIndexDataProcessDate, "MM/dd/yyyy", CultureInfo.InvariantCulture);
 
-            if( AmdVifsProcessDate > IndexDataProcessDate)
+            if (AmdVifsProcessDate > IndexDataProcessDate)
             {
                 // Initialize everything cuz its a new day
                 setIndexDataProcessDate(sAmdVifsProcessDate);
             }
-            ProcessIndexDataWork();
+            ProcessIndexDataWork(sAmdVifsProcessDate);
             //RussellData russellData = new RussellData(logHelper);
             //russellData.SetConnectionString(sConnectionIndexData);
             //DateTime StartDate = DateTime.ParseExact("01/03/2017", "MM/dd/yyyy", CultureInfo.InvariantCulture);
@@ -69,10 +69,157 @@ namespace IndexDataEngineLibrary
 
         }
 
-        private void ProcessIndexDataWork()
+        private void ProcessIndexDataWork(string sProcessDate)
         {
+            //List<IndexRow> indexRowsTickerSort = new List<IndexRow>();
+
+            //var list = new List<KeyValuePair<string, int>>();
+            //list.Add(new KeyValuePair<string, int>("Cat", 1));
+            //list.Add(new KeyValuePair<string, int>("Dog", 2));
+            //list.Add(new KeyValuePair<string, int>("Rabbit", 4));
+
+            List<KeyValuePair<string, string>> listVendorDatasets = null;
+
+            getVendorDatasets(out listVendorDatasets);
+
+            string vendor = "";
+            string dataset = "";
+            int FilesTotal = 0;
+            int FilesDownloaded = 0;
+
+
+            foreach (KeyValuePair<string, string> element in listVendorDatasets)
+            {
+
+                vendor = element.Key.ToString();
+                dataset = element.Value.ToString();
+                bool downloaded = IsVendorDatasetDownloaded(vendor, dataset, sProcessDate, out FilesTotal, out FilesDownloaded);
+                logHelper.WriteLine("Vendor | " + vendor + " | Dataset | " + dataset + " | sProcessDate | " + sProcessDate + " | FilesDownloaded | "
+                                    + FilesDownloaded + " | FilesTotal | " + FilesTotal);
+            }
 
         }
+
+        private bool IsVendorDatasetDownloaded( string Vendor, string Dataset, string sProcessDate, out int FilesTotal, out int FilesDownloaded)
+        {
+            FilesTotal = 0;
+            FilesDownloaded = 0;
+            bool isDownloaded = false;
+            SqlCommand cmd = null;
+
+            string commandText = @"
+                select count(*) as FilesTotal from VIFs
+                where Vendor = @Vendor and DataSet = @Dataset and [Application] = 'IDX' and Active = 'Yes'
+                ";
+            try
+            {
+                cmd = new SqlCommand
+                {
+                    Connection = cnSqlAmdVifs,
+                    CommandText = commandText
+                };
+
+                cmd.Parameters.Add("@Vendor", SqlDbType.VarChar);
+                cmd.Parameters["@Vendor"].Value = Vendor;
+                cmd.Parameters.Add("@Dataset", SqlDbType.VarChar);
+                cmd.Parameters["@Dataset"].Value = Dataset;
+
+                SqlDataReader dr = null;
+                dr = cmd.ExecuteReader();
+                if (dr.HasRows)
+                {
+                    dr.Read();
+                    //string val = dr[0].ToString();
+                    string val = dr["FilesTotal"].ToString();
+                    FilesTotal = Convert.ToInt32(val);
+                }
+                dr.Close();
+
+                if( FilesTotal > 0)
+                {
+                    cmd.Parameters.Add("@ProcessDate", SqlDbType.Date);
+                    cmd.Parameters["@ProcessDate"].Value = sProcessDate;
+                    cmd.CommandText = @"
+                        select count(*) as FilesDownloaded from VIFs
+                        where Vendor = @Vendor and DataSet = @Dataset and LastProcessDate = @ProcessDate 
+                        and [Application] = 'IDX' and Active = 'Yes'
+                        ";
+                    dr = cmd.ExecuteReader();
+                    if (dr.HasRows)
+                    {
+                        dr.Read();
+                        string val = dr[0].ToString();
+                        val = dr["FilesDownloaded"].ToString();
+                        FilesDownloaded = Convert.ToInt32(val);
+                        isDownloaded = (FilesTotal.Equals(FilesDownloaded) == true);
+                    }
+                    dr.Close();
+                }
+            }
+            catch (SqlException ex)
+            {
+                //LogHelper.WriteLine(logFuncName + " " + ex.Message);
+            }
+            finally
+            {
+                //  LogHelper.WriteLine(logFuncName + " done " );
+            }
+
+            return (isDownloaded);
+        }
+
+        private void getVendorDatasets(out List<KeyValuePair<string,string>> listVendorDatasets)
+        {
+            string logFuncName = "getVendorDatasets: ";
+
+            //LogHelper.WriteLine(logFuncName );
+
+            listVendorDatasets = new List<KeyValuePair<string, string>>();
+
+            SqlCommand cmd = null;
+            string vendor = "";
+            string dataset = "";
+
+            string commandText = @"
+                SELECT distinct Vendor, Dataset
+                FROM Jobs
+                where JobType = 'Vendor' and Active = 'Yes'
+                order by Vendor, DataSet 
+                ";
+            try
+            {
+                cmd = new SqlCommand
+                {
+                    Connection = cnSqlIndexData,
+                    CommandText = commandText
+                };
+
+                SqlDataReader dr = null;
+                dr = cmd.ExecuteReader();
+                int rows = 0;
+                if (dr.HasRows)
+                {
+                    while (dr.Read())
+                    {
+                        rows += 1;
+                        vendor = dr["Vendor"].ToString();
+                        dataset = dr["Dataset"].ToString();
+                        listVendorDatasets.Add(new KeyValuePair<string, string>(vendor, dataset));
+                    }
+                }
+                dr.Close();
+            }
+            catch (SqlException ex)
+            {
+                //LogHelper.WriteLine(logFuncName + " " + ex.Message);
+            }
+            finally
+            {
+                //  LogHelper.WriteLine(logFuncName + " done " );
+            }
+            return;
+        }
+
 
         private void BeginSql()
         {

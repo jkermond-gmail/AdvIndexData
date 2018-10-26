@@ -1,0 +1,498 @@
+getVendorDatasets:  done 
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | Russell | Dataset | RGS | sProcessDate | 10/22/2018 | FilesDownloaded | 3 | FilesTotal | 3
+getVendorDatasets:  done 
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | Russell | Dataset | RGS | sProcessDate | 10/22/2018 | FilesDownloaded | 3 | FilesTotal | 3
+AreVendorDatasetJobsProcessed:  done 
+Vendor | Russell | Dataset | RGS | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 2
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | StandardAndPoors | Dataset | sp100 | sProcessDate | 10/22/2018 | FilesDownloaded | 3 | FilesTotal | 3
+AreVendorDatasetJobsProcessed:  done 
+Vendor | StandardAndPoors | Dataset | sp100 | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 2
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | StandardAndPoors | Dataset | sp1000 | sProcessDate | 10/22/2018 | FilesDownloaded | 2 | FilesTotal | 2
+AreVendorDatasetJobsProcessed:  done 
+Vendor | StandardAndPoors | Dataset | sp1000 | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 2
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | StandardAndPoors | Dataset | sp1500 | sProcessDate | 10/22/2018 | FilesDownloaded | 4 | FilesTotal | 4
+AreVendorDatasetJobsProcessed:  done 
+Vendor | StandardAndPoors | Dataset | sp1500 | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 2
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | StandardAndPoors | Dataset | sp400 | sProcessDate | 10/22/2018 | FilesDownloaded | 4 | FilesTotal | 4
+AreVendorDatasetJobsProcessed:  done 
+Vendor | StandardAndPoors | Dataset | sp400 | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 2
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | StandardAndPoors | Dataset | sp500 | sProcessDate | 10/22/2018 | FilesDownloaded | 4 | FilesTotal | 4
+AreVendorDatasetJobsProcessed:  done 
+Vendor | StandardAndPoors | Dataset | sp500 | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 2
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | StandardAndPoors | Dataset | sp600 | sProcessDate | 10/22/2018 | FilesDownloaded | 4 | FilesTotal | 4
+AreVendorDatasetJobsProcessed:  done 
+Vendor | StandardAndPoors | Dataset | sp600 | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 2
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | StandardAndPoors | Dataset | spMLP | sProcessDate | 10/22/2018 | FilesDownloaded | 4 | FilesTotal | 4
+AreVendorDatasetJobsProcessed:  done 
+Vendor | StandardAndPoors | Dataset | spMLP | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 1
+getVendorDatasets:  done 
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | Russell | Dataset | RGS | sProcessDate | 10/22/2018 | FilesDownloaded | 3 | FilesTotal | 3
+AreVendorDatasetJobsProcessed:  done 
+Vendor | Russell | Dataset | RGS | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 2
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | StandardAndPoors | Dataset | sp100 | sProcessDate | 10/22/2018 | FilesDownloaded | 3 | FilesTotal | 3
+AreVendorDatasetJobsProcessed:  done 
+Vendor | StandardAndPoors | Dataset | sp100 | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 2
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | StandardAndPoors | Dataset | sp1000 | sProcessDate | 10/22/2018 | FilesDownloaded | 2 | FilesTotal | 2
+AreVendorDatasetJobsProcessed:  done 
+Vendor | StandardAndPoors | Dataset | sp1000 | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 2
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | StandardAndPoors | Dataset | sp1500 | sProcessDate | 10/22/2018 | FilesDownloaded | 4 | FilesTotal | 4
+AreVendorDatasetJobsProcessed:  done 
+Vendor | StandardAndPoors | Dataset | sp1500 | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 2
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | StandardAndPoors | Dataset | sp400 | sProcessDate | 10/22/2018 | FilesDownloaded | 4 | FilesTotal | 4
+AreVendorDatasetJobsProcessed:  done 
+Vendor | StandardAndPoors | Dataset | sp400 | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 2
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | StandardAndPoors | Dataset | sp500 | sProcessDate | 10/22/2018 | FilesDownloaded | 4 | FilesTotal | 4
+AreVendorDatasetJobsProcessed:  done 
+Vendor | StandardAndPoors | Dataset | sp500 | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 2
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | StandardAndPoors | Dataset | sp600 | sProcessDate | 10/22/2018 | FilesDownloaded | 4 | FilesTotal | 4
+AreVendorDatasetJobsProcessed:  done 
+Vendor | StandardAndPoors | Dataset | sp600 | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 2
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | StandardAndPoors | Dataset | spMLP | sProcessDate | 10/22/2018 | FilesDownloaded | 4 | FilesTotal | 4
+AreVendorDatasetJobsProcessed:  done 
+Vendor | StandardAndPoors | Dataset | spMLP | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 1
+getVendorDatasets:  done 
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | Russell | Dataset | RGS | sProcessDate | 10/22/2018 | FilesDownloaded | 3 | FilesTotal | 3
+AreVendorDatasetJobsProcessed:  done 
+Vendor | Russell | Dataset | RGS | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 2
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | StandardAndPoors | Dataset | sp100 | sProcessDate | 10/22/2018 | FilesDownloaded | 3 | FilesTotal | 3
+AreVendorDatasetJobsProcessed:  done 
+Vendor | StandardAndPoors | Dataset | sp100 | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 2
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | StandardAndPoors | Dataset | sp1000 | sProcessDate | 10/22/2018 | FilesDownloaded | 2 | FilesTotal | 2
+AreVendorDatasetJobsProcessed:  done 
+Vendor | StandardAndPoors | Dataset | sp1000 | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 2
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | StandardAndPoors | Dataset | sp1500 | sProcessDate | 10/22/2018 | FilesDownloaded | 4 | FilesTotal | 4
+AreVendorDatasetJobsProcessed:  done 
+Vendor | StandardAndPoors | Dataset | sp1500 | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 2
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | StandardAndPoors | Dataset | sp400 | sProcessDate | 10/22/2018 | FilesDownloaded | 4 | FilesTotal | 4
+AreVendorDatasetJobsProcessed:  done 
+Vendor | StandardAndPoors | Dataset | sp400 | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 2
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | StandardAndPoors | Dataset | sp500 | sProcessDate | 10/22/2018 | FilesDownloaded | 4 | FilesTotal | 4
+AreVendorDatasetJobsProcessed:  done 
+Vendor | StandardAndPoors | Dataset | sp500 | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 2
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | StandardAndPoors | Dataset | sp600 | sProcessDate | 10/22/2018 | FilesDownloaded | 4 | FilesTotal | 4
+AreVendorDatasetJobsProcessed:  done 
+Vendor | StandardAndPoors | Dataset | sp600 | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 2
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | StandardAndPoors | Dataset | spMLP | sProcessDate | 10/22/2018 | FilesDownloaded | 4 | FilesTotal | 4
+AreVendorDatasetJobsProcessed:  done 
+Vendor | StandardAndPoors | Dataset | spMLP | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 1
+getVendorDatasets:  done 
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | Russell | Dataset | RGS | sProcessDate | 10/22/2018 | FilesDownloaded | 3 | FilesTotal | 3
+AreVendorDatasetJobsProcessed:  done 
+Vendor | Russell | Dataset | RGS | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 2
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | StandardAndPoors | Dataset | sp100 | sProcessDate | 10/22/2018 | FilesDownloaded | 3 | FilesTotal | 3
+AreVendorDatasetJobsProcessed:  done 
+Vendor | StandardAndPoors | Dataset | sp100 | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 2
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | StandardAndPoors | Dataset | sp1000 | sProcessDate | 10/22/2018 | FilesDownloaded | 2 | FilesTotal | 2
+AreVendorDatasetJobsProcessed:  done 
+Vendor | StandardAndPoors | Dataset | sp1000 | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 2
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | StandardAndPoors | Dataset | sp1500 | sProcessDate | 10/22/2018 | FilesDownloaded | 4 | FilesTotal | 4
+AreVendorDatasetJobsProcessed:  done 
+Vendor | StandardAndPoors | Dataset | sp1500 | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 2
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | StandardAndPoors | Dataset | sp400 | sProcessDate | 10/22/2018 | FilesDownloaded | 4 | FilesTotal | 4
+AreVendorDatasetJobsProcessed:  done 
+Vendor | StandardAndPoors | Dataset | sp400 | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 2
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | StandardAndPoors | Dataset | sp500 | sProcessDate | 10/22/2018 | FilesDownloaded | 4 | FilesTotal | 4
+AreVendorDatasetJobsProcessed:  done 
+Vendor | StandardAndPoors | Dataset | sp500 | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 2
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | StandardAndPoors | Dataset | sp600 | sProcessDate | 10/22/2018 | FilesDownloaded | 4 | FilesTotal | 4
+AreVendorDatasetJobsProcessed:  done 
+Vendor | StandardAndPoors | Dataset | sp600 | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 2
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | StandardAndPoors | Dataset | spMLP | sProcessDate | 10/22/2018 | FilesDownloaded | 4 | FilesTotal | 4
+AreVendorDatasetJobsProcessed:  done 
+Vendor | StandardAndPoors | Dataset | spMLP | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 1
+getVendorDatasets:  done 
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | Russell | Dataset | RGS | sProcessDate | 10/22/2018 | FilesDownloaded | 3 | FilesTotal | 3
+AreVendorDatasetJobsProcessed:  done 
+Vendor | Russell | Dataset | RGS | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 2
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | StandardAndPoors | Dataset | sp100 | sProcessDate | 10/22/2018 | FilesDownloaded | 3 | FilesTotal | 3
+AreVendorDatasetJobsProcessed:  done 
+Vendor | StandardAndPoors | Dataset | sp100 | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 2
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | StandardAndPoors | Dataset | sp1000 | sProcessDate | 10/22/2018 | FilesDownloaded | 2 | FilesTotal | 2
+AreVendorDatasetJobsProcessed:  done 
+Vendor | StandardAndPoors | Dataset | sp1000 | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 2
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | StandardAndPoors | Dataset | sp1500 | sProcessDate | 10/22/2018 | FilesDownloaded | 4 | FilesTotal | 4
+AreVendorDatasetJobsProcessed:  done 
+Vendor | StandardAndPoors | Dataset | sp1500 | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 2
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | StandardAndPoors | Dataset | sp400 | sProcessDate | 10/22/2018 | FilesDownloaded | 4 | FilesTotal | 4
+AreVendorDatasetJobsProcessed:  done 
+Vendor | StandardAndPoors | Dataset | sp400 | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 2
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | StandardAndPoors | Dataset | sp500 | sProcessDate | 10/22/2018 | FilesDownloaded | 4 | FilesTotal | 4
+AreVendorDatasetJobsProcessed:  done 
+Vendor | StandardAndPoors | Dataset | sp500 | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 2
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | StandardAndPoors | Dataset | sp600 | sProcessDate | 10/22/2018 | FilesDownloaded | 4 | FilesTotal | 4
+AreVendorDatasetJobsProcessed:  done 
+Vendor | StandardAndPoors | Dataset | sp600 | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 2
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | StandardAndPoors | Dataset | spMLP | sProcessDate | 10/22/2018 | FilesDownloaded | 4 | FilesTotal | 4
+AreVendorDatasetJobsProcessed:  done 
+Vendor | StandardAndPoors | Dataset | spMLP | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 1
+getVendorDatasets:  done 
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | Russell | Dataset | RGS | sProcessDate | 10/22/2018 | FilesDownloaded | 3 | FilesTotal | 3
+AreVendorDatasetJobsProcessed:  done 
+Vendor | Russell | Dataset | RGS | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 2
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | StandardAndPoors | Dataset | sp100 | sProcessDate | 10/22/2018 | FilesDownloaded | 3 | FilesTotal | 3
+AreVendorDatasetJobsProcessed:  done 
+Vendor | StandardAndPoors | Dataset | sp100 | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 2
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | StandardAndPoors | Dataset | sp1000 | sProcessDate | 10/22/2018 | FilesDownloaded | 2 | FilesTotal | 2
+AreVendorDatasetJobsProcessed:  done 
+Vendor | StandardAndPoors | Dataset | sp1000 | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 2
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | StandardAndPoors | Dataset | sp1500 | sProcessDate | 10/22/2018 | FilesDownloaded | 4 | FilesTotal | 4
+AreVendorDatasetJobsProcessed:  done 
+Vendor | StandardAndPoors | Dataset | sp1500 | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 2
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | StandardAndPoors | Dataset | sp400 | sProcessDate | 10/22/2018 | FilesDownloaded | 4 | FilesTotal | 4
+AreVendorDatasetJobsProcessed:  done 
+Vendor | StandardAndPoors | Dataset | sp400 | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 2
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | StandardAndPoors | Dataset | sp500 | sProcessDate | 10/22/2018 | FilesDownloaded | 4 | FilesTotal | 4
+AreVendorDatasetJobsProcessed:  done 
+Vendor | StandardAndPoors | Dataset | sp500 | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 2
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | StandardAndPoors | Dataset | sp600 | sProcessDate | 10/22/2018 | FilesDownloaded | 4 | FilesTotal | 4
+AreVendorDatasetJobsProcessed:  done 
+Vendor | StandardAndPoors | Dataset | sp600 | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 2
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | StandardAndPoors | Dataset | spMLP | sProcessDate | 10/22/2018 | FilesDownloaded | 4 | FilesTotal | 4
+AreVendorDatasetJobsProcessed:  done 
+Vendor | StandardAndPoors | Dataset | spMLP | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 1
+getVendorDatasets:  done 
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | Russell | Dataset | RGS | sProcessDate | 10/22/2018 | FilesDownloaded | 3 | FilesTotal | 3
+AreVendorDatasetJobsProcessed:  done 
+Vendor | Russell | Dataset | RGS | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 2
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | StandardAndPoors | Dataset | sp100 | sProcessDate | 10/22/2018 | FilesDownloaded | 3 | FilesTotal | 3
+AreVendorDatasetJobsProcessed:  done 
+Vendor | StandardAndPoors | Dataset | sp100 | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 2
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | StandardAndPoors | Dataset | sp1000 | sProcessDate | 10/22/2018 | FilesDownloaded | 2 | FilesTotal | 2
+AreVendorDatasetJobsProcessed:  done 
+Vendor | StandardAndPoors | Dataset | sp1000 | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 2
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | StandardAndPoors | Dataset | sp1500 | sProcessDate | 10/22/2018 | FilesDownloaded | 4 | FilesTotal | 4
+AreVendorDatasetJobsProcessed:  done 
+Vendor | StandardAndPoors | Dataset | sp1500 | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 2
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | StandardAndPoors | Dataset | sp400 | sProcessDate | 10/22/2018 | FilesDownloaded | 4 | FilesTotal | 4
+AreVendorDatasetJobsProcessed:  done 
+Vendor | StandardAndPoors | Dataset | sp400 | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 2
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | StandardAndPoors | Dataset | sp500 | sProcessDate | 10/22/2018 | FilesDownloaded | 4 | FilesTotal | 4
+AreVendorDatasetJobsProcessed:  done 
+Vendor | StandardAndPoors | Dataset | sp500 | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 2
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | StandardAndPoors | Dataset | sp600 | sProcessDate | 10/22/2018 | FilesDownloaded | 4 | FilesTotal | 4
+AreVendorDatasetJobsProcessed:  done 
+Vendor | StandardAndPoors | Dataset | sp600 | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 2
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | StandardAndPoors | Dataset | spMLP | sProcessDate | 10/22/2018 | FilesDownloaded | 4 | FilesTotal | 4
+AreVendorDatasetJobsProcessed:  done 
+Vendor | StandardAndPoors | Dataset | spMLP | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 1
+getVendorDatasets:  done 
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | Russell | Dataset | RGS | sProcessDate | 10/22/2018 | FilesDownloaded | 3 | FilesTotal | 3
+AreVendorDatasetJobsProcessed:  done 
+Vendor | Russell | Dataset | RGS | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 2
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | StandardAndPoors | Dataset | sp100 | sProcessDate | 10/22/2018 | FilesDownloaded | 3 | FilesTotal | 3
+AreVendorDatasetJobsProcessed:  done 
+Vendor | StandardAndPoors | Dataset | sp100 | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 2
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | StandardAndPoors | Dataset | sp1000 | sProcessDate | 10/22/2018 | FilesDownloaded | 2 | FilesTotal | 2
+AreVendorDatasetJobsProcessed:  done 
+Vendor | StandardAndPoors | Dataset | sp1000 | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 2
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | StandardAndPoors | Dataset | sp1500 | sProcessDate | 10/22/2018 | FilesDownloaded | 4 | FilesTotal | 4
+AreVendorDatasetJobsProcessed:  done 
+Vendor | StandardAndPoors | Dataset | sp1500 | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 2
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | StandardAndPoors | Dataset | sp400 | sProcessDate | 10/22/2018 | FilesDownloaded | 4 | FilesTotal | 4
+AreVendorDatasetJobsProcessed:  done 
+Vendor | StandardAndPoors | Dataset | sp400 | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 2
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | StandardAndPoors | Dataset | sp500 | sProcessDate | 10/22/2018 | FilesDownloaded | 4 | FilesTotal | 4
+AreVendorDatasetJobsProcessed:  done 
+Vendor | StandardAndPoors | Dataset | sp500 | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 2
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | StandardAndPoors | Dataset | sp600 | sProcessDate | 10/22/2018 | FilesDownloaded | 4 | FilesTotal | 4
+AreVendorDatasetJobsProcessed:  done 
+Vendor | StandardAndPoors | Dataset | sp600 | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 2
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | StandardAndPoors | Dataset | spMLP | sProcessDate | 10/22/2018 | FilesDownloaded | 4 | FilesTotal | 4
+AreVendorDatasetJobsProcessed:  done 
+Vendor | StandardAndPoors | Dataset | spMLP | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 1
+getVendorDatasets:  done 
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | Russell | Dataset | RGS | sProcessDate | 10/22/2018 | FilesDownloaded | 3 | FilesTotal | 3
+AreVendorDatasetJobsProcessed:  done 
+Vendor | Russell | Dataset | RGS | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 2
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | StandardAndPoors | Dataset | sp100 | sProcessDate | 10/22/2018 | FilesDownloaded | 3 | FilesTotal | 3
+AreVendorDatasetJobsProcessed:  done 
+Vendor | StandardAndPoors | Dataset | sp100 | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 2
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | StandardAndPoors | Dataset | sp1000 | sProcessDate | 10/22/2018 | FilesDownloaded | 2 | FilesTotal | 2
+AreVendorDatasetJobsProcessed:  done 
+Vendor | StandardAndPoors | Dataset | sp1000 | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 2
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | StandardAndPoors | Dataset | sp1500 | sProcessDate | 10/22/2018 | FilesDownloaded | 4 | FilesTotal | 4
+AreVendorDatasetJobsProcessed:  done 
+Vendor | StandardAndPoors | Dataset | sp1500 | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 2
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | StandardAndPoors | Dataset | sp400 | sProcessDate | 10/22/2018 | FilesDownloaded | 4 | FilesTotal | 4
+AreVendorDatasetJobsProcessed:  done 
+Vendor | StandardAndPoors | Dataset | sp400 | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 2
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | StandardAndPoors | Dataset | sp500 | sProcessDate | 10/22/2018 | FilesDownloaded | 4 | FilesTotal | 4
+AreVendorDatasetJobsProcessed:  done 
+Vendor | StandardAndPoors | Dataset | sp500 | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 2
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | StandardAndPoors | Dataset | sp600 | sProcessDate | 10/22/2018 | FilesDownloaded | 4 | FilesTotal | 4
+AreVendorDatasetJobsProcessed:  done 
+Vendor | StandardAndPoors | Dataset | sp600 | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 2
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | StandardAndPoors | Dataset | spMLP | sProcessDate | 10/22/2018 | FilesDownloaded | 4 | FilesTotal | 4
+AreVendorDatasetJobsProcessed:  done 
+Vendor | StandardAndPoors | Dataset | spMLP | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 1
+getVendorDatasets:  done 
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | Russell | Dataset | RGS | sProcessDate | 10/22/2018 | FilesDownloaded | 3 | FilesTotal | 3
+AreVendorDatasetJobsProcessed:  done 
+Vendor | Russell | Dataset | RGS | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 2
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | StandardAndPoors | Dataset | sp100 | sProcessDate | 10/22/2018 | FilesDownloaded | 3 | FilesTotal | 3
+AreVendorDatasetJobsProcessed:  done 
+Vendor | StandardAndPoors | Dataset | sp100 | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 2
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | StandardAndPoors | Dataset | sp1000 | sProcessDate | 10/22/2018 | FilesDownloaded | 2 | FilesTotal | 2
+AreVendorDatasetJobsProcessed:  done 
+Vendor | StandardAndPoors | Dataset | sp1000 | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 2
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | StandardAndPoors | Dataset | sp1500 | sProcessDate | 10/22/2018 | FilesDownloaded | 4 | FilesTotal | 4
+AreVendorDatasetJobsProcessed:  done 
+Vendor | StandardAndPoors | Dataset | sp1500 | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 2
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | StandardAndPoors | Dataset | sp400 | sProcessDate | 10/22/2018 | FilesDownloaded | 4 | FilesTotal | 4
+AreVendorDatasetJobsProcessed:  done 
+Vendor | StandardAndPoors | Dataset | sp400 | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 2
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | StandardAndPoors | Dataset | sp500 | sProcessDate | 10/22/2018 | FilesDownloaded | 4 | FilesTotal | 4
+AreVendorDatasetJobsProcessed:  done 
+Vendor | StandardAndPoors | Dataset | sp500 | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 2
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | StandardAndPoors | Dataset | sp600 | sProcessDate | 10/22/2018 | FilesDownloaded | 4 | FilesTotal | 4
+AreVendorDatasetJobsProcessed:  done 
+Vendor | StandardAndPoors | Dataset | sp600 | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 2
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | StandardAndPoors | Dataset | spMLP | sProcessDate | 10/22/2018 | FilesDownloaded | 4 | FilesTotal | 4
+AreVendorDatasetJobsProcessed:  done 
+Vendor | StandardAndPoors | Dataset | spMLP | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 1
+getVendorDatasets:  done 
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | Russell | Dataset | RGS | sProcessDate | 10/22/2018 | FilesDownloaded | 3 | FilesTotal | 3
+AreVendorDatasetJobsProcessed:  done 
+Vendor | Russell | Dataset | RGS | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 2
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | StandardAndPoors | Dataset | sp100 | sProcessDate | 10/22/2018 | FilesDownloaded | 3 | FilesTotal | 3
+AreVendorDatasetJobsProcessed:  done 
+Vendor | StandardAndPoors | Dataset | sp100 | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 2
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | StandardAndPoors | Dataset | sp1000 | sProcessDate | 10/22/2018 | FilesDownloaded | 2 | FilesTotal | 2
+AreVendorDatasetJobsProcessed:  done 
+Vendor | StandardAndPoors | Dataset | sp1000 | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 2
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | StandardAndPoors | Dataset | sp1500 | sProcessDate | 10/22/2018 | FilesDownloaded | 4 | FilesTotal | 4
+AreVendorDatasetJobsProcessed:  done 
+Vendor | StandardAndPoors | Dataset | sp1500 | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 2
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | StandardAndPoors | Dataset | sp400 | sProcessDate | 10/22/2018 | FilesDownloaded | 4 | FilesTotal | 4
+AreVendorDatasetJobsProcessed:  done 
+Vendor | StandardAndPoors | Dataset | sp400 | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 2
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | StandardAndPoors | Dataset | sp500 | sProcessDate | 10/22/2018 | FilesDownloaded | 4 | FilesTotal | 4
+AreVendorDatasetJobsProcessed:  done 
+Vendor | StandardAndPoors | Dataset | sp500 | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 2
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | StandardAndPoors | Dataset | sp600 | sProcessDate | 10/22/2018 | FilesDownloaded | 4 | FilesTotal | 4
+AreVendorDatasetJobsProcessed:  done 
+Vendor | StandardAndPoors | Dataset | sp600 | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 2
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | StandardAndPoors | Dataset | spMLP | sProcessDate | 10/22/2018 | FilesDownloaded | 4 | FilesTotal | 4
+AreVendorDatasetJobsProcessed:  done 
+Vendor | StandardAndPoors | Dataset | spMLP | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 1
+getVendorDatasets:  done 
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | Russell | Dataset | RGS | sProcessDate | 10/22/2018 | FilesDownloaded | 3 | FilesTotal | 3
+AreVendorDatasetJobsProcessed:  done 
+Vendor | Russell | Dataset | RGS | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 2
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | StandardAndPoors | Dataset | sp100 | sProcessDate | 10/22/2018 | FilesDownloaded | 3 | FilesTotal | 3
+AreVendorDatasetJobsProcessed:  done 
+Vendor | StandardAndPoors | Dataset | sp100 | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 2
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | StandardAndPoors | Dataset | sp1000 | sProcessDate | 10/22/2018 | FilesDownloaded | 2 | FilesTotal | 2
+AreVendorDatasetJobsProcessed:  done 
+Vendor | StandardAndPoors | Dataset | sp1000 | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 2
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | StandardAndPoors | Dataset | sp1500 | sProcessDate | 10/22/2018 | FilesDownloaded | 4 | FilesTotal | 4
+AreVendorDatasetJobsProcessed:  done 
+Vendor | StandardAndPoors | Dataset | sp1500 | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 2
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | StandardAndPoors | Dataset | sp400 | sProcessDate | 10/22/2018 | FilesDownloaded | 4 | FilesTotal | 4
+AreVendorDatasetJobsProcessed:  done 
+Vendor | StandardAndPoors | Dataset | sp400 | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 2
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | StandardAndPoors | Dataset | sp500 | sProcessDate | 10/22/2018 | FilesDownloaded | 4 | FilesTotal | 4
+AreVendorDatasetJobsProcessed:  done 
+Vendor | StandardAndPoors | Dataset | sp500 | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 2
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | StandardAndPoors | Dataset | sp600 | sProcessDate | 10/22/2018 | FilesDownloaded | 4 | FilesTotal | 4
+AreVendorDatasetJobsProcessed:  done 
+Vendor | StandardAndPoors | Dataset | sp600 | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 2
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | StandardAndPoors | Dataset | spMLP | sProcessDate | 10/22/2018 | FilesDownloaded | 4 | FilesTotal | 4
+AreVendorDatasetJobsProcessed:  done 
+Vendor | StandardAndPoors | Dataset | spMLP | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 1
+getVendorDatasets:  done 
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | Russell | Dataset | RGS | sProcessDate | 10/22/2018 | FilesDownloaded | 3 | FilesTotal | 3
+AreVendorDatasetJobsProcessed:  done 
+Vendor | Russell | Dataset | RGS | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 2
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | StandardAndPoors | Dataset | sp100 | sProcessDate | 10/22/2018 | FilesDownloaded | 3 | FilesTotal | 3
+AreVendorDatasetJobsProcessed:  done 
+Vendor | StandardAndPoors | Dataset | sp100 | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 2
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | StandardAndPoors | Dataset | sp1000 | sProcessDate | 10/22/2018 | FilesDownloaded | 2 | FilesTotal | 2
+AreVendorDatasetJobsProcessed:  done 
+Vendor | StandardAndPoors | Dataset | sp1000 | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 2
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | StandardAndPoors | Dataset | sp1500 | sProcessDate | 10/22/2018 | FilesDownloaded | 4 | FilesTotal | 4
+AreVendorDatasetJobsProcessed:  done 
+Vendor | StandardAndPoors | Dataset | sp1500 | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 2
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | StandardAndPoors | Dataset | sp400 | sProcessDate | 10/22/2018 | FilesDownloaded | 4 | FilesTotal | 4
+AreVendorDatasetJobsProcessed:  done 
+Vendor | StandardAndPoors | Dataset | sp400 | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 2
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | StandardAndPoors | Dataset | sp500 | sProcessDate | 10/22/2018 | FilesDownloaded | 4 | FilesTotal | 4
+AreVendorDatasetJobsProcessed:  done 
+Vendor | StandardAndPoors | Dataset | sp500 | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 2
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | StandardAndPoors | Dataset | sp600 | sProcessDate | 10/22/2018 | FilesDownloaded | 4 | FilesTotal | 4
+AreVendorDatasetJobsProcessed:  done 
+Vendor | StandardAndPoors | Dataset | sp600 | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 2
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | StandardAndPoors | Dataset | spMLP | sProcessDate | 10/22/2018 | FilesDownloaded | 4 | FilesTotal | 4
+AreVendorDatasetJobsProcessed:  done 
+Vendor | StandardAndPoors | Dataset | spMLP | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 1
+getVendorDatasets:  done 
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | Russell | Dataset | RGS | sProcessDate | 10/22/2018 | FilesDownloaded | 3 | FilesTotal | 3
+AreVendorDatasetJobsProcessed:  done 
+Vendor | Russell | Dataset | RGS | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 2
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | StandardAndPoors | Dataset | sp100 | sProcessDate | 10/22/2018 | FilesDownloaded | 3 | FilesTotal | 3
+AreVendorDatasetJobsProcessed:  done 
+Vendor | StandardAndPoors | Dataset | sp100 | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 2
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | StandardAndPoors | Dataset | sp1000 | sProcessDate | 10/22/2018 | FilesDownloaded | 2 | FilesTotal | 2
+AreVendorDatasetJobsProcessed:  done 
+Vendor | StandardAndPoors | Dataset | sp1000 | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 2
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | StandardAndPoors | Dataset | sp1500 | sProcessDate | 10/22/2018 | FilesDownloaded | 4 | FilesTotal | 4
+AreVendorDatasetJobsProcessed:  done 
+Vendor | StandardAndPoors | Dataset | sp1500 | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 2
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | StandardAndPoors | Dataset | sp400 | sProcessDate | 10/22/2018 | FilesDownloaded | 4 | FilesTotal | 4
+AreVendorDatasetJobsProcessed:  done 
+Vendor | StandardAndPoors | Dataset | sp400 | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 2
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | StandardAndPoors | Dataset | sp500 | sProcessDate | 10/22/2018 | FilesDownloaded | 4 | FilesTotal | 4
+AreVendorDatasetJobsProcessed:  done 
+Vendor | StandardAndPoors | Dataset | sp500 | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 2
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | StandardAndPoors | Dataset | sp600 | sProcessDate | 10/22/2018 | FilesDownloaded | 4 | FilesTotal | 4
+AreVendorDatasetJobsProcessed:  done 
+Vendor | StandardAndPoors | Dataset | sp600 | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 2
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | StandardAndPoors | Dataset | spMLP | sProcessDate | 10/22/2018 | FilesDownloaded | 4 | FilesTotal | 4
+AreVendorDatasetJobsProcessed:  done 
+Vendor | StandardAndPoors | Dataset | spMLP | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 1
+getVendorDatasets:  done 
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | Russell | Dataset | RGS | sProcessDate | 10/22/2018 | FilesDownloaded | 3 | FilesTotal | 3
+AreVendorDatasetJobsProcessed:  done 
+Vendor | Russell | Dataset | RGS | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 2
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | StandardAndPoors | Dataset | sp100 | sProcessDate | 10/22/2018 | FilesDownloaded | 3 | FilesTotal | 3
+AreVendorDatasetJobsProcessed:  done 
+Vendor | StandardAndPoors | Dataset | sp100 | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 2
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | StandardAndPoors | Dataset | sp1000 | sProcessDate | 10/22/2018 | FilesDownloaded | 2 | FilesTotal | 2
+AreVendorDatasetJobsProcessed:  done 
+Vendor | StandardAndPoors | Dataset | sp1000 | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 2
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | StandardAndPoors | Dataset | sp1500 | sProcessDate | 10/22/2018 | FilesDownloaded | 4 | FilesTotal | 4
+AreVendorDatasetJobsProcessed:  done 
+Vendor | StandardAndPoors | Dataset | sp1500 | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 2
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | StandardAndPoors | Dataset | sp400 | sProcessDate | 10/22/2018 | FilesDownloaded | 4 | FilesTotal | 4
+AreVendorDatasetJobsProcessed:  done 
+Vendor | StandardAndPoors | Dataset | sp400 | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 2
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | StandardAndPoors | Dataset | sp500 | sProcessDate | 10/22/2018 | FilesDownloaded | 4 | FilesTotal | 4
+AreVendorDatasetJobsProcessed:  done 
+Vendor | StandardAndPoors | Dataset | sp500 | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 2
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | StandardAndPoors | Dataset | sp600 | sProcessDate | 10/22/2018 | FilesDownloaded | 4 | FilesTotal | 4
+AreVendorDatasetJobsProcessed:  done 
+Vendor | StandardAndPoors | Dataset | sp600 | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 2
+AreVendorDatasetFilesDownloaded:  done 
+Vendor | StandardAndPoors | Dataset | spMLP | sProcessDate | 10/22/2018 | FilesDownloaded | 4 | FilesTotal | 4
+AreVendorDatasetJobsProcessed:  done 
+Vendor | StandardAndPoors | Dataset | spMLP | sProcessDate | 10/22/2018 | JobsProcessed | 0 | JobsTotal | 1

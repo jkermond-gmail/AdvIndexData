@@ -37,8 +37,6 @@ namespace IndexDataEngineLibrary
         //private string mConnectionString = @"server=JKERMOND-NEW\SQLEXPRESS2014;database=IndexData;uid=sa;pwd=M@gichat!";
         private string mConnectionString = null;
 
-        private LogHelper logHelper;
-
         private SqlConnection mSqlConn = null;
 
 
@@ -55,9 +53,8 @@ namespace IndexDataEngineLibrary
             get { return mConnectionString; }
         }
 
-        public SharedData(LogHelper appLogHelper)
+        public SharedData()
         {
-            logHelper = appLogHelper;
             mConnectionString = ConfigurationManager.ConnectionStrings["dbConnectionIndexData"].ConnectionString;
         }
 
@@ -97,7 +94,7 @@ namespace IndexDataEngineLibrary
             }
             catch (SqlException ex)
             {
-                logHelper.WriteLine(ex.Message);
+                LogHelper.WriteLine(ex.Message);
             }
 
             finally
@@ -144,7 +141,7 @@ namespace IndexDataEngineLibrary
             }
             catch (SqlException ex)
             {
-                logHelper.WriteLine(ex.Message);
+                LogHelper.WriteLine(ex.Message);
             }
 
             finally

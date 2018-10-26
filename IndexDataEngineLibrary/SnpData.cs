@@ -16,7 +16,6 @@ namespace IndexDataEngineLibrary
 {
     public sealed class SnpData
     {
-        private LogHelper logHelper;
         private SharedData sharedData = null;
         private SqlConnection mSqlConn = null;
         private SqlDataReader mSqlDr = null;
@@ -48,11 +47,10 @@ namespace IndexDataEngineLibrary
         };
 
 
-        public SnpData(LogHelper appLogHelper)
+        public SnpData()
         {
-            logHelper = appLogHelper;
-            logHelper.Info("SnpData()", "SnpData");
-            sharedData = new SharedData(appLogHelper);
+            LogHelper.Info("SnpData()", "SnpData");
+            sharedData = new SharedData();
             DateHelper.ConnectionString = sharedData.ConnectionString;
             sharedData.Vendor = Vendors.Snp;
             mSqlConn = new SqlConnection(sharedData.ConnectionString);
@@ -129,13 +127,13 @@ namespace IndexDataEngineLibrary
         void csv_ParseError(object sender, ParseErrorEventArgs e)
         {
             //if (e.Error is MissingFieldCsvException)
-            //logHelper.WriteLine("APUtilities: CsvParseError: " + DateTime.Now);
-            //logHelper.WriteLine("         CurrentFieldIndex: " + e.Error.CurrentFieldIndex);
-            //logHelper.WriteLine("           CurrentPosition: " + e.Error.CurrentPosition);
-            //logHelper.WriteLine("        CurrentRecordIndex: " + e.Error.CurrentRecordIndex);
-            //logHelper.WriteLine("                   Message: " + e.Error.Message);
-            //logHelper.WriteLine("                   RawDate: " + e.Error.RawData);
-            //logHelper.WriteLine("--------------------------: " );
+            //LogHelper.WriteLine("APUtilities: CsvParseError: " + DateTime.Now);
+            //LogHelper.WriteLine("         CurrentFieldIndex: " + e.Error.CurrentFieldIndex);
+            //LogHelper.WriteLine("           CurrentPosition: " + e.Error.CurrentPosition);
+            //LogHelper.WriteLine("        CurrentRecordIndex: " + e.Error.CurrentRecordIndex);
+            //LogHelper.WriteLine("                   Message: " + e.Error.Message);
+            //LogHelper.WriteLine("                   RawDate: " + e.Error.RawData);
+            //LogHelper.WriteLine("--------------------------: " );
 
             e.Action = ParseErrorAction.AdvanceToNextLine;
         }
@@ -213,7 +211,7 @@ namespace IndexDataEngineLibrary
             string FileName;
             string sMsg = "ProcessVendorFiles: ";
 
-            logHelper.WriteLine(sMsg + "Started " + DateTime.Now);
+            LogHelper.WriteLine(sMsg + "Started " + DateTime.Now);
 
             try
             {
@@ -314,7 +312,7 @@ namespace IndexDataEngineLibrary
             }
             finally
             {
-                logHelper.WriteLine(sMsg + "finished " + DateTime.Now);
+                LogHelper.WriteLine(sMsg + "finished " + DateTime.Now);
                 //RussellData_Finish();
             }
         }
@@ -390,7 +388,7 @@ namespace IndexDataEngineLibrary
             SqlCommand cmd = null;
             DateTime oDate = DateTime.MinValue;
 
-            logHelper.WriteLine("AddSnpOpeningData Processing: " + Filename + " " + DateTime.Now);
+            LogHelper.WriteLine("AddSnpOpeningData Processing: " + Filename + " " + DateTime.Now);
 
             string IndexCode = GetIndexCodeFromFilename(Filename);
 
@@ -528,12 +526,12 @@ namespace IndexDataEngineLibrary
                 {
                     sValue = ParseColumn(dr, "INDEX CODE");
                     int LineCount = Convert.ToInt32(sValue);
-                    logHelper.WriteLine("finished " + DateTime.Now + " " + Filename + " adds = " + AddCount + " Linecount = " + LineCount);
+                    LogHelper.WriteLine("finished " + DateTime.Now + " " + Filename + " adds = " + AddCount + " Linecount = " + LineCount);
                 }
 
 
             }
-            logHelper.WriteLine("AddSnpOpeningData Done: " + Filename + " " + DateTime.Now);
+            LogHelper.WriteLine("AddSnpOpeningData Done: " + Filename + " " + DateTime.Now);
         }
 
         private void AddSnpClosingData(string Filename, DateTime FileDate)
@@ -543,7 +541,7 @@ namespace IndexDataEngineLibrary
             SqlCommand cmd = null;
             DateTime oDate = DateTime.MinValue;
 
-            logHelper.WriteLine("AddSnpOpeningData Processing: " + Filename + " " + DateTime.Now);
+            LogHelper.WriteLine("AddSnpOpeningData Processing: " + Filename + " " + DateTime.Now);
 
             string IndexCode = GetIndexCodeFromFilename(Filename);
             string Tablename = " SnpDailyClosingHoldings ";  // Note leading and trailing spaces
@@ -685,10 +683,10 @@ namespace IndexDataEngineLibrary
                 {
                     sValue = ParseColumn(dr, "INDEX CODE");
                     int LineCount = Convert.ToInt32(sValue);
-                    logHelper.WriteLine("finished " + DateTime.Now + " " + Filename + " adds = " + AddCount + " Linecount = " + LineCount);
+                    LogHelper.WriteLine("finished " + DateTime.Now + " " + Filename + " adds = " + AddCount + " Linecount = " + LineCount);
                 }
             }
-            logHelper.WriteLine("AddSnpClosingData Done: " + Filename + " " + DateTime.Now);
+            LogHelper.WriteLine("AddSnpClosingData Done: " + Filename + " " + DateTime.Now);
         }
 
 
@@ -700,7 +698,7 @@ namespace IndexDataEngineLibrary
             //{
             //    DeleteTotalReturn(FileDate, sIndex);
             //}
-            logHelper.WriteLine("AddSnpTotalReturnData Processing: " + Filename + " " + DateTime.Now);
+            LogHelper.WriteLine("AddSnpTotalReturnData Processing: " + Filename + " " + DateTime.Now);
             List<string> SearchCodeList = new List<string>();
             List<string> IndexCodeList = new List<string>();
 
@@ -742,7 +740,7 @@ namespace IndexDataEngineLibrary
                 {
                     sValue = ParseColumn(dr, "INDEX CODE");
                     sIndexName = ParseColumn(dr, "INDEX NAME");
-                    //logHelper.WriteLine("IndexCode|" + IndexCode + "| comare to |" + sValue + "|" + sIndexName + "|");
+                    //LogHelper.WriteLine("IndexCode|" + IndexCode + "| comare to |" + sValue + "|" + sIndexName + "|");
                     CurrentRowCount += 1;
                     if (sValue.Equals(IndexCodeSearch))
                     {
@@ -757,7 +755,7 @@ namespace IndexDataEngineLibrary
                 }
                 i += 1;
             }
-            logHelper.WriteLine("AddSnpTotalReturnData Done: " + Filename + " " + DateTime.Now);
+            LogHelper.WriteLine("AddSnpTotalReturnData Done: " + Filename + " " + DateTime.Now);
         }
 
 
@@ -836,7 +834,7 @@ namespace IndexDataEngineLibrary
             {
                 if (ex.Number == 2627)
                 {
-                    logHelper.WriteLine(ex.Message);
+                    LogHelper.WriteLine(ex.Message);
                 }
             }
             finally
@@ -891,7 +889,7 @@ namespace IndexDataEngineLibrary
             try
             {
                 sMsg = "GenerateReturnsForDate: " + sDate + " Index: " + sIndexName;
-                logHelper.WriteLine(sMsg + sDate);
+                LogHelper.WriteLine(sMsg + sDate);
 
                 /*
                 USE IndexData
@@ -995,7 +993,7 @@ namespace IndexDataEngineLibrary
                         break;
                 }
 
-                logHelper.WriteLine(SqlSelect);
+                LogHelper.WriteLine(SqlSelect);
                 mSqlConn.Open();
                 SqlCommand cmd = new SqlCommand(SqlSelect + SqlOrderBy, mSqlConn);
                 cmd.Parameters.Add("@IndexCode", SqlDbType.VarChar, 20);
@@ -1022,13 +1020,13 @@ namespace IndexDataEngineLibrary
 
             catch (SqlException ex)
             {
-                logHelper.WriteLine(ex.Message);
+                LogHelper.WriteLine(ex.Message);
             }
 
             finally
             {
                 //swLogFile.Flush();
-                //logHelper.WriteLine(sMsg + "finished " + DateTime.Now);
+                //LogHelper.WriteLine(sMsg + "finished " + DateTime.Now);
             }
 
             return (ReturnsGenerated);
@@ -1142,20 +1140,20 @@ namespace IndexDataEngineLibrary
                             sTicker = sOriginalTicker;
 
                         sMsg = sTicker + "," + sWeight + "," + sSecurityReturn + "," + sCusip;
-                        logHelper.WriteLine(sMsg);
+                        LogHelper.WriteLine(sMsg);
 
 
                         if ((mPrevId.Length > 0) && sCusip.Equals(mPrevId))
                         {
                             sMsg = "GetNextConstituentReturn: duplicate, " + sCusip;
-                            logHelper.WriteLine(sMsg);
+                            LogHelper.WriteLine(sMsg);
                         }
                         mPrevId = sCusip;
                     }
                     else
                     {
                         sMsg = "GetNextConstituentReturn:," + ConstituentCount.ToString();
-                        logHelper.WriteLine(sMsg);
+                        LogHelper.WriteLine(sMsg);
                         if (ConstituentCount > 0)
                         {
                             CloseGlobals();
@@ -1166,13 +1164,13 @@ namespace IndexDataEngineLibrary
 
             catch (SqlException ex)
             {
-                logHelper.WriteLine(ex.Message);
+                LogHelper.WriteLine(ex.Message);
             }
 
             finally
             {
                 //swLogFile.Flush();
-                //logHelper.WriteLine(sMsg + "finished " + DateTime.Now);
+                //LogHelper.WriteLine(sMsg + "finished " + DateTime.Now);
             }
 
             return (GetNext);
@@ -1396,20 +1394,20 @@ namespace IndexDataEngineLibrary
                         indexRowRollUp.RateOfReturn += indexRowConstituent.RateOfReturn * indexRowConstituent.Weight / indexRowRollUp.Weight;
                 }
 
-            logHelper.WriteLine("---Before---");
+            LogHelper.WriteLine("---Before---");
             foreach (IndexRow indexRowRollUp in indexRowsRollUp)
             {
-                logHelper.WriteLine(indexRowRollUp.Identifier + " " + indexRowRollUp.Weight.ToString() + " " + indexRowRollUp.RateOfReturn.ToString());
+                LogHelper.WriteLine(indexRowRollUp.Identifier + " " + indexRowRollUp.Weight.ToString() + " " + indexRowRollUp.RateOfReturn.ToString());
             }
 
             //AdjustReturnsToMatchPublishedTotalReturns(indexRowsRollUp, sDate, sIndexName);
-            //logHelper.WriteLine("---After---");
+            //LogHelper.WriteLine("---After---");
 
             //foreach (IndexRow indexRowRollUp in indexRowsRollUp)
             //{
-            //    logHelper.WriteLine(indexRowRollUp.Identifier + " " + indexRowRollUp.Weight.ToString() + " " + indexRowRollUp.RateOfReturnAdjusted.ToString());
+            //    LogHelper.WriteLine(indexRowRollUp.Identifier + " " + indexRowRollUp.Weight.ToString() + " " + indexRowRollUp.RateOfReturnAdjusted.ToString());
             //}
-            //logHelper.WriteLine("---Done---");
+            //LogHelper.WriteLine("---Done---");
         }
 
 
@@ -1593,7 +1591,7 @@ namespace IndexDataEngineLibrary
             try
             {
                 //sMsg = "CalculateAdventTotalReturnForDate: ";
-                //logHelper.WriteLine(sMsg + sDate );
+                //LogHelper.WriteLine(sMsg + sDate );
                 string SqlSelect = @"
                     Select SUM(WeightedCalcReturn9) FROM ( 
                     SELECT ROUND((( (cast(hopen.MktValue as float)/
@@ -1617,7 +1615,7 @@ namespace IndexDataEngineLibrary
                     ) as SumWeightedCalcReturn9 
                 ";
 
-                //logHelper.WriteLine(SqlSelect);
+                //LogHelper.WriteLine(SqlSelect);
                 conn.Open();
                 SqlCommand cmd = new SqlCommand(SqlSelect, conn);
                 cmd.Parameters.Add("@IndexName", SqlDbType.VarChar, 20);
@@ -1636,7 +1634,7 @@ namespace IndexDataEngineLibrary
                         dReturn = Math.Round(dReturn, 9, MidpointRounding.AwayFromZero);
                         string sReturn = dReturn.ToString();
 
-                        logHelper.WriteLine(sDate + " " + sReturn);
+                        LogHelper.WriteLine(sDate + " " + sReturn);
                         if (bSaveReturnInDb)
                         {
                             foreach (string sVendorFormat in sVendorFormats)
@@ -1654,7 +1652,7 @@ namespace IndexDataEngineLibrary
 
             catch (SqlException ex)
             {
-                logHelper.WriteLine(ex.Message);
+                LogHelper.WriteLine(ex.Message);
             }
 
             finally
@@ -1662,7 +1660,7 @@ namespace IndexDataEngineLibrary
                 dr.Close();
                 conn.Close();
                 //swLogFile.Flush();
-                //logHelper.WriteLine(sMsg + "finished " + DateTime.Now);
+                //LogHelper.WriteLine(sMsg + "finished " + DateTime.Now);
             }
 
             return (dReturn);
@@ -1774,7 +1772,7 @@ namespace IndexDataEngineLibrary
             {
                 // See notes above the routine if a runtime error is generated
                 sMsg = "CalculateAdventTotalReturnsForPeriod: ";
-                logHelper.WriteLine(sMsg + sStartDate + " to " + sEndDate + " index " + sIndexName);
+                LogHelper.WriteLine(sMsg + sStartDate + " to " + sEndDate + " index " + sIndexName);
                 string SqlSelect;
                 string SqlWhere;
                 SqlSelect = "select count (distinct FileDate) from SnpDailyClosingHoldings ";
@@ -1793,7 +1791,7 @@ namespace IndexDataEngineLibrary
                     while (dr.Read())
                     {
                         string sDate = dr["FileDate"].ToString();
-                        //logHelper.WriteLine("Processing: " + sDate);
+                        //LogHelper.WriteLine("Processing: " + sDate);
                         // Uncomment this line to Calculate Return from RussellDailyHoldings
                         dReturn = CalculateAdventTotalReturnForDateNoGood(sDate, sIndexName, true);
                         // Uncomment this line to Select the Advent Adjusted Return from TotalReturns
@@ -1810,21 +1808,21 @@ namespace IndexDataEngineLibrary
                     }
                     //dProduct = dProduct;
                     double dRetForPeriod = (dProduct - 1) * 100;
-                    logHelper.WriteLine("Return for period " + sStartDate + " to " + sEndDate + " for " + sIndexName + " = " + dRetForPeriod);
+                    LogHelper.WriteLine("Return for period " + sStartDate + " to " + sEndDate + " for " + sIndexName + " = " + dRetForPeriod);
                 }
             }
 
             catch (SqlException ex)
             {
-                logHelper.WriteLine(ex.Message);
+                LogHelper.WriteLine(ex.Message);
             }
 
             finally
             {
                 dr.Close();
                 conn.Close();
-                logHelper.WriteLine(sMsg + "finished " + DateTime.Now);
-                //logHelper.Flush();
+                LogHelper.WriteLine(sMsg + "finished " + DateTime.Now);
+                //LogHelper.Flush();
             }
             return;
         }

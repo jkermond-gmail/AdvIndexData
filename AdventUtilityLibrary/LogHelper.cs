@@ -1,27 +1,18 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Diagnostics;
 using System.IO;
-using System.Configuration;
 
 namespace AdventUtilityLibrary
 {
-    public class LogHelper
+    public static class LogHelper
     {
-        private StreamWriter swLogFile = null;
-        private string LogFileName;
-//        private string OutputPath = @"C:\A_Development\visual studio 2017\AdventProjects\IndexDataForm\IndexDataForm\Output\";
-        private string OutputPath = @"";
+        private static StreamWriter swLogFile = null;
+        private static string LogFileName;
+        //private static string OutputPath = @"C:\A_Development\visual studio 2017\Projects\AdvIndexData\IndexDataForm\Output\";
+        private static bool LogFileOpened = false;
 
-        public LogHelper()
-        {
-            StartLog();
-        }
-
-        private void StartLog()
+        /*
+        private static void StartLog()
         {
             LogFileName = OutputPath + "AdvIndexDataLog.txt";
             if (File.Exists(LogFileName))
@@ -30,19 +21,30 @@ namespace AdventUtilityLibrary
             swLogFile.WriteLine(LogFileName + DateTime.Now);
             swLogFile.Flush();
         }
+        */
 
-        private void StartLog(string logFileName)
+        public static void StartLog(string logFileName, string logFilePath, bool deleteExisting)
         {
-            if (swLogFile.BaseStream != null)
+            if (LogFileOpened)
                 CloseAndFlush(ref swLogFile);
-            LogFileName = /* OutputPath + */ logFileName;
-            if (File.Exists(LogFileName))
+            LogFileName = Path.Combine(logFilePath, logFileName);
+            if (deleteExisting && File.Exists(LogFileName))
+            {
                 File.Delete(LogFileName);
-            swLogFile = File.CreateText(LogFileName);
+                swLogFile = new StreamWriter(Path.Combine(logFilePath, logFileName));
+            }
+            else
+            {
+                bool append = true;
+                swLogFile = new StreamWriter(Path.Combine(logFilePath, logFileName), append);
+            }
+            LogFileOpened = true;
+            string message = LogFileName + " opened " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+            //WriteLine(message);
             swLogFile.Flush();
         }
 
-        private void EndLog()
+        private static void EndLog()
         {
             if (swLogFile.BaseStream != null)
             {
@@ -51,14 +53,14 @@ namespace AdventUtilityLibrary
             }
         }
 
-        private void CloseAndFlush(ref StreamWriter WriteFile)
+        private static void CloseAndFlush(ref StreamWriter WriteFile)
         {
             if (WriteFile.BaseStream != null)
             {
-
                 WriteFile.Flush();
                 WriteFile.Close();
                 WriteFile = null;
+                LogFileOpened = false;
             }
         }
 
@@ -77,12 +79,12 @@ namespace AdventUtilityLibrary
             WriteEntry(message, "warning", module);
         }
 
-        public void Info(string message, string module)
+        public static void Info(string message, string module)
         {
             WriteEntry(message, "info", module);
         }
 
-        public void WriteLine(string message)
+        public static void WriteLine(string message)
         {
             Trace.WriteLine(message);
             Trace.TraceInformation(message);

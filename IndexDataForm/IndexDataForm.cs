@@ -25,7 +25,6 @@ namespace IndexDataForm
         //private System.Timers.Timer timer1 = new System.Timers.Timer();
 
         private IndexDataEngine indexDataEngine;
-        private LogHelper logHelper;
         private RussellData russellData = null;
         private SnpData snpData = null;
 
@@ -33,10 +32,11 @@ namespace IndexDataForm
         public IndexDataForm()
         {
             InitializeComponent();
-            logHelper = new LogHelper();
-            logHelper.Info("Started", "IndexDataForm");
-            russellData = new RussellData(logHelper);
-            snpData = new SnpData(logHelper);
+            bool deleteExisting = false;
+            LogHelper.StartLog("AdvIndexDataLog.txt", @"C:\A_Development\visual studio 2017\Projects\AdvIndexData\IndexDataForm\Output\", deleteExisting);
+
+            russellData = new RussellData();
+            snpData = new SnpData();
 
         }
 
@@ -53,11 +53,11 @@ namespace IndexDataForm
 
         private void timerRunIndexData_Tick(object sender, EventArgs e)
         {
-            logHelper.Info("timerRunIndexData_Tick", "IndexDataForm");
+            LogHelper.Info("timerRunIndexData_Tick", "IndexDataForm");
             TimerEnableDisable("Start Working", false);
 
             // Begin checking if there is any index data work to do
-            indexDataEngine = new IndexDataEngine(logHelper);
+            indexDataEngine = new IndexDataEngine();
             indexDataEngine.Run();
 
             // End checking if there is any index data work to do
@@ -69,7 +69,7 @@ namespace IndexDataForm
         private void TimerEnableDisable(string message, bool enable)
         {
 
-            logHelper.Info(message, "IndexDataForm");
+            LogHelper.Info(message, "IndexDataForm");
 
             if (enable)
             {

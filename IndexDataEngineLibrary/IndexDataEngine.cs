@@ -15,8 +15,6 @@ namespace IndexDataEngineLibrary
 {
     public class IndexDataEngine
     {
-        private LogHelper logHelper;
-
         private string sConnectionIndexData = null;
         private string sConnectionAmdVifs = null;
 
@@ -27,22 +25,17 @@ namespace IndexDataEngineLibrary
         private string sIndexDataProcessDate;
         private DateTime IndexDataProcessDate;
 
+
         public IndexDataEngine()
         {
-            Trace.WriteLine("IndexDataEngine()");
-        }
-
-        public IndexDataEngine(LogHelper appLogHelper)
-        {
-            logHelper = appLogHelper;
-            logHelper.Info("IndexDataEngine()", "IndexDataEngineLibrary");
+            LogHelper.Info("IndexDataEngine()", "IndexDataEngineLibrary");
 
         }
 
 
         public void Run()
         {
-            logHelper.Info("IndexDataEngine.Run", "IndexDataEngineLibrary");
+            LogHelper.Info("IndexDataEngine.Run", "IndexDataEngineLibrary");
             sConnectionIndexData = ConfigurationManager.ConnectionStrings["dbConnectionIndexData"].ConnectionString;
             sConnectionAmdVifs = ConfigurationManager.ConnectionStrings["dbConnectionAmdVifs"].ConnectionString;
 
@@ -59,7 +52,7 @@ namespace IndexDataEngineLibrary
                 setIndexDataProcessDate(sAmdVifsProcessDate);
             }
             ProcessIndexDataWork(sAmdVifsProcessDate);
-            //RussellData russellData = new RussellData(logHelper);
+            //RussellData russellData = new RussellData(LogHelper);
             //russellData.SetConnectionString(sConnectionIndexData);
             //DateTime StartDate = DateTime.ParseExact("01/03/2017", "MM/dd/yyyy", CultureInfo.InvariantCulture);
             //DateTime EndDate = StartDate.AddDays(1.0);
@@ -86,6 +79,8 @@ namespace IndexDataEngineLibrary
             string dataset = "";
             int FilesTotal = 0;
             int FilesDownloaded = 0;
+            int JobsTotal = 0;
+            int JobsProcessed = 0;
 
 
             foreach (KeyValuePair<string, string> element in listVendorDatasets)
@@ -93,19 +88,25 @@ namespace IndexDataEngineLibrary
 
                 vendor = element.Key.ToString();
                 dataset = element.Value.ToString();
-                bool downloaded = IsVendorDatasetDownloaded(vendor, dataset, sProcessDate, out FilesTotal, out FilesDownloaded);
-                logHelper.WriteLine("Vendor | " + vendor + " | Dataset | " + dataset + " | sProcessDate | " + sProcessDate + " | FilesDownloaded | "
+                bool downloaded = AreVendorDatasetFilesDownloaded(vendor, dataset, sProcessDate, out FilesTotal, out FilesDownloaded);
+                LogHelper.WriteLine("Vendor | " + vendor + " | Dataset | " + dataset + " | sProcessDate | " + sProcessDate + " | FilesDownloaded | "
                                     + FilesDownloaded + " | FilesTotal | " + FilesTotal);
+                bool processed = AreVendorDatasetJobsProcessed(vendor, dataset, sProcessDate, out JobsTotal, out JobsProcessed);
+                LogHelper.WriteLine("Vendor | " + vendor + " | Dataset | " + dataset + " | sProcessDate | " + sProcessDate + " | JobsProcessed | "
+                                    + JobsProcessed + " | JobsTotal | " + JobsTotal);
+
             }
 
         }
 
-        private bool IsVendorDatasetDownloaded( string Vendor, string Dataset, string sProcessDate, out int FilesTotal, out int FilesDownloaded)
+        private bool AreVendorDatasetFilesDownloaded( string Vendor, string Dataset, string sProcessDate, out int FilesTotal, out int FilesDownloaded)
         {
             FilesTotal = 0;
             FilesDownloaded = 0;
             bool isDownloaded = false;
             SqlCommand cmd = null;
+            string logFuncName = "AreVendorDatasetFilesDownloaded: ";
+
 
             string commandText = @"
                 select count(*) as FilesTotal from VIFs
@@ -129,7 +130,6 @@ namespace IndexDataEngineLibrary
                 if (dr.HasRows)
                 {
                     dr.Read();
-                    //string val = dr[0].ToString();
                     string val = dr["FilesTotal"].ToString();
                     FilesTotal = Convert.ToInt32(val);
                 }
@@ -148,8 +148,7 @@ namespace IndexDataEngineLibrary
                     if (dr.HasRows)
                     {
                         dr.Read();
-                        string val = dr[0].ToString();
-                        val = dr["FilesDownloaded"].ToString();
+                        string val = dr["FilesDownloaded"].ToString();
                         FilesDownloaded = Convert.ToInt32(val);
                         isDownloaded = (FilesTotal.Equals(FilesDownloaded) == true);
                     }
@@ -158,15 +157,86 @@ namespace IndexDataEngineLibrary
             }
             catch (SqlException ex)
             {
-                //LogHelper.WriteLine(logFuncName + " " + ex.Message);
+                LogHelper.WriteLine(logFuncName + " " + ex.Message);
             }
             finally
             {
-                //  LogHelper.WriteLine(logFuncName + " done " );
+                LogHelper.WriteLine(logFuncName + " done " );
             }
 
             return (isDownloaded);
         }
+
+        private bool AreVendorDatasetJobsProcessed(string Vendor, string Dataset, string sProcessDate, out int JobsTotal, out int JobsProcessed)
+        {
+            JobsTotal = 0;
+            JobsProcessed = 0;
+            bool Processed = false;
+            SqlCommand cmd = null;
+            string logFuncName = "AreVendorDatasetJobsProcessed: ";
+
+
+            string commandText = @"
+                SELECT count(*) as JobsTotal
+                FROM Jobs
+                WHERE  Vendor = @Vendor and DataSet = @Dataset and JobType = 'Vendor' and Active = 'Yes'
+                ";
+            try
+            {
+                cmd = new SqlCommand
+                {
+                    Connection = cnSqlIndexData,
+                    CommandText = commandText
+                };
+
+                cmd.Parameters.Add("@Vendor", SqlDbType.VarChar);
+                cmd.Parameters["@Vendor"].Value = Vendor;
+                cmd.Parameters.Add("@Dataset", SqlDbType.VarChar);
+                cmd.Parameters["@Dataset"].Value = Dataset;
+
+                SqlDataReader dr = null;
+                dr = cmd.ExecuteReader();
+                if (dr.HasRows)
+                {
+                    dr.Read();
+                    string val = dr["JobsTotal"].ToString();
+                    JobsTotal = Convert.ToInt32(val);
+                }
+                dr.Close();
+
+                if (JobsTotal > 0)
+                {
+                    cmd.Parameters.Add("@ProcessDate", SqlDbType.Date);
+                    cmd.Parameters["@ProcessDate"].Value = sProcessDate;
+                    cmd.CommandText = @"
+                        SELECT count(*) as JobsProcessed
+                        FROM Jobs
+                        WHERE  Vendor = @Vendor and DataSet = @Dataset and LastProcessDate = @ProcessDate 
+                        and JobType = 'Vendor' and Active = 'Yes'
+                        ";
+                    dr = cmd.ExecuteReader();
+                    if (dr.HasRows)
+                    {
+                        dr.Read();
+                        string val = dr["JobsProcessed"].ToString();
+                        JobsProcessed = Convert.ToInt32(val);
+                        Processed = (JobsTotal.Equals(JobsProcessed) == true);
+                    }
+                    dr.Close();
+                }
+            }
+            catch (SqlException ex)
+            {
+                LogHelper.WriteLine(logFuncName + " " + ex.Message);
+            }
+            finally
+            {
+                LogHelper.WriteLine(logFuncName + " done ");
+            }
+
+            return (Processed);
+        }
+
 
         private void getVendorDatasets(out List<KeyValuePair<string,string>> listVendorDatasets)
         {
@@ -211,11 +281,11 @@ namespace IndexDataEngineLibrary
             }
             catch (SqlException ex)
             {
-                //LogHelper.WriteLine(logFuncName + " " + ex.Message);
+                LogHelper.WriteLine(logFuncName + " " + ex.Message);
             }
             finally
             {
-                //  LogHelper.WriteLine(logFuncName + " done " );
+                LogHelper.WriteLine(logFuncName + " done " );
             }
             return;
         }

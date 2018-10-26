@@ -15,7 +15,6 @@ namespace IndexDataEngineLibrary
 {
     public sealed class RussellData
     {
-        private LogHelper logHelper;
         //private DateHelper dateHelper;
 
         #region privates, enums, constants
@@ -97,19 +96,18 @@ namespace IndexDataEngineLibrary
         /***************************************************/
 
         #region Constructor / Finish 
+        //public RussellData()
+        //{
+        //    //private const string SQL_CONN = "server=JKERMOND\\JKERMOND;database=AdvIndexData;uid=sa;pwd=M@gichat!";
+        //    // mConnectionString = ConfigurationManager.AppSettings["AdoConnectionString"];
+        //    OpenLogFile();
+        //}
+
         public RussellData()
         {
-            //private const string SQL_CONN = "server=JKERMOND\\JKERMOND;database=AdvIndexData;uid=sa;pwd=M@gichat!";
-            // mConnectionString = ConfigurationManager.AppSettings["AdoConnectionString"];
-            OpenLogFile();
-        }
-
-        public RussellData(LogHelper appLogHelper)
-        {
-            logHelper = appLogHelper;
             //dateHelper = 
-            logHelper.Info("RussellData()", "RussellData");
-            sharedData = new SharedData(appLogHelper);
+            LogHelper.Info("RussellData()", "RussellData");
+            sharedData = new SharedData();
             DateHelper.ConnectionString = sharedData.ConnectionString;
             sharedData.Vendor = Vendors.Russell;
         }
@@ -134,7 +132,7 @@ namespace IndexDataEngineLibrary
                 else
                     swLogFile = File.AppendText(LogFileName);
 
-                //logHelper.WriteLine("Russell Data started: " + DateTime.Now);
+                //LogHelper.WriteLine("Russell Data started: " + DateTime.Now);
                 ////swLogFile.Flush();
             }
         }
@@ -262,14 +260,14 @@ namespace IndexDataEngineLibrary
             bUpdated = ((bDatesUpdated) && (bTotalsUpdated) && (bOpenTotalsMatch) && (bCloseTotalsMatch));
             if (!bUpdated)
             {
-                logHelper.WriteLine("HoldingsFilesUpdated() == false");
-                logHelper.WriteLine("Process Date      : " + ProcessDate.ToShortDateString());
-                logHelper.WriteLine("Open File Date    : " + OpenFileDate.ToShortDateString());
-                logHelper.WriteLine("Close File Date   : " + CloseFileDate.ToShortDateString());
-                logHelper.WriteLine("Open Vendor Total : " + OpenVendorTotal.ToString());
-                logHelper.WriteLine("Open Advent Total : " + OpenAdventTotal.ToString());
-                logHelper.WriteLine("Close Vendor Total: " + CloseVendorTotal.ToString());
-                logHelper.WriteLine("Close Advent Total: " + CloseAdventTotal.ToString());
+                LogHelper.WriteLine("HoldingsFilesUpdated() == false");
+                LogHelper.WriteLine("Process Date      : " + ProcessDate.ToShortDateString());
+                LogHelper.WriteLine("Open File Date    : " + OpenFileDate.ToShortDateString());
+                LogHelper.WriteLine("Close File Date   : " + CloseFileDate.ToShortDateString());
+                LogHelper.WriteLine("Open Vendor Total : " + OpenVendorTotal.ToString());
+                LogHelper.WriteLine("Open Advent Total : " + OpenAdventTotal.ToString());
+                LogHelper.WriteLine("Close Vendor Total: " + CloseVendorTotal.ToString());
+                LogHelper.WriteLine("Close Advent Total: " + CloseAdventTotal.ToString());
             }
             return (bUpdated);
         }
@@ -284,7 +282,7 @@ namespace IndexDataEngineLibrary
             string FileName;
             string sMsg = "ProcessVendorFiles: ";
 
-            logHelper.WriteLine(sMsg + "Started " + DateTime.Now);
+            LogHelper.WriteLine(sMsg + "Started " + DateTime.Now);
 
             try
             {
@@ -298,12 +296,12 @@ namespace IndexDataEngineLibrary
                         FileName = FilePath + "H_OPEN_R3000E_" + oProcessDate.ToString("yyyyMMdd") + "_RGS.TXT";
                         if (File.Exists(FileName))
                         {
-                            logHelper.WriteLine("Processing: " + FileName + " " + DateTime.Now);
+                            LogHelper.WriteLine("Processing: " + FileName + " " + DateTime.Now);
                             if (bOpenFiles)
                                 AddRussellOpeningData(VendorFileFormats.H_OPEN_RGS, FileName, oProcessDate);
                             if (bSymbolChanges)
                                 AddRussellSymbolChangeData(VendorFileFormats.H_OPEN_RGS, FileName, oProcessDate);
-                            logHelper.WriteLine("Done      : " + FileName + " " + DateTime.Now);
+                            LogHelper.WriteLine("Done      : " + FileName + " " + DateTime.Now);
                         }
                     }
 
@@ -312,9 +310,9 @@ namespace IndexDataEngineLibrary
                         FileName = FilePath + "H_" + oProcessDate.ToString("yyyyMMdd") + "_RGS_R3000E.TXT";
                         if (File.Exists(FileName))
                         {
-                            logHelper.WriteLine("Processing: " + FileName + " " + DateTime.Now);
+                            LogHelper.WriteLine("Processing: " + FileName + " " + DateTime.Now);
                             AddRussellClosingData(VendorFileFormats.H_CLOSE_RGS, FileName, oProcessDate);
-                            logHelper.WriteLine("Done      : " + FileName + " " + DateTime.Now);
+                            LogHelper.WriteLine("Done      : " + FileName + " " + DateTime.Now);
                         }
                     }
                     if (bTotalReturnFiles)
@@ -322,9 +320,9 @@ namespace IndexDataEngineLibrary
                         FileName = FilePath + "ALL" + oProcessDate.ToString("yyyyMMdd") + ".TXT";
                         if (File.Exists(FileName))
                         {
-                            logHelper.WriteLine("Processing: " + FileName + " " + DateTime.Now);
+                            LogHelper.WriteLine("Processing: " + FileName + " " + DateTime.Now);
                             AddRussellTotalReturnData(VendorFileFormats.ALL, FileName, oProcessDate);
-                            logHelper.WriteLine("Done      : " + FileName + " " + DateTime.Now);
+                            LogHelper.WriteLine("Done      : " + FileName + " " + DateTime.Now);
                         }
                     }                    
                 }
@@ -334,7 +332,7 @@ namespace IndexDataEngineLibrary
             }
             finally
             {
-                logHelper.WriteLine(sMsg + "finished " + DateTime.Now);
+                LogHelper.WriteLine(sMsg + "finished " + DateTime.Now);
                 RussellData_Finish();
             }
         }
@@ -353,7 +351,7 @@ namespace IndexDataEngineLibrary
             int Pos = TextLine.IndexOf(TOTAL_COUNT);
             int VendorTotal = Convert.ToInt32(TextLine.Substring(Pos + TOTAL_COUNT.Length));
             int AdventTotal = SecuritiesTotal - ZeroSharesTotal;
-            logHelper.WriteLine(FileName + ": SecurityCount " + AdventTotal +
+            LogHelper.WriteLine(FileName + ": SecurityCount " + AdventTotal +
                                 " VendorTotalCount " + VendorTotal + " Zero Shares " + ZeroSharesTotal);
             //CREATE TABLE dbo.RussellDailyTotals
             //(
@@ -421,7 +419,7 @@ namespace IndexDataEngineLibrary
             {
                 if (ex.Number == 2627)
                 {
-                    logHelper.WriteLine(ex.Message);
+                    LogHelper.WriteLine(ex.Message);
                 }
             }
             finally
@@ -956,7 +954,7 @@ RU3000    20170103   CHF   1662.25918   1365.02441   1696.48181   1567.99955    
                             if (ex.Number == 2627)
                             {
                                 Console.WriteLine(ex.Message);
-                                logHelper.WriteLine(FileName + ":" + TextLine);
+                                LogHelper.WriteLine(FileName + ":" + TextLine);
                             }
                         }
                         finally
@@ -971,7 +969,7 @@ RU3000    20170103   CHF   1662.25918   1365.02441   1696.48181   1567.99955    
                 }
                 if (!add && !IsHeader1 && !IsHeader2 && (TextLine.Length > 0))
                 {
-                    logHelper.WriteLine("Skipping line:" + TextLine.ToString());
+                    LogHelper.WriteLine("Skipping line:" + TextLine.ToString());
                 }
             }
             try
@@ -983,7 +981,7 @@ RU3000    20170103   CHF   1662.25918   1365.02441   1696.48181   1567.99955    
             {
                 if (ex.Number == 2627)
                 {
-                    logHelper.WriteLine(ex.Message);
+                    LogHelper.WriteLine(ex.Message);
                 }
             }
             finally
@@ -1070,8 +1068,8 @@ RU3000    20170103   CHF   1662.25918   1365.02441   1696.48181   1567.99955    
                                 {
                                     if (GetDailyHoldings1Count(oDate, sOldCUSIP) == 0)
                                     {
-                                        logHelper.WriteLine("Skipping line:" + TextLine.ToString());
-                                        logHelper.WriteLine("Can't find opening holdings1 for " + sCUSIP.ToString() +
+                                        LogHelper.WriteLine("Skipping line:" + TextLine.ToString());
+                                        LogHelper.WriteLine("Can't find opening holdings1 for " + sCUSIP.ToString() +
                                                             " linked to Old CUSIP " + sOldCUSIP.ToString());
                                         ok = false;
                                     }
@@ -1082,8 +1080,8 @@ RU3000    20170103   CHF   1662.25918   1365.02441   1696.48181   1567.99955    
                                 }
                                 else if (sOldCUSIP.Length == 0)
                                 {
-                                    logHelper.WriteLine("Skipping line:" + TextLine.ToString());
-                                    logHelper.WriteLine("Can't find opening holdings1 for " + sCUSIP.ToString());
+                                    LogHelper.WriteLine("Skipping line:" + TextLine.ToString());
+                                    LogHelper.WriteLine("Can't find opening holdings1 for " + sCUSIP.ToString());
                                     ok = false;
                                 }
 
@@ -1102,8 +1100,8 @@ RU3000    20170103   CHF   1662.25918   1365.02441   1696.48181   1567.99955    
                         {
                             if (ex.Number == 2627)
                             {
-                                logHelper.WriteLine(ex.Message);
-                                logHelper.WriteLine(FileName + ":" + TextLine);
+                                LogHelper.WriteLine(ex.Message);
+                                LogHelper.WriteLine(FileName + ":" + TextLine);
                             }
                         }
                         finally
@@ -1118,7 +1116,7 @@ RU3000    20170103   CHF   1662.25918   1365.02441   1696.48181   1567.99955    
                 }
                 if (!add && !IsHeader1 && !IsHeader2 && (TextLine.Length > 0))
                 {
-                    logHelper.WriteLine("Skipping line:" + TextLine.ToString());
+                    LogHelper.WriteLine("Skipping line:" + TextLine.ToString());
                 }
             }
             srHoldingsFile.Close();
@@ -1143,7 +1141,7 @@ RU3000    20170103   CHF   1662.25918   1365.02441   1696.48181   1567.99955    
             }
             catch (SqlException ex)
             {
-                logHelper.WriteLine(ex.Message);
+                LogHelper.WriteLine(ex.Message);
             }
 
             finally
@@ -1527,7 +1525,7 @@ RU3000    20170103   CHF   1662.25918   1365.02441   1696.48181   1567.99955    
                             "\"" + dr["SubSectorCode"].ToString() + "\"," + "\"" + dr["SubSectorDesc"].ToString() + "\"," +
                             "\"" + dr["IndustryCode"].ToString() + "\"," + "\"" + dr["IndustryDesc"].ToString() + "\"";
                     }
-                    logHelper.WriteLine(sLine);
+                    LogHelper.WriteLine(sLine);
                 }
                 dr.Close();
 
@@ -1841,7 +1839,7 @@ CREATE TABLE [dbo].[HistoricalSymbolChanges](
             }
             catch (SqlException ex)
             {
-                logHelper.WriteLine(ex.Message);
+                LogHelper.WriteLine(ex.Message);
             }
 
             finally
@@ -1890,7 +1888,7 @@ CREATE TABLE [dbo].[HistoricalSymbolChanges](
             }
             catch (SqlException ex)
             {
-                logHelper.WriteLine(ex.Message);
+                LogHelper.WriteLine(ex.Message);
             }
 
             finally
@@ -1941,7 +1939,7 @@ CREATE TABLE [dbo].[HistoricalSymbolChanges](
             {
                 // See notes above the routine if a runtime error is generated
                 sMsg = "CalculateAdventTotalReturnsForPeriod: ";
-                logHelper.WriteLine(sMsg + sStartDate + " to " + sEndDate + " index " + sIndexName);
+                LogHelper.WriteLine(sMsg + sStartDate + " to " + sEndDate + " index " + sIndexName);
                 string SqlSelect;
                 string SqlWhere;
                 SqlSelect = "select count (distinct FileDate) from RussellDailyHoldings1 ";
@@ -1960,7 +1958,7 @@ CREATE TABLE [dbo].[HistoricalSymbolChanges](
                     while (dr.Read())
                     {
                         string sDate = dr["FileDate"].ToString();
-                        //logHelper.WriteLine("Processing: " + sDate);
+                        //LogHelper.WriteLine("Processing: " + sDate);
                         // Uncomment this line to Calculate Return from RussellDailyHoldings
                         dReturn = CalculateAdventTotalReturnForDate(sDate, sIndexName, true);
                         // Uncomment this line to Select the Advent Adjusted Return from TotalReturns
@@ -1977,21 +1975,21 @@ CREATE TABLE [dbo].[HistoricalSymbolChanges](
                     }
                     //dProduct = dProduct;
                     double dRetForPeriod = (dProduct - 1) * 100;
-                    logHelper.WriteLine("Return for period " + sStartDate + " to " + sEndDate + " for " + sIndexName + " = " + dRetForPeriod);
+                    LogHelper.WriteLine("Return for period " + sStartDate + " to " + sEndDate + " for " + sIndexName + " = " + dRetForPeriod);
                 }
             }
 
             catch (SqlException ex)
             {
-                logHelper.WriteLine(ex.Message);
+                LogHelper.WriteLine(ex.Message);
             }
 
             finally
             {
                 dr.Close();
                 conn.Close();
-                logHelper.WriteLine(sMsg + "finished " + DateTime.Now);
-                //logHelper.Flush();
+                LogHelper.WriteLine(sMsg + "finished " + DateTime.Now);
+                //LogHelper.Flush();
             }
 
             return;
@@ -2056,20 +2054,20 @@ CREATE TABLE [dbo].[HistoricalSymbolChanges](
                         indexRowRollUp.RateOfReturn += indexRowConstituent.RateOfReturn * indexRowConstituent.Weight / indexRowRollUp.Weight;
                 }
 
-            logHelper.WriteLine("---Before---");
+            LogHelper.WriteLine("---Before---");
             foreach (IndexRow indexRowRollUp in indexRowsRollUp)
             {
-                logHelper.WriteLine(indexRowRollUp.Identifier + " " + indexRowRollUp.Weight.ToString() + " " + indexRowRollUp.RateOfReturn.ToString());
+                LogHelper.WriteLine(indexRowRollUp.Identifier + " " + indexRowRollUp.Weight.ToString() + " " + indexRowRollUp.RateOfReturn.ToString());
             }
 
             AdjustReturnsToMatchPublishedTotalReturns(indexRowsRollUp, sDate, sIndexName);
-            logHelper.WriteLine("---After---");
+            LogHelper.WriteLine("---After---");
 
             foreach (IndexRow indexRowRollUp in indexRowsRollUp)
             {
-                logHelper.WriteLine(indexRowRollUp.Identifier + " " + indexRowRollUp.Weight.ToString() + " " + indexRowRollUp.RateOfReturnAdjusted.ToString());
+                LogHelper.WriteLine(indexRowRollUp.Identifier + " " + indexRowRollUp.Weight.ToString() + " " + indexRowRollUp.RateOfReturnAdjusted.ToString());
             }
-            logHelper.WriteLine("---Done---");
+            LogHelper.WriteLine("---Done---");
         }
 
         public void GenerateIndustryReturnsForDate(string sDate, string sIndexName)
@@ -2194,20 +2192,20 @@ CREATE TABLE [dbo].[HistoricalSymbolChanges](
                                 indexRowSector.RateOfReturn += indexRowConstituent.RateOfReturn * indexRowConstituent.Weight / indexRowSector.Weight;
                         }
 
-                    logHelper.WriteLine("---Before---");
+                    LogHelper.WriteLine("---Before---");
                     foreach (IndexRow indexRowSector in indexRowsSectorLevel1RollUp)
                     {
-                        logHelper.WriteLine(indexRowSector.Identifier + " " + indexRowSector.Weight.ToString() + " " + indexRowSector.RateOfReturn.ToString());
+                        LogHelper.WriteLine(indexRowSector.Identifier + " " + indexRowSector.Weight.ToString() + " " + indexRowSector.RateOfReturn.ToString());
                     }
 
                     AdjustReturnsToMatchPublishedTotalReturns(indexRowsSectorLevel1RollUp, sDate, sIndexName);
-                    logHelper.WriteLine("---After---");
+                    LogHelper.WriteLine("---After---");
 
                     foreach (IndexRow indexRowSector in indexRowsSectorLevel1RollUp)
                     {
-                        logHelper.WriteLine(indexRowSector.Identifier + " " + indexRowSector.Weight.ToString() + " " + indexRowSector.RateOfReturnAdjusted.ToString());
+                        LogHelper.WriteLine(indexRowSector.Identifier + " " + indexRowSector.Weight.ToString() + " " + indexRowSector.RateOfReturnAdjusted.ToString());
                     }
-                    logHelper.WriteLine("---Done---");
+                    LogHelper.WriteLine("---Done---");
                     */
                 }
             }
@@ -2413,7 +2411,7 @@ CREATE TABLE [dbo].[HistoricalSymbolChanges](
             try
             {
                 sMsg = "GenerateReturnsForDate: " + sDate + " Index: " + sIndexName;
-                logHelper.WriteLine(sMsg + sDate);
+                LogHelper.WriteLine(sMsg + sDate);
                 /*
                 declare
                     @FileDate datetime,
@@ -2471,7 +2469,7 @@ CREATE TABLE [dbo].[HistoricalSymbolChanges](
                         break;
                 }
 
-                logHelper.WriteLine(SqlSelect);
+                LogHelper.WriteLine(SqlSelect);
                 mSqlConn.Open();
                 SqlCommand cmd = new SqlCommand(SqlSelect + SqlOrderBy, mSqlConn);
                 cmd.Parameters.Add("@IndexName", SqlDbType.VarChar, 20);
@@ -2492,13 +2490,13 @@ CREATE TABLE [dbo].[HistoricalSymbolChanges](
 
             catch (SqlException ex)
             {
-                logHelper.WriteLine(ex.Message);
+                LogHelper.WriteLine(ex.Message);
             }
 
             finally
             {
                 //swLogFile.Flush();
-                //logHelper.WriteLine(sMsg + "finished " + DateTime.Now);
+                //LogHelper.WriteLine(sMsg + "finished " + DateTime.Now);
             }
 
             return (ReturnsGenerated);
@@ -2559,20 +2557,20 @@ CREATE TABLE [dbo].[HistoricalSymbolChanges](
                             sTicker = sOriginalTicker;
 
                         sMsg = sTicker + "," + sWeight + "," + sSecurityReturn + "," + sCusip;
-                        logHelper.WriteLine(sMsg);
+                        LogHelper.WriteLine(sMsg);
 
 
                         if ((mPrevId.Length > 0) && sCusip.Equals(mPrevId))
                         {
                             sMsg = "GetNextConstituentReturn: duplicate, " + sCusip;
-                            logHelper.WriteLine(sMsg);
+                            LogHelper.WriteLine(sMsg);
                         }
                         mPrevId = sCusip;
                     }
                     else
                     {
                         sMsg = "GetNextConstituentReturn:," + ConstituentCount.ToString();
-                        logHelper.WriteLine(sMsg);
+                        LogHelper.WriteLine(sMsg);
                         if (ConstituentCount > 0)
                         {
                             CloseGlobals();
@@ -2583,13 +2581,13 @@ CREATE TABLE [dbo].[HistoricalSymbolChanges](
 
             catch (SqlException ex)
             {
-                logHelper.WriteLine(ex.Message);
+                LogHelper.WriteLine(ex.Message);
             }
 
             finally
             {
                 //swLogFile.Flush();
-                //logHelper.WriteLine(sMsg + "finished " + DateTime.Now);
+                //LogHelper.WriteLine(sMsg + "finished " + DateTime.Now);
             }
 
             return (GetNext);
@@ -2661,20 +2659,20 @@ CREATE TABLE [dbo].[HistoricalSymbolChanges](
                         }
                     }
                     sMsg = sRgsId + "," + sWeight + "," + sReturn;
-                    logHelper.WriteLine(sMsg);
+                    LogHelper.WriteLine(sMsg);
                 }
             }
 
 
             catch (SqlException ex)
             {
-                logHelper.WriteLine(ex.Message);
+                LogHelper.WriteLine(ex.Message);
             }
 
             finally
             {
                 //swLogFile.Flush();
-                //logHelper.WriteLine(sMsg + "finished " + DateTime.Now);
+                //LogHelper.WriteLine(sMsg + "finished " + DateTime.Now);
             }
 
             return (GetNext);
@@ -2745,7 +2743,7 @@ CREATE TABLE [dbo].[HistoricalSymbolChanges](
             try
             {
                 //sMsg = "CalculateAdventTotalReturnForDate: ";
-                //logHelper.WriteLine(sMsg + sDate );
+                //LogHelper.WriteLine(sMsg + sDate );
                 string SqlSelect = @"
                     Select SUM(WeightedCalcReturn9) FROM ( 
                     SELECT ROUND((( (cast(h1.MktValue as float) * 
@@ -2774,7 +2772,7 @@ CREATE TABLE [dbo].[HistoricalSymbolChanges](
                     ) as SumWeightedCalcReturn9 
                 ";
 
-                //logHelper.WriteLine(SqlSelect);
+                //LogHelper.WriteLine(SqlSelect);
                 conn.Open();
                 SqlCommand cmd = new SqlCommand(SqlSelect, conn);
                 cmd.Parameters.Add("@IndexName", SqlDbType.VarChar, 20);
@@ -2793,7 +2791,7 @@ CREATE TABLE [dbo].[HistoricalSymbolChanges](
                         dReturn = Math.Round(dReturn, 9, MidpointRounding.AwayFromZero);
                         string sReturn = dReturn.ToString();
                         
-                        logHelper.WriteLine(sDate + " " + sReturn);
+                        LogHelper.WriteLine(sDate + " " + sReturn);
                         if (bSaveReturnInDb)
                         {
                             foreach( string sVendorFormat in sVendorFormats )
@@ -2811,7 +2809,7 @@ CREATE TABLE [dbo].[HistoricalSymbolChanges](
 
             catch (SqlException ex)
             {
-                logHelper.WriteLine(ex.Message);
+                LogHelper.WriteLine(ex.Message);
             }
 
             finally
@@ -2819,7 +2817,7 @@ CREATE TABLE [dbo].[HistoricalSymbolChanges](
                 dr.Close();
                 conn.Close();
                 //swLogFile.Flush();
-                //logHelper.WriteLine(sMsg + "finished " + DateTime.Now);
+                //LogHelper.WriteLine(sMsg + "finished " + DateTime.Now);
             }
 
             return (dReturn);
@@ -2936,7 +2934,7 @@ CREATE TABLE [dbo].[HistoricalSymbolChanges](
         {
             if (ex.Number == 2627)
             {
-                logHelper.WriteLine(ex.Message);
+                LogHelper.WriteLine(ex.Message);
             }
         }
         finally

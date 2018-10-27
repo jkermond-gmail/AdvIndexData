@@ -81,6 +81,7 @@ namespace IndexDataEngineLibrary
             int FilesDownloaded = 0;
             int JobsTotal = 0;
             int JobsProcessed = 0;
+            int FilesGenerated = 0;
 
 
             foreach (KeyValuePair<string, string> element in listVendorDatasets)
@@ -91,13 +92,26 @@ namespace IndexDataEngineLibrary
                 bool downloaded = AreVendorDatasetFilesDownloaded(vendor, dataset, sProcessDate, out FilesTotal, out FilesDownloaded);
                 LogHelper.WriteLine("Vendor | " + vendor + " | Dataset | " + dataset + " | sProcessDate | " + sProcessDate + " | FilesDownloaded | "
                                     + FilesDownloaded + " | FilesTotal | " + FilesTotal);
+
                 bool processed = AreVendorDatasetJobsProcessed(vendor, dataset, sProcessDate, out JobsTotal, out JobsProcessed);
                 LogHelper.WriteLine("Vendor | " + vendor + " | Dataset | " + dataset + " | sProcessDate | " + sProcessDate + " | JobsProcessed | "
                                     + JobsProcessed + " | JobsTotal | " + JobsTotal);
 
+                bool generated = AreVendorDatasetFilesGenerated(vendor, dataset, sProcessDate, out FilesTotal, out FilesGenerated);
+
             }
 
         }
+
+        private bool AreVendorDatasetFilesGenerated(string Vendor, string Dataset, string sProcessDate, out int FilesTotal, out int FilesGenerated)
+        {
+            FilesTotal = 0;
+            FilesGenerated = 0;
+            bool isGenerated = false;
+
+            return (isGenerated);
+        }
+
 
         private bool AreVendorDatasetFilesDownloaded( string Vendor, string Dataset, string sProcessDate, out int FilesTotal, out int FilesDownloaded)
         {

@@ -108,7 +108,7 @@ namespace IndexDataEngineLibrary
             //dateHelper = 
             LogHelper.Info("RussellData()", "RussellData");
             sharedData = new SharedData();
-            DateHelper.ConnectionString = sharedData.ConnectionString;
+            DateHelper.ConnectionString = sharedData.ConnectionStringAmdVifs;
             sharedData.Vendor = Vendors.Russell;
         }
 
@@ -181,11 +181,32 @@ namespace IndexDataEngineLibrary
         }
         #endregion End Constructor / Finish
 
+        #region ProcessVendorDatasetJobs
+
+        public void ProcessVendorDatasetJobs(string Dataset, string sProcessDate)
+        {
+
+            DateTime ProcessDate = Convert.ToDateTime(sProcessDate);
+
+            ProcessVendorFiles(ProcessDate, ProcessDate, Dataset, true, true, true, true, true);
+            string sIndexName = "";
+            string[] Indices = null;
+            Indices = GetIndices();
+            for (int i = 0; i < Indices.Length; i++)
+            {
+                sIndexName = Indices[i];
+                GenerateReturnsForDateRange(sProcessDate, sProcessDate, sIndexName, AdventOutputType.Constituent);
+                GenerateReturnsForDateRange(sProcessDate, sProcessDate, sIndexName, AdventOutputType.Sector);
+            }
+        }
+
+        #endregion
+
         #region Daily Holdings File Processing
 
         public bool HoldingsFilesUpdated(DateTime ProcessDate)
         {
-            SqlConnection cnSql = new SqlConnection(sharedData.ConnectionString);
+            SqlConnection cnSql = new SqlConnection(sharedData.ConnectionStringIndexData);
             SqlDataReader dr = null;
             string sFileDate = "";
             bool bUpdated = false;
@@ -272,7 +293,7 @@ namespace IndexDataEngineLibrary
             return (bUpdated);
         }
 
-        public void ProcessVendorFiles(DateTime oStartDate, DateTime oEndDate, bool bOpenFiles, bool bCloseFiles, 
+        public void ProcessVendorFiles(DateTime oStartDate, DateTime oEndDate, string Dataset, bool bOpenFiles, bool bCloseFiles, 
                                        bool bTotalReturnFiles, bool bSecurityMaster, bool bSymbolChanges)
         {
             DateTime oProcessDate;
@@ -366,7 +387,7 @@ namespace IndexDataEngineLibrary
             //    PRIMARY KEY CLUSTERED (FileType,FileDate)
             //)
 
-            SqlConnection cnSql = new SqlConnection(sharedData.ConnectionString);
+            SqlConnection cnSql = new SqlConnection(sharedData.ConnectionStringIndexData);
             try
             {
                 string sFileType = "";
@@ -579,8 +600,8 @@ RU3000    20170103   CHF   1662.25918   1365.02441   1696.48181   1567.99955    
 
         private void AddRussellOpeningData(VendorFileFormats FileFormat, string FileName, DateTime FileDate)
         {
-            SqlConnection cnSql1 = new SqlConnection(sharedData.ConnectionString);
-            SqlConnection cnSql2 = new SqlConnection(sharedData.ConnectionString);
+            SqlConnection cnSql1 = new SqlConnection(sharedData.ConnectionStringIndexData);
+            SqlConnection cnSql2 = new SqlConnection(sharedData.ConnectionStringIndexData);
             string SqlDelete;
             string SqlWhere;
             SqlCommand cmdHoldings = null;
@@ -994,7 +1015,7 @@ RU3000    20170103   CHF   1662.25918   1365.02441   1696.48181   1567.99955    
 
         private void AddRussellClosingData(VendorFileFormats FileFormat, string FileName, DateTime FileDate)
         {
-            SqlConnection cnSql = new SqlConnection(sharedData.ConnectionString);
+            SqlConnection cnSql = new SqlConnection(sharedData.ConnectionStringIndexData);
             cnSql.Open();
             string sTable = "RussellDailyHoldings1";
             string SqlUpdate = "update " + sTable + " set SecurityReturn = @SecurityReturn ";
@@ -1124,7 +1145,7 @@ RU3000    20170103   CHF   1662.25918   1365.02441   1696.48181   1567.99955    
 
         public int GetDailyHoldings1Count(DateTime FileDate, string sCUSIP)
         {
-            SqlConnection conn = new SqlConnection(sharedData.ConnectionString);
+            SqlConnection conn = new SqlConnection(sharedData.ConnectionStringIndexData);
             int Count = 0;
             try
             {
@@ -1155,7 +1176,7 @@ RU3000    20170103   CHF   1662.25918   1365.02441   1696.48181   1567.99955    
 
         public string GetOldCUSIP(string sNewCUSIP)
         {
-            SqlConnection cnSql = new SqlConnection(sharedData.ConnectionString);
+            SqlConnection cnSql = new SqlConnection(sharedData.ConnectionStringIndexData);
             SqlDataReader dr = null;
             string sOldCUSIP = "";
 
@@ -1209,7 +1230,7 @@ RU3000    20170103   CHF   1662.25918   1365.02441   1696.48181   1567.99955    
             {
                 if (mSqlConn == null)
                 {
-                    mSqlConn = new SqlConnection(sharedData.ConnectionString);
+                    mSqlConn = new SqlConnection(sharedData.ConnectionStringIndexData);
                     mSqlConn.Open();
                 }
 
@@ -1285,7 +1306,7 @@ RU3000    20170103   CHF   1662.25918   1365.02441   1696.48181   1567.99955    
             {
                 if (mSqlConn == null)
                 {
-                    mSqlConn = new SqlConnection(sharedData.ConnectionString);
+                    mSqlConn = new SqlConnection(sharedData.ConnectionStringIndexData);
                     mSqlConn.Open();
                 }
                 CultureInfo enUS = new CultureInfo("en-US");
@@ -1350,7 +1371,7 @@ RU3000    20170103   CHF   1662.25918   1365.02441   1696.48181   1567.99955    
             {
                 if (mSqlConn == null)
                 {
-                    mSqlConn = new SqlConnection(sharedData.ConnectionString);
+                    mSqlConn = new SqlConnection(sharedData.ConnectionStringIndexData);
                     mSqlConn.Open();
                 }
                 string SqlSelectCount = "select count(*) from JobIndexIDs ";
@@ -1446,7 +1467,7 @@ RU3000    20170103   CHF   1662.25918   1365.02441   1696.48181   1567.99955    
 
             try
             {
-                SqlConnection SqlConn = new SqlConnection(sharedData.ConnectionString);
+                SqlConnection SqlConn = new SqlConnection(sharedData.ConnectionStringIndexData);
                 SqlConn.Open();
 
                 string SqlSelect = null;
@@ -1556,7 +1577,7 @@ CREATE TABLE [dbo].[HistoricalSymbolChanges](
             {
                 if (mSqlConn == null)
                 {
-                    mSqlConn = new SqlConnection(sharedData.ConnectionString);
+                    mSqlConn = new SqlConnection(sharedData.ConnectionStringIndexData);
                     mSqlConn.Open();
                 }
                 string SqlSelect = @"
@@ -1613,7 +1634,7 @@ CREATE TABLE [dbo].[HistoricalSymbolChanges](
             {
                 if (mSqlConn == null)
                 {
-                    mSqlConn = new SqlConnection(sharedData.ConnectionString);
+                    mSqlConn = new SqlConnection(sharedData.ConnectionStringIndexData);
                     mSqlConn.Open();
                 }
                 string SqlSelect = @"
@@ -1821,20 +1842,20 @@ CREATE TABLE [dbo].[HistoricalSymbolChanges](
         public string GetAdventIndex(string VendorIndex)
         {
             string AdventIndex = "";
-            SqlConnection conn = new SqlConnection(sharedData.ConnectionString);
+            SqlConnection conn = new SqlConnection(sharedData.ConnectionStringIndexData);
             SqlDataReader dr = null;
 
             try
             {
-                string SqlSelect = "select IndexClientName from VendorIndexMap ";
-                string SqlWhere = "where Vendor = 'Russell' and Supported = 'Yes' and IndexName ='" + VendorIndex + "'";
+                string SqlSelect = "select AdventIndexName from VendorIndexMap ";
+                string SqlWhere = "where Vendor = 'Russell' and Supported = 'Yes' and VendorIndexName ='" + VendorIndex + "'";
                 conn.Open();
                 SqlCommand cmd = new SqlCommand(SqlSelect + SqlWhere, conn);
                 dr = cmd.ExecuteReader();
                 if (dr.HasRows)
                 {
                     dr.Read();
-                    AdventIndex = dr["IndexClientName"].ToString();
+                    AdventIndex = dr["AdventIndexName"].ToString();
                 }
             }
             catch (SqlException ex)
@@ -1860,15 +1881,15 @@ CREATE TABLE [dbo].[HistoricalSymbolChanges](
         public string[] GetVendorIndices()
         {
             string[] Indices = null;
-            SqlConnection conn = new SqlConnection(sharedData.ConnectionString);
+            SqlConnection conn = new SqlConnection(sharedData.ConnectionStringIndexData);
             SqlDataReader dr = null;
 
             try
             {
-                string SqlSelectCount = "select count(IndexClientName) from VendorIndexMap ";
-                string SqlSelect = "select IndexName from VendorIndexMap ";
+                string SqlSelectCount = "select count(VendorIndexName) from VendorIndexMap ";
+                string SqlSelect = "select VendorIndexName from VendorIndexMap ";
                 string SqlWhere = "where Vendor = 'Russell' and Supported = 'Yes' ";
-                string SqlOrderBy = "order by IndexName";
+                string SqlOrderBy = "order by VendorIndexName";
 
                 conn.Open();
                 SqlCommand cmd = new SqlCommand(SqlSelectCount + SqlWhere, conn);
@@ -1881,7 +1902,7 @@ CREATE TABLE [dbo].[HistoricalSymbolChanges](
                     int i = 0;
                     while (dr.Read())
                     {
-                        Indices[i] = dr["IndexName"].ToString();
+                        Indices[i] = dr["VendorIndexName"].ToString();
                         i += 1;
                     }
                 }
@@ -1930,7 +1951,7 @@ CREATE TABLE [dbo].[HistoricalSymbolChanges](
         // CalculateAdventTotalReturnsForPeriod for Vendor Russell Advent calculation
         public void CalculateAdventTotalReturnsForPeriod(string sStartDate, string sEndDate, string sIndexName)
         {
-            SqlConnection conn = new SqlConnection(sharedData.ConnectionString);
+            SqlConnection conn = new SqlConnection(sharedData.ConnectionStringIndexData);
             SqlDataReader dr = null;
             string sMsg = null;
             double dReturn = 0.0;
@@ -2213,7 +2234,7 @@ CREATE TABLE [dbo].[HistoricalSymbolChanges](
 
 
 #if COMMENTED
-            #region 3. Now consolidate each dictionary into one indexRow and put it in new IndexRows.
+        #region 3. Now consolidate each dictionary into one indexRow and put it in new IndexRows.
 
                 List<IndexRow> newIndexRows = new List<IndexRow>();
 
@@ -2246,8 +2267,33 @@ CREATE TABLE [dbo].[HistoricalSymbolChanges](
 
                     indRowCounter++;
 
-            #endregion
+        #endregion
 #endif
+
+        public void GenerateReturnsForDateRange(string sStartDate, string sEndDate, string sIndexName, AdventOutputType adventOutputType)
+        {
+            DateTime startDate = Convert.ToDateTime(sStartDate);
+            DateTime endDate = Convert.ToDateTime(sEndDate);
+            DateTime processDate;
+            int DateCompare;
+
+            for (processDate = startDate
+               ; (DateCompare = processDate.CompareTo(endDate)) <= 0
+               ; processDate = processDate.AddDays(1))
+            {
+                if (adventOutputType.Equals(AdventOutputType.Constituent))
+                {
+                    GenerateConstituentReturnsForDate(processDate.ToString("MM/dd/yyyy"), sIndexName);
+                    GenerateAxmlFileConstituents(processDate.ToString("MM/dd/yyyy"), sIndexName);
+                }
+                else if (adventOutputType.Equals(AdventOutputType.Sector))
+                {
+                    GenerateIndustryReturnsForDate(processDate.ToString("MM/dd/yyyy"), sIndexName);
+                    GenerateAxmlFileSectors(processDate.ToString("MM/dd/yyyy"), sIndexName);
+                }
+            }
+        }
+
 
         public void GenerateConstituentReturnsForDate(string sDate, string sIndexName)
         {
@@ -2405,7 +2451,7 @@ CREATE TABLE [dbo].[HistoricalSymbolChanges](
         private bool GenerateReturnsForDate(string sDate, string sIndexName, AdventOutputType OutputType)
         {
             string sMsg = null;
-            mSqlConn = new SqlConnection(sharedData.ConnectionString);
+            mSqlConn = new SqlConnection(sharedData.ConnectionStringIndexData);
             bool ReturnsGenerated = false;
 
             try
@@ -2735,7 +2781,7 @@ CREATE TABLE [dbo].[HistoricalSymbolChanges](
 
         private double CalculateAdventTotalReturnForDate(string sDate, string sIndexName, bool bSaveReturnInDb)
         {
-            SqlConnection conn = new SqlConnection(sharedData.ConnectionString);
+            SqlConnection conn = new SqlConnection(sharedData.ConnectionStringIndexData);
             SqlDataReader dr = null;
             double dReturn = 0.0;
             // string sMsg = null;
@@ -2827,7 +2873,7 @@ CREATE TABLE [dbo].[HistoricalSymbolChanges](
 
         public string GetNewCUSIP(string sOldCUSIP)
         {
-            SqlConnection cnSql = new SqlConnection(sharedData.ConnectionString);
+            SqlConnection cnSql = new SqlConnection(sharedData.ConnectionStringIndexData);
             SqlDataReader dr = null;
             string sNewCUSIP = sOldCUSIP;
 
@@ -2868,7 +2914,7 @@ CREATE TABLE [dbo].[HistoricalSymbolChanges](
 
         public string GetSecurityMasterTicker(string sCUSIP)
         {
-            SqlConnection cnSql = new SqlConnection(sharedData.ConnectionString);
+            SqlConnection cnSql = new SqlConnection(sharedData.ConnectionStringIndexData);
             SqlDataReader dr = null;
             string sTicker = "";
 
@@ -2911,7 +2957,7 @@ CREATE TABLE [dbo].[HistoricalSymbolChanges](
 
     public void DeleteRussellTotalReturnForIndex(DateTime FileDate, string sIndexName)
     {
-       SqlConnection cnSql = new SqlConnection(sharedData.ConnectionString);
+       SqlConnection cnSql = new SqlConnection(sharedData.ConnectionStringIndexData);
             try
             {
             string SqlDelete;
@@ -2945,7 +2991,7 @@ CREATE TABLE [dbo].[HistoricalSymbolChanges](
 
         public void AddCalculatedTotalReturn(string sDate, string sIndexName, double dReturn)
         {
-            SqlConnection cnSql = new SqlConnection(sharedData.ConnectionString);
+            SqlConnection cnSql = new SqlConnection(sharedData.ConnectionStringIndexData);
             try
             {
                 cnSql.Open();
@@ -3000,7 +3046,7 @@ CREATE TABLE [dbo].[HistoricalSymbolChanges](
         public double GetAdvAdjReturnForDate(string sDate, string sIndexName)
         {
             SqlDataReader dr = null;
-            SqlConnection cnSql = new SqlConnection(sharedData.ConnectionString);
+            SqlConnection cnSql = new SqlConnection(sharedData.ConnectionStringIndexData);
             double dReturn = 0.0;
             try
             {
@@ -3045,7 +3091,7 @@ CREATE TABLE [dbo].[HistoricalSymbolChanges](
         public double GetVendorTotalReturnForDate(string sDate, string sIndexName)
         {
             SqlDataReader dr = null;
-            SqlConnection cnSql = new SqlConnection(sharedData.ConnectionString);
+            SqlConnection cnSql = new SqlConnection(sharedData.ConnectionStringIndexData);
             double dReturn = 0.0;
             try
             {
@@ -3092,7 +3138,7 @@ CREATE TABLE [dbo].[HistoricalSymbolChanges](
         public double GetAdvVsVendorDiffForDate(string sDate, string sIndexName)
         {
             SqlDataReader dr = null;
-            SqlConnection cnSql = new SqlConnection(sharedData.ConnectionString);
+            SqlConnection cnSql = new SqlConnection(sharedData.ConnectionStringIndexData);
             double dDiff = 0.0;
             try
             {
@@ -3148,7 +3194,7 @@ CREATE TABLE [dbo].[HistoricalSymbolChanges](
                 {
                     if (mSqlConn == null)
                     {
-                        mSqlConn = new SqlConnection(sharedData.ConnectionString);
+                        mSqlConn = new SqlConnection(sharedData.ConnectionStringIndexData);
                         mSqlConn.Open();
                     }
                     string sTotalReturn = String.Empty;
@@ -3243,7 +3289,7 @@ CREATE TABLE [dbo].[HistoricalSymbolChanges](
                 {
                     if (mSqlConn == null)
                     {
-                        mSqlConn = new SqlConnection(sharedData.ConnectionString);
+                        mSqlConn = new SqlConnection(sharedData.ConnectionStringIndexData);
                         mSqlConn.Open();
                     }
                     SqlDataReader dr = null;
@@ -3352,7 +3398,7 @@ CREATE TABLE [dbo].[HistoricalSymbolChanges](
             {
                 if (mSqlConn == null)
                 {
-                    mSqlConn = new SqlConnection(sharedData.ConnectionString);
+                    mSqlConn = new SqlConnection(sharedData.ConnectionStringIndexData);
                     mSqlConn.Open();
                 }
 

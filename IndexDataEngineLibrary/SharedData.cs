@@ -35,7 +35,8 @@ namespace IndexDataEngineLibrary
     {
         //private string mConnectionString = "server=VSTGMDDB2-1;database=IndexData;uid=sa;pwd=M@gichat!";
         //private string mConnectionString = @"server=JKERMOND-NEW\SQLEXPRESS2014;database=IndexData;uid=sa;pwd=M@gichat!";
-        private string mConnectionString = null;
+        private string mConnectionStringAmdVifs = null;
+        private string mConnectionStringIndexData = null;
 
         private SqlConnection mSqlConn = null;
 
@@ -48,33 +49,39 @@ namespace IndexDataEngineLibrary
             set { mVendor = value; }
         }
 
-        public string ConnectionString
+        public string ConnectionStringIndexData
         {
-            get { return mConnectionString; }
+            get { return mConnectionStringIndexData; }
+        }
+
+        public string ConnectionStringAmdVifs
+        {
+            get { return mConnectionStringAmdVifs; }
         }
 
         public SharedData()
         {
-            mConnectionString = ConfigurationManager.ConnectionStrings["dbConnectionIndexData"].ConnectionString;
+            mConnectionStringIndexData = ConfigurationManager.ConnectionStrings["dbConnectionIndexData"].ConnectionString;
+            mConnectionStringAmdVifs = ConfigurationManager.ConnectionStrings["dbConnectionAmdVifs"].ConnectionString;
         }
 
 
         public string[] GetIndices()
         {
             string[] Indices = null;
-            SqlConnection conn = new SqlConnection(mConnectionString);
+            SqlConnection conn = new SqlConnection(mConnectionStringIndexData);
             SqlDataReader dr = null;
 
             try
             {
-                string SqlSelectCount = "select count(IndexClientName) from VendorIndexMap ";
-                string SqlSelect = "select IndexClientName from VendorIndexMap ";
+                string SqlSelectCount = "select count(AdventIndexName) from VendorIndexMap ";
+                string SqlSelect = "select AdventIndexName from VendorIndexMap ";
                 string SqlWhere = "";
                 if (mVendor.Equals(Vendors.Russell))
                     SqlWhere = "where Vendor = 'Russell' and Supported = 'Yes' ";
                 else if (mVendor.Equals(Vendors.Snp))
                     SqlWhere = "where Vendor = 'StandardAndPoors' and Supported = 'Yes' ";
-                string SqlOrderBy = "order by IndexClientName";
+                string SqlOrderBy = "order by AdventIndexName";
 
                 conn.Open();
                 SqlCommand cmd = new SqlCommand(SqlSelectCount + SqlWhere, conn);
@@ -87,7 +94,7 @@ namespace IndexDataEngineLibrary
                     int i = 0;
                     while (dr.Read())
                     {
-                        Indices[i] = dr["IndexClientName"].ToString();
+                        Indices[i] = dr["AdventIndexName"].ToString();
                         i += 1;
                     }
                 }
@@ -109,19 +116,19 @@ namespace IndexDataEngineLibrary
         public string[] GetVendorIndices()
         {
             string[] Indices = null;
-            SqlConnection conn = new SqlConnection(mConnectionString);
+            SqlConnection conn = new SqlConnection(mConnectionStringIndexData);
             SqlDataReader dr = null;
 
             try
             {
-                string SqlSelectCount = "select count(IndexName) from VendorIndexMap ";
-                string SqlSelect = "select IndexName from VendorIndexMap ";
+                string SqlSelectCount = "select count(AdventIndexName) from VendorIndexMap ";
+                string SqlSelect = "select AdventIndexName from VendorIndexMap ";
                 string SqlWhere = "";
                 if (mVendor.Equals(Vendors.Russell))
                     SqlWhere = "where Vendor = 'Russell' and Supported = 'Yes' ";
                 else if (mVendor.Equals(Vendors.Snp))
                     SqlWhere = "where Vendor = 'StandardAndPoors' and Supported = 'Yes' ";
-                string SqlOrderBy = "order by IndexName";
+                string SqlOrderBy = "order by AdventIndexName";
 
                 conn.Open();
                 SqlCommand cmd = new SqlCommand(SqlSelectCount + SqlWhere, conn);
@@ -134,7 +141,7 @@ namespace IndexDataEngineLibrary
                     int i = 0;
                     while (dr.Read())
                     {
-                        Indices[i] = dr["IndexName"].ToString();
+                        Indices[i] = dr["AdventIndexName"].ToString();
                         i += 1;
                     }
                 }
@@ -168,7 +175,7 @@ namespace IndexDataEngineLibrary
             {
                 if (mSqlConn == null)
                 {
-                    mSqlConn = new SqlConnection(mConnectionString);
+                    mSqlConn = new SqlConnection(mConnectionStringIndexData);
                     mSqlConn.Open();
                 }
                 string SqlSelect = @"

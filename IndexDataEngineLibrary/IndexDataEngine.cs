@@ -20,8 +20,8 @@ namespace IndexDataEngineLibrary
 
         private SqlConnection cnSqlIndexData = null;
         private SqlConnection cnSqlAmdVifs = null;
-        private string sAmdVifsProcessDate;
-        private DateTime AmdVifsProcessDate;
+        private string sVifsProcessDate;
+        private DateTime VifsProcessDate;
         private string sIndexDataProcessDate;
         private DateTime IndexDataProcessDate;
 
@@ -41,17 +41,27 @@ namespace IndexDataEngineLibrary
 
             BeginSql();
 
-            sAmdVifsProcessDate = getVIFsProcessDate();
-            AmdVifsProcessDate = DateTime.ParseExact(sAmdVifsProcessDate, "MM/dd/yyyy", CultureInfo.InvariantCulture);
+            sVifsProcessDate = getVIFsProcessDate();
+            VifsProcessDate = DateTime.ParseExact(sVifsProcessDate, "MM/dd/yyyy", CultureInfo.InvariantCulture);
             sIndexDataProcessDate = getIndexDataProcessDate();
             IndexDataProcessDate = DateTime.ParseExact(sIndexDataProcessDate, "MM/dd/yyyy", CultureInfo.InvariantCulture);
 
-            if (AmdVifsProcessDate > IndexDataProcessDate)
+            if (VifsProcessDate.Date > IndexDataProcessDate.Date)
             {
                 // Initialize everything cuz its a new day
-                setIndexDataProcessDate(sAmdVifsProcessDate);
+                setIndexDataProcessDate(sVifsProcessDate);
             }
-            ProcessIndexDataWork(sAmdVifsProcessDate);
+            ProcessIndexDataWork(sVifsProcessDate);
+
+            bool testing = true;
+            if (testing)
+            {
+                if (sVifsProcessDate.Equals("10/26/2018"))
+                    testing = false;
+                VifsProcessDate = DateHelper.NextBusinessDay(VifsProcessDate);
+                sVifsProcessDate = VifsProcessDate.ToString("MM/dd/yyyy");
+                setVIFsProcessDate(sVifsProcessDate);
+            }
             //RussellData russellData = new RussellData(LogHelper);
             //russellData.SetConnectionString(sConnectionIndexData);
             //DateTime StartDate = DateTime.ParseExact("01/03/2017", "MM/dd/yyyy", CultureInfo.InvariantCulture);
@@ -81,29 +91,46 @@ namespace IndexDataEngineLibrary
             int FilesDownloaded = 0;
             int JobsTotal = 0;
             int JobsProcessed = 0;
-            int FilesGenerated = 0;
+            //int FilesGenerated = 0;
 
 
             foreach (KeyValuePair<string, string> element in listVendorDatasets)
             {
-
                 vendor = element.Key.ToString();
                 dataset = element.Value.ToString();
-                bool downloaded = AreVendorDatasetFilesDownloaded(vendor, dataset, sProcessDate, out FilesTotal, out FilesDownloaded);
-                LogHelper.WriteLine("Vendor | " + vendor + " | Dataset | " + dataset + " | sProcessDate | " + sProcessDate + " | FilesDownloaded | "
-                                    + FilesDownloaded + " | FilesTotal | " + FilesTotal);
 
-                bool processed = AreVendorDatasetJobsProcessed(vendor, dataset, sProcessDate, out JobsTotal, out JobsProcessed);
-                LogHelper.WriteLine("Vendor | " + vendor + " | Dataset | " + dataset + " | sProcessDate | " + sProcessDate + " | JobsProcessed | "
-                                    + JobsProcessed + " | JobsTotal | " + JobsTotal);
+                bool testing = true;
+                if (testing)
+                    VendorDatasetFilesUpdateLastProcessDate(vendor, dataset, sProcessDate);
 
-                bool generated = AreVendorDatasetFilesGenerated(vendor, dataset, sProcessDate, out FilesTotal, out FilesGenerated);
+                if (VendorDatasetFilesDownloaded(vendor, dataset, sProcessDate, out FilesTotal, out FilesDownloaded))
+                {
+
+                    LogHelper.WriteLine("Vendor | " + vendor + " | Dataset | " + dataset + " | sProcessDate | " + sProcessDate + " | FilesDownloaded | "
+                                        + FilesDownloaded + " | FilesTotal | " + FilesTotal);
+
+                    if (VendorDatasetJobsProcessed(vendor, dataset, sProcessDate, out JobsTotal, out JobsProcessed))
+                    {
+                        LogHelper.WriteLine("Vendor | " + vendor + " | Dataset | " + dataset + " | sProcessDate | " + sProcessDate + " | JobsProcessed | "
+                                            + JobsProcessed + " | JobsTotal | " + JobsTotal);
+
+                        //if (VendorDatasetFilesGenerated(vendor, dataset, sProcessDate, out FilesTotal, out FilesGenerated))
+                        //{
+
+                        //}
+                    }
+                    else
+                    {
+                        ProcessVendorDatasetJobs(vendor, dataset, sProcessDate, out JobsTotal, out JobsProcessed);
+                        VendorDatasetJobsUpdateProcessDate(vendor, dataset, sProcessDate);
+                        }
+                }
 
             }
 
         }
 
-        private bool AreVendorDatasetFilesGenerated(string Vendor, string Dataset, string sProcessDate, out int FilesTotal, out int FilesGenerated)
+        private bool VendorDatasetFilesGenerated(string Vendor, string Dataset, string sProcessDate, out int FilesTotal, out int FilesGenerated)
         {
             FilesTotal = 0;
             FilesGenerated = 0;
@@ -113,7 +140,7 @@ namespace IndexDataEngineLibrary
         }
 
 
-        private bool AreVendorDatasetFilesDownloaded( string Vendor, string Dataset, string sProcessDate, out int FilesTotal, out int FilesDownloaded)
+        private bool VendorDatasetFilesDownloaded( string Vendor, string Dataset, string sProcessDate, out int FilesTotal, out int FilesDownloaded)
         {
             FilesTotal = 0;
             FilesDownloaded = 0;
@@ -181,13 +208,50 @@ namespace IndexDataEngineLibrary
             return (isDownloaded);
         }
 
-        private bool AreVendorDatasetJobsProcessed(string Vendor, string Dataset, string sProcessDate, out int JobsTotal, out int JobsProcessed)
+        private void VendorDatasetFilesUpdateLastProcessDate(string Vendor, string Dataset, string sProcessDate)
+        {
+            SqlCommand cmd = null;
+            string logFuncName = "VendorDatasetFilesUpdateLastProcessDate: ";
+
+
+            string commandText = @"
+                Update VIFs set LastProcessDate = @LastProcessDate
+                where Vendor = @Vendor and DataSet = @Dataset and [Application] = 'IDX' and Active = 'Yes'
+                ";
+            try
+            {
+                cmd = new SqlCommand
+                {
+                    Connection = cnSqlAmdVifs,
+                    CommandText = commandText
+                };
+
+                cmd.Parameters.Add("@Vendor", SqlDbType.VarChar);
+                cmd.Parameters["@Vendor"].Value = Vendor;
+                cmd.Parameters.Add("@Dataset", SqlDbType.VarChar);
+                cmd.Parameters["@Dataset"].Value = Dataset;
+                cmd.Parameters.Add("@LastProcessDate", SqlDbType.Date);
+                cmd.Parameters["@LastProcessDate"].Value = sProcessDate;
+                cmd.ExecuteNonQuery();
+            }
+            catch (SqlException ex)
+            {
+                LogHelper.WriteLine(logFuncName + " " + ex.Message);
+            }
+            finally
+            {
+                LogHelper.WriteLine(logFuncName + " done ");
+            }
+        }
+
+
+        private bool VendorDatasetJobsProcessed(string Vendor, string Dataset, string sProcessDate, out int JobsTotal, out int JobsProcessed)
         {
             JobsTotal = 0;
             JobsProcessed = 0;
             bool Processed = false;
             SqlCommand cmd = null;
-            string logFuncName = "AreVendorDatasetJobsProcessed: ";
+            string logFuncName = "VendorDatasetJobsProcessed: ";
 
 
             string commandText = @"
@@ -249,6 +313,60 @@ namespace IndexDataEngineLibrary
             }
 
             return (Processed);
+        }
+
+        private void VendorDatasetJobsUpdateProcessDate(string Vendor, string Dataset, string sProcessDate)
+        {
+            SqlCommand cmd = null;
+            string logFuncName = "VendorDatasetJobsUpdateProcessDate: ";
+
+
+            string commandText = @"
+                update Jobs set LastProcessDate = @ProcessDate
+                WHERE  Vendor = @Vendor and DataSet = @Dataset and JobType = 'Vendor' and Active = 'Yes'
+                ";
+            try
+            {
+                cmd = new SqlCommand
+                {
+                    Connection = cnSqlIndexData,
+                    CommandText = commandText
+                };
+
+                cmd.Parameters.Add("@Vendor", SqlDbType.VarChar);
+                cmd.Parameters["@Vendor"].Value = Vendor;
+                cmd.Parameters.Add("@Dataset", SqlDbType.VarChar);
+                cmd.Parameters["@Dataset"].Value = Dataset;
+                cmd.Parameters.Add("@ProcessDate", SqlDbType.Date);
+                cmd.Parameters["@ProcessDate"].Value = sProcessDate;
+
+                cmd.ExecuteNonQuery();
+            }
+            catch (SqlException ex)
+            {
+                LogHelper.WriteLine(logFuncName + " " + ex.Message);
+            }
+            finally
+            {
+                LogHelper.WriteLine(logFuncName + " done ");
+            }
+        }
+
+        private void ProcessVendorDatasetJobs(string Vendor, string Dataset, string sProcessDate, out int JobsTotal, out int JobsProcessed)
+        {
+            JobsTotal = 0;
+            JobsProcessed = 0;
+
+            if (Vendor.Equals("Russell"))
+            {
+                RussellData russellData = new RussellData();
+                russellData.ProcessVendorDatasetJobs(Dataset, sProcessDate);
+            }
+            else if (Vendor.Equals("StandardAndPoors"))
+            {
+                SnpData snpData = new SnpData();
+                snpData.ProcessVendorDatasetJobs(Dataset, sProcessDate);
+            }
         }
 
 
@@ -444,6 +562,10 @@ namespace IndexDataEngineLibrary
             setSystemSettingValue("IndexDataProcessDate", sDate, cnSqlIndexData);
         }
 
+        private void setVIFsProcessDate(string sDate)
+        {
+            setSystemSettingValue("VIFLastProcessDate", sDate, cnSqlAmdVifs);
+        }
 
 
         private void EndSql()

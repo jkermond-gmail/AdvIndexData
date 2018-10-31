@@ -27,6 +27,7 @@ namespace IndexDataForm
         private IndexDataEngine indexDataEngine;
         private RussellData russellData = null;
         private SnpData snpData = null;
+        //private SharedData 
 
 
         public IndexDataForm()
@@ -130,15 +131,9 @@ namespace IndexDataForm
                 Indexname = Indexname.ToUpper();
 
                 if (cboOutputType.Text.Equals("Constituent"))
-                { 
-                    russellData.GenerateConstituentReturnsForDate(lnkEndDate.Text, Indexname);
-                    russellData.GenerateAxmlFileConstituents(lnkEndDate.Text, Indexname);
-                }
+                    russellData.GenerateReturnsForDateRange(lnkStartDate.Text, lnkEndDate.Text, Indexname, AdventOutputType.Constituent);
                 else if (cboOutputType.Text.Equals("Sector"))
-                { 
-                    russellData.GenerateIndustryReturnsForDate(lnkEndDate.Text, Indexname);
-                    russellData.GenerateAxmlFileSectors(lnkEndDate.Text, Indexname);
-                }
+                    russellData.GenerateReturnsForDateRange(lnkStartDate.Text, lnkEndDate.Text, Indexname, AdventOutputType.Sector);
             }
             else if (cboVendor.SelectedItem.Equals("S&P"))
             {
@@ -159,13 +154,15 @@ namespace IndexDataForm
             if (!bEndDateSelected)
                 endDate = Convert.ToDateTime(lnkEndDate.Text);
 
+            string DataSet = "All";
+
             if (cboVendor.SelectedItem.Equals("Russell"))
             {
-                russellData.ProcessVendorFiles(startDate, endDate, true, true, true, true, true);
+                russellData.ProcessVendorFiles(startDate, endDate, DataSet, true, true, true, true, true);
             }
             else if (cboVendor.SelectedItem.Equals("S&P"))
             {
-                snpData.ProcessVendorFiles(startDate, endDate, true, true, true, true, true);                
+                snpData.ProcessVendorFiles(startDate, endDate, DataSet, true, true, true, true, true);                
             }
         }
 

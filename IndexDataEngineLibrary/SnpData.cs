@@ -51,16 +51,16 @@ namespace IndexDataEngineLibrary
         {
             LogHelper.Info("SnpData()", "SnpData");
             sharedData = new SharedData();
-            DateHelper.ConnectionString = sharedData.ConnectionString;
+            DateHelper.ConnectionString = sharedData.ConnectionStringAmdVifs;
             sharedData.Vendor = Vendors.Snp;
-            mSqlConn = new SqlConnection(sharedData.ConnectionString);
+            mSqlConn = new SqlConnection(sharedData.ConnectionStringIndexData);
             try
             {
                 mSqlConn.Open();
             }
             catch( SqlException ex)
             {
-                Console.WriteLine(sharedData.ConnectionString);
+                Console.WriteLine(sharedData.ConnectionStringIndexData);
                 Console.WriteLine(ex.Message);
             }
             finally
@@ -88,6 +88,20 @@ namespace IndexDataEngineLibrary
             //mRolledUpReturn = 0.0;
 
         }
+
+        #region ProcessVendorDatasetJobs
+
+        public void ProcessVendorDatasetJobs(string Dataset, string sProcessDate)
+        {
+            DateTime ProcessDate = Convert.ToDateTime(sProcessDate);
+
+            ProcessVendorFiles(ProcessDate, ProcessDate, Dataset, true, true, true, true, true);
+            string sIndexName = Dataset;
+            GenerateReturnsForDateRange(sProcessDate, sProcessDate, sIndexName, AdventOutputType.Constituent);
+            GenerateReturnsForDateRange(sProcessDate, sProcessDate, sIndexName, AdventOutputType.Sector);
+        }
+
+        #endregion
 
 
         #region CsvReader
@@ -201,7 +215,7 @@ namespace IndexDataEngineLibrary
             return (sharedData.GetIndices());
         }
 
-        public void ProcessVendorFiles(DateTime oStartDate, DateTime oEndDate, bool bOpenFiles, bool bCloseFiles,
+        public void ProcessVendorFiles(DateTime oStartDate, DateTime oEndDate, string Dataset, bool bOpenFiles, bool bCloseFiles,
                                        bool bTotalReturnFiles, bool bSecurityMaster, bool bSymbolChanges)
         {
             DateTime oProcessDate;
@@ -224,86 +238,74 @@ namespace IndexDataEngineLibrary
                    ; oProcessDate = oProcessDate.AddDays(1))
                 {
                     if (bOpenFiles || bSymbolChanges)
-                    {
-                        
+                    {                        
                         FileName = FilePath + oProcessDate.ToString("yyyyMMdd") + "_SP100_ADJ.SDC";
-                        if (File.Exists(FileName))
+                        if (File.Exists(FileName) && (Dataset.Equals("All") || Dataset.Equals("sp100")))
                             AddSnpOpeningData(FileName, oProcessDate);
                         FileName = FilePath + oProcessDate.ToString("yyyyMMdd") + "_SP400_ADJ.SDC";
-                        if (File.Exists(FileName))
+                        if (File.Exists(FileName) && (Dataset.Equals("All") || Dataset.Equals("sp400")))
                             AddSnpOpeningData(FileName, oProcessDate);                        
                         FileName = FilePath + oProcessDate.ToString("yyyyMMdd") + "_SP500_ADJ.SDC";
-                        if (File.Exists(FileName))
-                            AddSnpOpeningData(FileName, oProcessDate);
-                        
+                        if (File.Exists(FileName) && (Dataset.Equals("All") || Dataset.Equals("sp500")))
+                            AddSnpOpeningData(FileName, oProcessDate);                        
                         FileName = FilePath + oProcessDate.ToString("yyyyMMdd") + "_SP600_ADJ.SDC";
-                        if (File.Exists(FileName))
-                            AddSnpOpeningData(FileName, oProcessDate);
-                        
+                        if (File.Exists(FileName) && (Dataset.Equals("All") || Dataset.Equals("sp600")))
+                            AddSnpOpeningData(FileName, oProcessDate);                        
                         FileName = FilePath + oProcessDate.ToString("yyyyMMdd") + "_SP1000_ADJ.SDC";
-                        if (File.Exists(FileName))
+                        if (File.Exists(FileName) && (Dataset.Equals("All") || Dataset.Equals("sp1000")))
                             AddSnpOpeningData(FileName, oProcessDate);
                         FileName = FilePath + oProcessDate.ToString("yyyyMMdd") + "_SP1500_ADJ.SDC";
-                        if (File.Exists(FileName))
-                            AddSnpOpeningData(FileName, oProcessDate);
-                        
+                        if (File.Exists(FileName) && (Dataset.Equals("All") || Dataset.Equals("sp1500")))
+                            AddSnpOpeningData(FileName, oProcessDate);                        
                         FileName = FilePath + oProcessDate.ToString("yyyyMMdd") + "_SPMLP_ADJ.SDC";
-                        if (File.Exists(FileName))
-                            AddSnpOpeningData(FileName, oProcessDate);
-                            
+                        if (File.Exists(FileName) && (Dataset.Equals("All") || Dataset.Equals("spMLP")))
+                            AddSnpOpeningData(FileName, oProcessDate);                            
                     }
 
                     if (bCloseFiles)
-                    {
-                        
+                    {                        
                         FileName = FilePath + oProcessDate.ToString("yyyyMMdd") + "_SP100_CLS.SDC";
-                        if (File.Exists(FileName))
+                        if (File.Exists(FileName) && (Dataset.Equals("All") || Dataset.Equals("sp100")))
                             AddSnpClosingData(FileName, oProcessDate);
                         FileName = FilePath + oProcessDate.ToString("yyyyMMdd") + "_SP400_CLS.SDC";
-                        if (File.Exists(FileName))
+                        if (File.Exists(FileName) && (Dataset.Equals("All") || Dataset.Equals("sp400")))
                             AddSnpClosingData(FileName, oProcessDate);                        
                         FileName = FilePath + oProcessDate.ToString("yyyyMMdd") + "_SP500_CLS.SDC";
-                        if (File.Exists(FileName))
+                        if (File.Exists(FileName) && (Dataset.Equals("All") || Dataset.Equals("sp500")))
                             AddSnpClosingData(FileName, oProcessDate);
                         FileName = FilePath + oProcessDate.ToString("yyyyMMdd") + "_SP600_CLS.SDC";
-                        if (File.Exists(FileName))
-                            AddSnpClosingData(FileName, oProcessDate);
-                        
+                        if (File.Exists(FileName) && (Dataset.Equals("All") || Dataset.Equals("sp600")))
+                            AddSnpClosingData(FileName, oProcessDate);                        
                         FileName = FilePath + oProcessDate.ToString("yyyyMMdd") + "_SP1000_CLS.SDC";
-                        if (File.Exists(FileName))
+                        if (File.Exists(FileName) && (Dataset.Equals("All") || Dataset.Equals("sp1000")))
                             AddSnpClosingData(FileName, oProcessDate);
                         FileName = FilePath + oProcessDate.ToString("yyyyMMdd") + "_SP1500_CLS.SDC";
-                        if (File.Exists(FileName))
-                            AddSnpClosingData(FileName, oProcessDate);
-                        
+                        if (File.Exists(FileName) && (Dataset.Equals("All") || Dataset.Equals("sp1500")))
+                            AddSnpClosingData(FileName, oProcessDate);                        
                         FileName = FilePath + oProcessDate.ToString("yyyyMMdd") + "_SPMLP_CLS.SDC";
-                        if (File.Exists(FileName))
-                            AddSnpClosingData(FileName, oProcessDate);
-                        
+                        if (File.Exists(FileName) && (Dataset.Equals("All") || Dataset.Equals("spMLP")))
+                            AddSnpClosingData(FileName, oProcessDate);                        
                     }
                     if (bTotalReturnFiles)
                     {
                         FileName = FilePath + oProcessDate.ToString("yyyyMMdd") + "_SP100.SDL";
-                        if (File.Exists(FileName))
+                        if (File.Exists(FileName) && (Dataset.Equals("All") || Dataset.Equals("sp100")))
                             AddSnpTotalReturnData(FileName, oProcessDate);
                         FileName = FilePath + oProcessDate.ToString("yyyyMMdd") + "_SP400.SDL";
-                        if (File.Exists(FileName))
+                        if (File.Exists(FileName) && (Dataset.Equals("All") || Dataset.Equals("sp400")))
                             AddSnpTotalReturnData(FileName, oProcessDate);
                         FileName = FilePath + oProcessDate.ToString("yyyyMMdd") + "_SP500.SDL";
-                        if (File.Exists(FileName))
+                        if (File.Exists(FileName) && (Dataset.Equals("All") || Dataset.Equals("sp500")))
                             AddSnpTotalReturnData(FileName, oProcessDate);
                         FileName = FilePath + oProcessDate.ToString("yyyyMMdd") + "_SP600.SDL";
-                        if (File.Exists(FileName))
-                            AddSnpTotalReturnData(FileName, oProcessDate);
-                        
+                        if (File.Exists(FileName) && (Dataset.Equals("All") || Dataset.Equals("sp600")))
+                            AddSnpTotalReturnData(FileName, oProcessDate);                        
                         FileName = FilePath + oProcessDate.ToString("yyyyMMdd") + "_SP1500.SDL";
-                        if (File.Exists(FileName))
-                            AddSnpTotalReturnData(FileName, oProcessDate);
-                        
+                        if (File.Exists(FileName) && (Dataset.Equals("All") || Dataset.Equals("sp1500")))
+                            AddSnpTotalReturnData(FileName, oProcessDate);                        
                         FileName = FilePath + oProcessDate.ToString("yyyyMMdd") + "_SPMLP.SDL";
-                        if (File.Exists(FileName))
-                            AddSnpTotalReturnData(FileName, oProcessDate);
-                        
+                        if (File.Exists(FileName) && (Dataset.Equals("All") || Dataset.Equals("spMLP")))
+                            AddSnpTotalReturnData(FileName, oProcessDate);                        
                     }
                 }
             }
@@ -765,7 +767,7 @@ namespace IndexDataEngineLibrary
             {
                 if (mSqlConn == null)
                 {
-                    mSqlConn = new SqlConnection(sharedData.ConnectionString);
+                    mSqlConn = new SqlConnection(sharedData.ConnectionStringIndexData);
                     mSqlConn.Open();
                 }
                 string SqlSelect = @"
@@ -811,7 +813,7 @@ namespace IndexDataEngineLibrary
 
         public void DeleteSnpTotalReturnForIndex(DateTime FileDate, string sIndexName)
         {
-            SqlConnection cnSql = new SqlConnection(sharedData.ConnectionString);
+            SqlConnection cnSql = new SqlConnection(sharedData.ConnectionStringIndexData);
             try
             {
                 string SqlDelete;
@@ -847,7 +849,7 @@ namespace IndexDataEngineLibrary
         private bool GenerateReturnsForDate(string sDate, string sIndexName, AdventOutputType OutputType)
         {
             string sMsg = null;
-            mSqlConn = new SqlConnection(sharedData.ConnectionString);
+            mSqlConn = new SqlConnection(sharedData.ConnectionStringIndexData);
             bool ReturnsGenerated = false;
 
             indexRowsTickerSort.Clear();
@@ -1041,7 +1043,7 @@ namespace IndexDataEngineLibrary
 
         public string GetSecurityMasterTicker(string sCUSIP)
         {
-            SqlConnection cnSql = new SqlConnection(sharedData.ConnectionString);
+            SqlConnection cnSql = new SqlConnection(sharedData.ConnectionStringIndexData);
             SqlDataReader dr = null;
             string sTicker = "";
 
@@ -1583,7 +1585,7 @@ namespace IndexDataEngineLibrary
 
         private double CalculateAdventTotalReturnForDateNoGood(string sDate, string sIndexName, bool bSaveReturnInDb)
         {
-            SqlConnection conn = new SqlConnection(sharedData.ConnectionString);
+            SqlConnection conn = new SqlConnection(sharedData.ConnectionStringIndexData);
             SqlDataReader dr = null;
             double dReturn = 0.0;
             // string sMsg = null;
@@ -1682,7 +1684,7 @@ namespace IndexDataEngineLibrary
                 {
                     if (mSqlConn == null)
                     {
-                        mSqlConn = new SqlConnection(sharedData.ConnectionString);
+                        mSqlConn = new SqlConnection(sharedData.ConnectionStringIndexData);
                         mSqlConn.Open();
                     }
                     string sTotalReturn = String.Empty;
@@ -1763,7 +1765,7 @@ namespace IndexDataEngineLibrary
 
         public void CalculateAdventTotalReturnsForPeriod(string sStartDate, string sEndDate, string sIndexName)
         {
-            SqlConnection conn = new SqlConnection(sharedData.ConnectionString);
+            SqlConnection conn = new SqlConnection(sharedData.ConnectionStringIndexData);
             SqlDataReader dr = null;
             string sMsg = null;
             double dReturn = 0.0;

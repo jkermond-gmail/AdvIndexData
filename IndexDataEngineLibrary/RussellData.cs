@@ -186,18 +186,32 @@ namespace IndexDataEngineLibrary
         public void ProcessVendorDatasetJobs(string Dataset, string sProcessDate)
         {
 
-            DateTime ProcessDate = Convert.ToDateTime(sProcessDate);
-
-            ProcessVendorFiles(ProcessDate, ProcessDate, Dataset, true, true, true, true, true);
-            string sIndexName = "";
-            string[] Indices = null;
-            Indices = GetIndices();
-            for (int i = 0; i < Indices.Length; i++)
+            try
             {
-                sIndexName = Indices[i];
-                GenerateReturnsForDateRange(sProcessDate, sProcessDate, sIndexName, AdventOutputType.Constituent);
-                GenerateReturnsForDateRange(sProcessDate, sProcessDate, sIndexName, AdventOutputType.Sector);
+                DateTime ProcessDate = Convert.ToDateTime(sProcessDate);
+
+                ProcessVendorFiles(ProcessDate, ProcessDate, Dataset, true, true, true, true, true);
+                string sIndexName = "";
+                string[] Indices = null;
+                Indices = GetIndices();
+                for (int i = 0; i < Indices.Length; i++)
+                {
+                    sIndexName = Indices[i];
+                    GenerateReturnsForDateRange(sProcessDate, sProcessDate, sIndexName, AdventOutputType.Constituent);
+                    GenerateReturnsForDateRange(sProcessDate, sProcessDate, sIndexName, AdventOutputType.Sector);
+                }
             }
+            catch (SqlException ex)
+            {
+                if (ex.Number == 2627)
+                {
+                    Console.WriteLine(ex.Message);
+                }
+            }
+            finally
+            {
+            }
+
         }
 
         #endregion
@@ -590,6 +604,9 @@ RU3000    20170103   CHF   1662.25918   1365.02441   1696.48181   1567.99955    
                                 AddRussellTotalReturnForIndex(FileDate, sAdventIndex, sTotal);
                                 string sStartAndEndDate = FileDate.ToString("MM/dd/yyyy");
                                 CalculateVendorTotalReturnsForPeriod(sStartAndEndDate, sStartAndEndDate, sAdventIndex);
+                                CalculateAdventTotalReturnsForPeriod(sStartAndEndDate, sStartAndEndDate, sAdventIndex);
+                                CalculateAdjustedTotalReturnsForPeriod(sStartAndEndDate, sStartAndEndDate, sAdventIndex);
+
                             }
                         }
                     }
@@ -2075,24 +2092,29 @@ CREATE TABLE [dbo].[HistoricalSymbolChanges](
                         indexRowRollUp.RateOfReturn += indexRowConstituent.RateOfReturn * indexRowConstituent.Weight / indexRowRollUp.Weight;
                 }
 
-            LogHelper.WriteLine("---Before---");
-            foreach (IndexRow indexRowRollUp in indexRowsRollUp)
-            {
-                LogHelper.WriteLine(indexRowRollUp.Identifier + " " + indexRowRollUp.Weight.ToString() + " " + indexRowRollUp.RateOfReturn.ToString());
-            }
+            //LogHelper.WriteLine("---Before---");
+            //foreach (IndexRow indexRowRollUp in indexRowsRollUp)
+            //{
+            //    LogHelper.WriteLine(indexRowRollUp.Identifier + " " + indexRowRollUp.Weight.ToString() + " " + indexRowRollUp.RateOfReturn.ToString());
+            //}
 
             AdjustReturnsToMatchPublishedTotalReturns(indexRowsRollUp, sDate, sIndexName);
-            LogHelper.WriteLine("---After---");
+            //LogHelper.WriteLine("---After---");
 
-            foreach (IndexRow indexRowRollUp in indexRowsRollUp)
-            {
-                LogHelper.WriteLine(indexRowRollUp.Identifier + " " + indexRowRollUp.Weight.ToString() + " " + indexRowRollUp.RateOfReturnAdjusted.ToString());
-            }
-            LogHelper.WriteLine("---Done---");
+            //foreach (IndexRow indexRowRollUp in indexRowsRollUp)
+            //{
+            //    LogHelper.WriteLine(indexRowRollUp.Identifier + " " + indexRowRollUp.Weight.ToString() + " " + indexRowRollUp.RateOfReturnAdjusted.ToString());
+            //}
+            //LogHelper.WriteLine("---Done---");
         }
 
         public void GenerateIndustryReturnsForDate(string sDate, string sIndexName)
         {
+            indexRowsIndustrySort.Clear();
+            indexRowsSectorLevel1RollUp.Clear();
+            indexRowsSectorLevel2RollUp.Clear();
+            indexRowsSectorLevel3RollUp.Clear();
+
             if (GenerateReturnsForDate(sDate, sIndexName, AdventOutputType.Sector) == true)
             {
                 for (bool GotNext = true; GotNext;)
@@ -2297,6 +2319,7 @@ CREATE TABLE [dbo].[HistoricalSymbolChanges](
 
         public void GenerateConstituentReturnsForDate(string sDate, string sIndexName)
         {
+            indexRowsTickerSort.Clear();
             if (GenerateReturnsForDate(sDate, sIndexName, AdventOutputType.Constituent) == true)
             {
                 for (bool GotNext = true; GotNext;)
@@ -2515,7 +2538,7 @@ CREATE TABLE [dbo].[HistoricalSymbolChanges](
                         break;
                 }
 
-                LogHelper.WriteLine(SqlSelect);
+                //LogHelper.WriteLine(SqlSelect);
                 mSqlConn.Open();
                 SqlCommand cmd = new SqlCommand(SqlSelect + SqlOrderBy, mSqlConn);
                 cmd.Parameters.Add("@IndexName", SqlDbType.VarChar, 20);
@@ -2603,7 +2626,7 @@ CREATE TABLE [dbo].[HistoricalSymbolChanges](
                             sTicker = sOriginalTicker;
 
                         sMsg = sTicker + "," + sWeight + "," + sSecurityReturn + "," + sCusip;
-                        LogHelper.WriteLine(sMsg);
+                        //LogHelper.WriteLine(sMsg);
 
 
                         if ((mPrevId.Length > 0) && sCusip.Equals(mPrevId))
@@ -3115,7 +3138,9 @@ CREATE TABLE [dbo].[HistoricalSymbolChanges](
                 {
                     if (dr.Read())
                     {
-                        dReturn = (double)dr[0];
+                        string s = dr["VendorReturn"].ToString();
+                        if (s.Length > 0 && double.TryParse(s, out double dNum))
+                            dReturn = Convert.ToDouble(dr["VendorReturn"].ToString());
                     }
                 }
             }
@@ -3322,13 +3347,18 @@ CREATE TABLE [dbo].[HistoricalSymbolChanges](
                     {
                         if (dr.Read())
                         {
-                            dAdvReturn = Convert.ToDouble(dr["AdvReturn"].ToString());
-                            dVendorReturn = Convert.ToDouble(dr["VendorReturn"].ToString());
+                            double dNum;
+                            string s = "";
+                            s = dr["AdvReturn"].ToString();
+                            if(s.Length > 0 && double.TryParse(s, out dNum))
+                                dAdvReturn = Convert.ToDouble(dr["AdvReturn"].ToString());
+                            s = dr["VendorReturn"].ToString();
+                            if (s.Length > 0 && double.TryParse(s, out dNum))
+                                dVendorReturn = Convert.ToDouble(dr["VendorReturn"].ToString());
                             dr.Close();
 
                             if((dVendorReturn.Equals(double.MinValue) == false) && (dAdvReturn.Equals(double.MinValue) == false))
                             {
-
                                 //dDiff = dVendorReturn - dAdvReturn;
                                 dDiff = Math.Round((dVendorReturn - dAdvReturn), iTotalReturnPrecision, MidpointRounding.AwayFromZero);
 

@@ -995,7 +995,7 @@ namespace IndexDataEngineLibrary
                         break;
                 }
 
-                LogHelper.WriteLine(SqlSelect);
+                //LogHelper.WriteLine(SqlSelect);
                 mSqlConn.Open();
                 SqlCommand cmd = new SqlCommand(SqlSelect + SqlOrderBy, mSqlConn);
                 cmd.Parameters.Add("@IndexCode", SqlDbType.VarChar, 20);
@@ -1142,7 +1142,7 @@ namespace IndexDataEngineLibrary
                             sTicker = sOriginalTicker;
 
                         sMsg = sTicker + "," + sWeight + "," + sSecurityReturn + "," + sCusip;
-                        LogHelper.WriteLine(sMsg);
+                        //LogHelper.WriteLine(sMsg);
 
 
                         if ((mPrevId.Length > 0) && sCusip.Equals(mPrevId))
@@ -1342,6 +1342,8 @@ namespace IndexDataEngineLibrary
 
         public void GenerateConstituentReturnsForDate(string sDate, string sIndexName)
         {
+            indexRowsTickerSort.Clear();
+
             if (GenerateReturnsForDate(sDate, sIndexName, AdventOutputType.Constituent) == true)
             {
                 indexRowsTickerSort.Clear();
@@ -1396,18 +1398,10 @@ namespace IndexDataEngineLibrary
                         indexRowRollUp.RateOfReturn += indexRowConstituent.RateOfReturn * indexRowConstituent.Weight / indexRowRollUp.Weight;
                 }
 
-            LogHelper.WriteLine("---Before---");
-            foreach (IndexRow indexRowRollUp in indexRowsRollUp)
-            {
-                LogHelper.WriteLine(indexRowRollUp.Identifier + " " + indexRowRollUp.Weight.ToString() + " " + indexRowRollUp.RateOfReturn.ToString());
-            }
-
-            //AdjustReturnsToMatchPublishedTotalReturns(indexRowsRollUp, sDate, sIndexName);
-            //LogHelper.WriteLine("---After---");
-
+            //LogHelper.WriteLine("---Before---");
             //foreach (IndexRow indexRowRollUp in indexRowsRollUp)
             //{
-            //    LogHelper.WriteLine(indexRowRollUp.Identifier + " " + indexRowRollUp.Weight.ToString() + " " + indexRowRollUp.RateOfReturnAdjusted.ToString());
+            //    LogHelper.WriteLine(indexRowRollUp.Identifier + " " + indexRowRollUp.Weight.ToString() + " " + indexRowRollUp.RateOfReturn.ToString());
             //}
             //LogHelper.WriteLine("---Done---");
         }
@@ -1415,6 +1409,11 @@ namespace IndexDataEngineLibrary
 
         public void GenerateIndustryReturnsForDate(string sDate, string sIndexName)
         {
+            indexRowsIndustrySort.Clear();
+            indexRowsSectorLevel1RollUp.Clear();
+            indexRowsSectorLevel2RollUp.Clear();
+            indexRowsSectorLevel3RollUp.Clear();
+
             if (GenerateReturnsForDate(sDate, sIndexName, AdventOutputType.Sector) == true)
             {
                 for (bool GotNext = true; GotNext;)
@@ -1632,7 +1631,9 @@ namespace IndexDataEngineLibrary
                 {
                     if (dr.Read())
                     {
-                        dReturn = (double)dr[0];
+                        string s = dr[0].ToString();
+                        if (s.Length > 0 && double.TryParse(s, out double dNum))
+                            dReturn = Convert.ToDouble(dr[0].ToString());
                         dReturn = Math.Round(dReturn, 9, MidpointRounding.AwayFromZero);
                         string sReturn = dReturn.ToString();
 

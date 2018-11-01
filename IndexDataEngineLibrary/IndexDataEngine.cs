@@ -56,20 +56,15 @@ namespace IndexDataEngineLibrary
             bool testing = true;
             if (testing)
             {
-                if (sVifsProcessDate.Equals("10/26/2018"))
+                if (sVifsProcessDate.Equals("10/26/2018")) // JK to do change
+                {
                     testing = false;
+                }
                 VifsProcessDate = DateHelper.NextBusinessDay(VifsProcessDate);
                 sVifsProcessDate = VifsProcessDate.ToString("MM/dd/yyyy");
                 setVIFsProcessDate(sVifsProcessDate);
             }
-            //RussellData russellData = new RussellData(LogHelper);
-            //russellData.SetConnectionString(sConnectionIndexData);
-            //DateTime StartDate = DateTime.ParseExact("01/03/2017", "MM/dd/yyyy", CultureInfo.InvariantCulture);
-            //DateTime EndDate = StartDate.AddDays(1.0);
-            //russellData.ProcessRussellHoldingsFiles(StartDate, EndDate, true, true);
-
-            //EndSql();
-
+            // should there be an endsql() here?
         }
 
         private void ProcessIndexDataWork(string sProcessDate)
@@ -566,7 +561,6 @@ namespace IndexDataEngineLibrary
         {
             setSystemSettingValue("VIFLastProcessDate", sDate, cnSqlAmdVifs);
         }
-
 
         private void EndSql()
         {

@@ -34,7 +34,7 @@ namespace IndexDataForm
         {
             InitializeComponent();
             bool deleteExisting = false;
-            LogHelper.StartLog("AdvIndexDataLog.txt", @"C:\A_Development\visual studio 2017\Projects\AdvIndexData\IndexDataForm\Output\", deleteExisting);
+            LogHelper.StartLog("IndexDataLog.txt", @"\IndexData\Logs\", deleteExisting);
 
             russellData = new RussellData();
             snpData = new SnpData();

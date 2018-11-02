@@ -33,6 +33,10 @@ namespace AdventUtilityLibrary
                 File.Delete(LogFileName);
                 swLogFile = new StreamWriter(Path.Combine(logFilePath, logFileName));
             }
+            else if( !File.Exists(LogFileName))
+            {
+                swLogFile = new StreamWriter(Path.Combine(logFilePath, logFileName));
+            }
             else
             {
                 bool append = true;

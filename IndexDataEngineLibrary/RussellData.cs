@@ -2602,22 +2602,31 @@ CREATE TABLE [dbo].[HistoricalSymbolChanges](
                         sIndustry = mSqlDr["Industry"].ToString();
 
                         ConstituentCount += 1;
-                        string sCmpCusip = null;
-                        string sNewCusip = null;
-                        bool Done = false;
-                        for (sCmpCusip = sCusip, sNewCusip = ""; !Done;)
-                        {
-                            sNewCusip = GetNewCUSIP(sCmpCusip);
-                            if (sCmpCusip.Equals(sNewCusip))
-                                Done = true;
-                            else
-                                sCmpCusip = sNewCusip;
-                        }
+                        //string sCmpCusip = null;
+                        //string sNewCusip = null;
+                        //bool Done = false;
+                        // JK: Not sure why this was written this way as it ends in an infinite loop
+                        //for (sCmpCusip = sCusip, sNewCusip = ""; !Done;)
+                        //{
+                        //    sNewCusip = GetNewCUSIP(sCmpCusip);
+                        //    if (sCmpCusip.Equals(sNewCusip))
+                        //        Done = true;
+                        //    else
+                        //        sCmpCusip = sNewCusip;
+                        //}
+                        //string smCusip = null;
+                        //if (sCusip.Equals(sNewCusip))
+                        //    smCusip = sCusip;
+                        //else
+                        //    smCusip = sNewCusip;
+
+                        string sNewCusip = GetNewCUSIP(sCusip);
                         string smCusip = null;
                         if (sCusip.Equals(sNewCusip))
                             smCusip = sCusip;
                         else
                             smCusip = sNewCusip;
+
 
                         string smTicker = GetSecurityMasterTicker(smCusip);
                         if (smTicker.Length > 0)

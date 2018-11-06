@@ -24,6 +24,7 @@ namespace IndexDataEngineLibrary
         private DateTime VifsProcessDate;
         private string sIndexDataProcessDate;
         private DateTime IndexDataProcessDate;
+        private bool testing = true;
 
 
         public IndexDataEngine()
@@ -38,6 +39,8 @@ namespace IndexDataEngineLibrary
             LogHelper.Info("IndexDataEngine.Run", "IndexDataEngineLibrary");
             sConnectionIndexData = ConfigurationManager.ConnectionStrings["dbConnectionIndexData"].ConnectionString;
             sConnectionAmdVifs = ConfigurationManager.ConnectionStrings["dbConnectionAmdVifs"].ConnectionString;
+            DateHelper.ConnectionString = sConnectionAmdVifs;
+
 
             BeginSql();
 
@@ -53,28 +56,27 @@ namespace IndexDataEngineLibrary
             }
             ProcessIndexDataWork(sVifsProcessDate);
 
-            bool testing = true;
             if (testing)
             {
-                if (sVifsProcessDate.Equals("10/26/2018")) // JK to do change
+                string sToday = DateTime.Now.ToString("MM/dd/yyyy");
+                if (sVifsProcessDate.Equals(sToday)) // JK to do change
                 {
                     testing = false;
                 }
-                VifsProcessDate = DateHelper.NextBusinessDay(VifsProcessDate);
-                sVifsProcessDate = VifsProcessDate.ToString("MM/dd/yyyy");
-                setVIFsProcessDate(sVifsProcessDate);
+                else
+                {
+                    VifsProcessDate = DateHelper.NextBusinessDay(VifsProcessDate);
+                    sVifsProcessDate = VifsProcessDate.ToString("MM/dd/yyyy");
+                    setVIFsProcessDate(sVifsProcessDate);
+                }
             }
             // should there be an endsql() here?
         }
 
         private void ProcessIndexDataWork(string sProcessDate)
         {
-            //List<IndexRow> indexRowsTickerSort = new List<IndexRow>();
 
-            //var list = new List<KeyValuePair<string, int>>();
-            //list.Add(new KeyValuePair<string, int>("Cat", 1));
-            //list.Add(new KeyValuePair<string, int>("Dog", 2));
-            //list.Add(new KeyValuePair<string, int>("Rabbit", 4));
+            LogHelper.WriteLine("ProcessIndexDataWork: " + sProcessDate.ToString());
 
             List<KeyValuePair<string, string>> listVendorDatasets = null;
 

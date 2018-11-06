@@ -7,6 +7,7 @@ using System.Globalization;
 using System.IO;
 using System.Data.SqlClient;
 using System.Data;
+using System.Configuration;
 
 using AdventUtilityLibrary;
 using LumenWorks.Framework.IO.Csv;
@@ -22,7 +23,6 @@ namespace IndexDataEngineLibrary
         private CultureInfo mEnUS = null;
         private string mPrevId;
         private int ConstituentCount = 0;
-        private const string mAxmlOutputPath = @"C:\IndexData\AxmlOutput\";
         private string mAxmlFilename;
         //private double mRolledUpWeight;
         //private double mRolledUpReturn;
@@ -220,10 +220,9 @@ namespace IndexDataEngineLibrary
         {
             DateTime oProcessDate;
             int DateCompare;
-            string FilePath = @"c:\indexdata\vifs\snp\";
-            //string FilePath = ConfigurationManager.AppSettings["RussellVifsPath"];
+            string FilePath = ConfigurationManager.AppSettings["VifsPath.Snp"];
             string FileName;
-            string sMsg = "ProcessVendorFiles: ";
+            string sMsg = "ProcessVendorFiles: " + oStartDate.ToShortDateString() + " to " + oEndDate.ToShortDateString() + " " + Dataset;
 
             LogHelper.WriteLine(sMsg + "Started " + DateTime.Now);
 
@@ -390,7 +389,7 @@ namespace IndexDataEngineLibrary
             SqlCommand cmd = null;
             DateTime oDate = DateTime.MinValue;
 
-            LogHelper.WriteLine("AddSnpOpeningData Processing: " + Filename + " " + DateTime.Now);
+            LogHelper.WriteLine("AddSnpOpeningData Processing: " + Filename + " " + FileDate.ToShortDateString());
 
             string IndexCode = GetIndexCodeFromFilename(Filename);
 
@@ -408,7 +407,7 @@ namespace IndexDataEngineLibrary
             cmd.Parameters.Add("@IndexCode", SqlDbType.VarChar);
             cmd.Parameters["@IndexCode"].Value = IndexCode;
             try
-            { 
+            {
                 cmd.ExecuteNonQuery();
             }
             catch (SqlException ex)
@@ -530,8 +529,6 @@ namespace IndexDataEngineLibrary
                     int LineCount = Convert.ToInt32(sValue);
                     LogHelper.WriteLine("finished " + DateTime.Now + " " + Filename + " adds = " + AddCount + " Linecount = " + LineCount);
                 }
-
-
             }
             LogHelper.WriteLine("AddSnpOpeningData Done: " + Filename + " " + DateTime.Now);
         }
@@ -1204,7 +1201,8 @@ namespace IndexDataEngineLibrary
             // rl-20170714-xse-r3000.XSX
 
             mAxmlFilename = "ix-" + DateHelper.ConvertToYYYYMMDD(sDate) + "-xse-" + sIndexName + ".XSX";
-            string filename = (mAxmlOutputPath + mAxmlFilename);
+            string sAxmlOutputPath = ConfigurationManager.AppSettings["AxmlOutputPath"];
+            string filename = (sAxmlOutputPath + mAxmlFilename);
 
             if (File.Exists(filename))
                 File.Delete(filename);
@@ -1269,7 +1267,8 @@ namespace IndexDataEngineLibrary
              */
 
             mAxmlFilename = "ix-" + DateHelper.ConvertToYYYYMMDD(sDate) + "-xnf-" + sIndexName + ".XNX";
-            string filename = (mAxmlOutputPath + mAxmlFilename);
+            string sAxmlOutputPath = ConfigurationManager.AppSettings["AxmlOutputPath"];
+            string filename = (sAxmlOutputPath + mAxmlFilename);
 
             if (File.Exists(filename))
                 File.Delete(filename);
@@ -1637,7 +1636,7 @@ namespace IndexDataEngineLibrary
                         dReturn = Math.Round(dReturn, 9, MidpointRounding.AwayFromZero);
                         string sReturn = dReturn.ToString();
 
-                        LogHelper.WriteLine(sDate + " " + sReturn);
+                        //LogHelper.WriteLine(sDate + " " + sReturn);
                         if (bSaveReturnInDb)
                         {
                             foreach (string sVendorFormat in sVendorFormats)
@@ -1775,7 +1774,7 @@ namespace IndexDataEngineLibrary
             {
                 // See notes above the routine if a runtime error is generated
                 sMsg = "CalculateAdventTotalReturnsForPeriod: ";
-                LogHelper.WriteLine(sMsg + sStartDate + " to " + sEndDate + " index " + sIndexName);
+                //LogHelper.WriteLine(sMsg + sStartDate + " to " + sEndDate + " index " + sIndexName);
                 string SqlSelect;
                 string SqlWhere;
                 SqlSelect = "select count (distinct FileDate) from SnpDailyClosingHoldings ";
@@ -1811,7 +1810,7 @@ namespace IndexDataEngineLibrary
                     }
                     //dProduct = dProduct;
                     double dRetForPeriod = (dProduct - 1) * 100;
-                    LogHelper.WriteLine("Return for period " + sStartDate + " to " + sEndDate + " for " + sIndexName + " = " + dRetForPeriod);
+                    //LogHelper.WriteLine("Return for period " + sStartDate + " to " + sEndDate + " for " + sIndexName + " = " + dRetForPeriod);
                 }
             }
 

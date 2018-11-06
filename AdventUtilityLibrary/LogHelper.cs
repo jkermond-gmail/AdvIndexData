@@ -90,11 +90,17 @@ namespace AdventUtilityLibrary
 
         public static void WriteLine(string message)
         {
-            Trace.WriteLine(message);
-            Trace.TraceInformation(message);
-            Trace.Flush();
+            //Trace.WriteLine(message);
+            //Trace.TraceInformation(message);
+            //Trace.Flush();
             Console.WriteLine(message);
-            swLogFile.WriteLine(message);
+
+            string formattedMsg = string.Format("{0}:{1}",
+                                  DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
+                                  message);
+
+
+            swLogFile.WriteLine(formattedMsg);
             swLogFile.Flush();
         }
 
@@ -107,9 +113,10 @@ namespace AdventUtilityLibrary
                                   module,
                                   message);
             //Trace.WriteLine(formattedMsg);
-            Trace.TraceInformation(formattedMsg);
-            Trace.Flush();
-            Console.WriteLine(formattedMsg);
+            //Trace.TraceInformation(formattedMsg);
+            //Trace.Flush();
+            //Console.WriteLine(formattedMsg);
+            WriteLine(message);
         }
 
     }

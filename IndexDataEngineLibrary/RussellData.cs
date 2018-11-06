@@ -8,6 +8,7 @@ using System.Data.SqlClient;
 using System.Data;
 using System.Globalization;
 using System.Configuration;
+
 using AdventUtilityLibrary;
 
 
@@ -39,14 +40,9 @@ namespace IndexDataEngineLibrary
 
         private const string NumberFormat = "0.#########";
 
-        private const string mAxmlOutputPath = @"C:\IndexData\AxmlOutput\";
-        private const string mAxmlOutputPathProd = @"C:\IndexData\AxmlOutputProd\";
-
         private string mAxmlFilename;
 
         private SharedData sharedData = null;
-
-
 
         private enum VendorFileFormats
         {
@@ -312,8 +308,7 @@ namespace IndexDataEngineLibrary
         {
             DateTime oProcessDate;
             int DateCompare;
-            string FilePath = @"c:\indexdata\vifs\russell\";
-            //string FilePath = ConfigurationManager.AppSettings["RussellVifsPath"];
+            string FilePath = ConfigurationManager.AppSettings["VifsPath.Russell"];
             string FileName;
             string sMsg = "ProcessVendorFiles: ";
 
@@ -1977,7 +1972,7 @@ CREATE TABLE [dbo].[HistoricalSymbolChanges](
             {
                 // See notes above the routine if a runtime error is generated
                 sMsg = "CalculateAdventTotalReturnsForPeriod: ";
-                LogHelper.WriteLine(sMsg + sStartDate + " to " + sEndDate + " index " + sIndexName);
+                //LogHelper.WriteLine(sMsg + sStartDate + " to " + sEndDate + " index " + sIndexName);
                 string SqlSelect;
                 string SqlWhere;
                 SqlSelect = "select count (distinct FileDate) from RussellDailyHoldings1 ";
@@ -2013,7 +2008,7 @@ CREATE TABLE [dbo].[HistoricalSymbolChanges](
                     }
                     //dProduct = dProduct;
                     double dRetForPeriod = (dProduct - 1) * 100;
-                    LogHelper.WriteLine("Return for period " + sStartDate + " to " + sEndDate + " for " + sIndexName + " = " + dRetForPeriod);
+                    //LogHelper.WriteLine("Return for period " + sStartDate + " to " + sEndDate + " for " + sIndexName + " = " + dRetForPeriod);
                 }
             }
 
@@ -2374,7 +2369,8 @@ CREATE TABLE [dbo].[HistoricalSymbolChanges](
             // rl-20170714-xse-r3000.XSX
 
             mAxmlFilename = "rl-" + DateHelper.ConvertToYYYYMMDD(sDate) + "-xse-" + sIndexName + ".XSX";
-            string filename = (mAxmlOutputPath + mAxmlFilename);
+            string sAxmlOutputPath = ConfigurationManager.AppSettings["AxmlOutputPath"];
+            string filename = (sAxmlOutputPath + mAxmlFilename);
 
             if (File.Exists(filename))
                 File.Delete(filename);
@@ -2431,7 +2427,8 @@ CREATE TABLE [dbo].[HistoricalSymbolChanges](
              */
 
             mAxmlFilename = "rl-" + DateHelper.ConvertToYYYYMMDD(sDate) + "-xnf-" + sIndexName + ".XNX";
-            string filename = (mAxmlOutputPath + mAxmlFilename);
+            string sAxmlOutputPath = ConfigurationManager.AppSettings["AxmlOutputPath"];
+            string filename = (sAxmlOutputPath + mAxmlFilename);
 
             if (File.Exists(filename))
                 File.Delete(filename);
@@ -2647,8 +2644,8 @@ CREATE TABLE [dbo].[HistoricalSymbolChanges](
                     }
                     else
                     {
-                        sMsg = "GetNextConstituentReturn:," + ConstituentCount.ToString();
-                        LogHelper.WriteLine(sMsg);
+                        //sMsg = "GetNextConstituentReturn:," + ConstituentCount.ToString();
+                        //LogHelper.WriteLine(sMsg);
                         if (ConstituentCount > 0)
                         {
                             CloseGlobals();
@@ -2869,7 +2866,7 @@ CREATE TABLE [dbo].[HistoricalSymbolChanges](
                         dReturn = Math.Round(dReturn, 9, MidpointRounding.AwayFromZero);
                         string sReturn = dReturn.ToString();
                         
-                        LogHelper.WriteLine(sDate + " " + sReturn);
+                        //LogHelper.WriteLine(sDate + " " + sReturn);
                         if (bSaveReturnInDb)
                         {
                             foreach( string sVendorFormat in sVendorFormats )

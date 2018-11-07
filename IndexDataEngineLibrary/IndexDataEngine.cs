@@ -4,11 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Diagnostics;
-using AdventUtilityLibrary;
 using System.Data;
 using System.Data.SqlClient;
 using System.Globalization;
 using System.Configuration;
+using AdventUtilityLibrary;
 
 
 namespace IndexDataEngineLibrary
@@ -40,6 +40,7 @@ namespace IndexDataEngineLibrary
             sConnectionIndexData = ConfigurationManager.ConnectionStrings["dbConnectionIndexData"].ConnectionString;
             sConnectionAmdVifs = ConfigurationManager.ConnectionStrings["dbConnectionAmdVifs"].ConnectionString;
             DateHelper.ConnectionString = sConnectionAmdVifs;
+            ProcessStatus.ConnectionString = sConnectionIndexData;
 
 
             BeginSql();
@@ -52,6 +53,7 @@ namespace IndexDataEngineLibrary
             if (VifsProcessDate.Date > IndexDataProcessDate.Date)
             {
                 // Initialize everything cuz its a new day
+                InitializeProcessStatus(sVifsProcessDate);
                 setIndexDataProcessDate(sVifsProcessDate);
             }
             ProcessIndexDataWork(sVifsProcessDate);
@@ -73,9 +75,43 @@ namespace IndexDataEngineLibrary
             // should there be an endsql() here?
         }
 
+        private void InitializeProcessStatus(string sProcessDate)
+        {
+            string Vendor = "";
+            string Dataset = "";
+            string IndexName = "";
+            LogHelper.WriteLine("InitializeProcessDate: " + sProcessDate.ToString());
+
+            ProcessStatus.Initialize();
+            List<KeyValuePair<string, string>> listVendorDatasets = null;
+
+            getVendorDatasets(out listVendorDatasets);
+
+            foreach (KeyValuePair<string, string> element in listVendorDatasets)
+            {
+                Vendor = element.Key.ToString();
+                Dataset = element.Value.ToString();
+                if (Vendor.Equals("Russell"))
+                {
+                    RussellData russellData = new RussellData();
+                    string[] Indices = null;
+                    Indices = russellData.GetIndices();
+                    for (int i = 0; i < Indices.Length; i++)
+                    {
+                        IndexName = Indices[i];
+                        ProcessStatus.Add(sProcessDate, Vendor, Dataset, IndexName);
+                    }
+                }
+                else if (Vendor.Equals("StandardAndPoors"))
+                {
+                    IndexName = Dataset;
+                    ProcessStatus.Add(sProcessDate, Vendor, Dataset, IndexName);
+                }
+            }
+        }
+
         private void ProcessIndexDataWork(string sProcessDate)
         {
-
             LogHelper.WriteLine("ProcessIndexDataWork: " + sProcessDate.ToString());
 
             List<KeyValuePair<string, string>> listVendorDatasets = null;

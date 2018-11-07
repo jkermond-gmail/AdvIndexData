@@ -15,12 +15,6 @@ namespace AdventUtilityLibrary
         public static string ConnectionString { get; set; }
 
         private static SqlConnection mSqlConn = null;
-        public static bool IsWeekday(DateTime date)
-        {
-            DayOfWeek dow = date.DayOfWeek;
-            bool bIs = ((int)dow >= 1 && (int)dow <= 5);
-            return (bIs);
-        }
 
         private static void OpenSqlConn()
         {
@@ -29,7 +23,13 @@ namespace AdventUtilityLibrary
                 mSqlConn = new SqlConnection(ConnectionString);
                 mSqlConn.Open();
             }
+        }
 
+        public static bool IsWeekday(DateTime date)
+        {
+            DayOfWeek dow = date.DayOfWeek;
+            bool bIs = ((int)dow >= 1 && (int)dow <= 5);
+            return (bIs);
         }
 
         public static bool IsHoliday(DateTime date)

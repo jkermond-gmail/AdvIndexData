@@ -187,14 +187,19 @@ namespace IndexDataEngineLibrary
                 DateTime ProcessDate = Convert.ToDateTime(sProcessDate);
 
                 ProcessVendorFiles(ProcessDate, ProcessDate, Dataset, true, true, true, true, true);
-                string sIndexName = "";
+                string IndexName = "";
                 string[] Indices = null;
                 Indices = GetIndices();
                 for (int i = 0; i < Indices.Length; i++)
                 {
-                    sIndexName = Indices[i];
-                    GenerateReturnsForDateRange(sProcessDate, sProcessDate, sIndexName, AdventOutputType.Constituent);
-                    GenerateReturnsForDateRange(sProcessDate, sProcessDate, sIndexName, AdventOutputType.Sector);
+                    IndexName = Indices[i];
+                    if (ProcessStatus.GenerateReturns(sProcessDate, Vendors.Russell.ToString(), Dataset, IndexName))
+                    {
+                        GenerateReturnsForDateRange(sProcessDate, sProcessDate, IndexName, AdventOutputType.Constituent);
+                        ProcessStatus.Update(sProcessDate, Vendors.Russell.ToString(), Dataset, IndexName, ProcessStatus.WhichStatus.AxmlConstituentData, ProcessStatus.StatusValue.Pass);
+                        GenerateReturnsForDateRange(sProcessDate, sProcessDate, IndexName, AdventOutputType.Sector);
+                        ProcessStatus.Update(sProcessDate, Vendors.Russell.ToString(), Dataset, IndexName, ProcessStatus.WhichStatus.AxmlSectorData, ProcessStatus.StatusValue.Pass);
+                    }
                 }
             }
             catch (SqlException ex)
@@ -328,9 +333,15 @@ namespace IndexDataEngineLibrary
                         {
                             LogHelper.WriteLine("Processing: " + FileName + " " + DateTime.Now);
                             if (bOpenFiles)
+                            {
                                 AddRussellOpeningData(VendorFileFormats.H_OPEN_RGS, FileName, oProcessDate);
+                                ProcessStatus.Update(oProcessDate, Vendors.Russell.ToString(), Dataset, "", ProcessStatus.WhichStatus.OpenData, ProcessStatus.StatusValue.Pass);
+                            }
                             if (bSymbolChanges)
+                            {
                                 AddRussellSymbolChangeData(VendorFileFormats.H_OPEN_RGS, FileName, oProcessDate);
+                                ProcessStatus.Update(oProcessDate, Vendors.Russell.ToString(), Dataset, "", ProcessStatus.WhichStatus.SymbolChangeData, ProcessStatus.StatusValue.Pass);
+                            }
                             LogHelper.WriteLine("Done      : " + FileName + " " + DateTime.Now);
                         }
                     }
@@ -342,6 +353,7 @@ namespace IndexDataEngineLibrary
                         {
                             LogHelper.WriteLine("Processing: " + FileName + " " + DateTime.Now);
                             AddRussellClosingData(VendorFileFormats.H_CLOSE_RGS, FileName, oProcessDate);
+                            ProcessStatus.Update(oProcessDate, Vendors.Russell.ToString(), Dataset, "", ProcessStatus.WhichStatus.CloseData, ProcessStatus.StatusValue.Pass);
                             LogHelper.WriteLine("Done      : " + FileName + " " + DateTime.Now);
                         }
                     }
@@ -352,6 +364,7 @@ namespace IndexDataEngineLibrary
                         {
                             LogHelper.WriteLine("Processing: " + FileName + " " + DateTime.Now);
                             AddRussellTotalReturnData(VendorFileFormats.ALL, FileName, oProcessDate);
+                            ProcessStatus.Update(oProcessDate, Vendors.Russell.ToString(), Dataset, "", ProcessStatus.WhichStatus.TotalReturnData, ProcessStatus.StatusValue.Pass);
                             LogHelper.WriteLine("Done      : " + FileName + " " + DateTime.Now);
                         }
                     }                    

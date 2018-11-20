@@ -24,7 +24,7 @@ namespace IndexDataEngineLibrary
         private DateTime VifsProcessDate;
         private string sIndexDataProcessDate;
         private DateTime IndexDataProcessDate;
-        private bool testing = false;
+        private bool testing = true;
 
 
         public IndexDataEngine()

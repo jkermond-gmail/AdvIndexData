@@ -46,6 +46,7 @@
   <ItemGroup>
     <Compile Include="IndexDataEngine.cs" />
     <Compile Include="IndexRow.cs" />
+    <Compile Include="IndexRows.cs" />
     <Compile Include="ProcessStatus.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RussellData.cs" />

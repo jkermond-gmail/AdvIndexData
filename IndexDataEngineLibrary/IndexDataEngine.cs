@@ -24,7 +24,7 @@ namespace IndexDataEngineLibrary
         private DateTime VifsProcessDate;
         private string sIndexDataProcessDate;
         private DateTime IndexDataProcessDate;
-        private bool testing = true;
+        private bool testing = false;
 
 
         public IndexDataEngine()
@@ -61,15 +61,16 @@ namespace IndexDataEngineLibrary
             if (testing)
             {
                 string sToday = DateTime.Now.ToString("MM/dd/yyyy");
-                if (sVifsProcessDate.Equals(sToday)) // JK to do change
+                //if (sVifsProcessDate.Equals(sToday)) // JK to do change
+                if (sVifsProcessDate.Equals("01/05/2018")) // JK to do change
                 {
                     testing = false;
                 }
                 else
                 {
-                    VifsProcessDate = DateHelper.NextBusinessDay(VifsProcessDate);
-                    sVifsProcessDate = VifsProcessDate.ToString("MM/dd/yyyy");
-                    setVIFsProcessDate(sVifsProcessDate);
+                VifsProcessDate = DateHelper.NextBusinessDay(VifsProcessDate);
+                sVifsProcessDate = VifsProcessDate.ToString("MM/dd/yyyy");
+                setVIFsProcessDate(sVifsProcessDate);
                 }
             }
             // should there be an endsql() here?
@@ -99,13 +100,13 @@ namespace IndexDataEngineLibrary
                     for (int i = 0; i < Indices.Length; i++)
                     {
                         IndexName = Indices[i];
-                        ProcessStatus.Add(sProcessDate, Vendor, Dataset, IndexName);
+                        ProcessStatus.Add(sProcessDate, Vendors.Russell.ToString(), Dataset, IndexName);
                     }
                 }
                 else if (Vendor.Equals("StandardAndPoors"))
                 {
                     IndexName = Dataset;
-                    ProcessStatus.Add(sProcessDate, Vendor, Dataset, IndexName);
+                    ProcessStatus.Add(sProcessDate, Vendors.Snp.ToString(), Dataset, IndexName);
                 }
             }
         }

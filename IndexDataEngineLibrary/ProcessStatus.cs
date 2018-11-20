@@ -204,7 +204,15 @@ namespace IndexDataEngineLibrary
                             bool bTotalReturnData = dr["TotalReturnData"].ToString().Equals("P");
                             // JK:ToDo bool bSecurityMasterData = dr["SecurityMasterData"].ToString().Equals("P");
                             bool bSymbolChangeData = dr["SymbolChangeData"].ToString().Equals("P");
-                            GenerateReturns = (bOpenData.Equals(true) && bCloseData.Equals(true) && bTotalReturnData.Equals(true) && bSymbolChangeData.Equals(true));
+                            if (Vendor.Equals(Vendors.Russell.ToString()))
+                            {
+                                GenerateReturns = (bOpenData.Equals(true) && bCloseData.Equals(true)
+                                                   && bTotalReturnData.Equals(true) && bSymbolChangeData.Equals(true));
+                            }
+                            else if (Vendor.Equals(Vendors.Snp.ToString()))
+                            {
+                                GenerateReturns = (bOpenData.Equals(true) && bCloseData.Equals(true));
+                            }
                         }
                     }
                     dr.Close();

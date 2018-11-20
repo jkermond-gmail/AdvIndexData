@@ -76,13 +76,13 @@ namespace IndexDataEngineLibrary
                     RUSSELLINDUSTRY,
                 }
                 */
-        private string[] sVendorFormats = new string[]
-        {
-        "RussellSecurity",
-        "RussellSector",
-        "RussellIndustry",
-        "RussellSubSector"
-        };
+        //private string[] sVendorFormats = new string[]
+        //{
+        //"RussellSecurity",
+        //"RussellSector",
+        //"RussellIndustry",
+        //"RussellSubSector"
+        //};
 
         private const string TOTAL_COUNT = "Total Count:";
 
@@ -2041,41 +2041,48 @@ CREATE TABLE [dbo].[HistoricalSymbolChanges](
             return;
         }
 
-        private void AdjustReturnsToMatchPublishedTotalReturns(List<IndexRow> indexRows, string sDate, string sIndexName)
+        private void AdjustReturnsToMatchPublishedTotalReturns(List<IndexRow> indexRows, string sDate, string sIndexName, string sVendorFormat)
         {
             int totalReturnPrecision = 9;
+            double dZero = 0.0;
 
             double VendorTotalReturn = GetVendorTotalReturnForDate(sDate, sIndexName);
 
-            VendorTotalReturn = Math.Round(VendorTotalReturn, totalReturnPrecision, MidpointRounding.AwayFromZero);
-
-            int i = 0;
-            foreach (IndexRow indexRow in indexRows)
+            if (VendorTotalReturn.Equals(dZero) == false)
             {
-                if (i == 0)
+
+                VendorTotalReturn = Math.Round(VendorTotalReturn, totalReturnPrecision, MidpointRounding.AwayFromZero);
+
+                IndexRows.ZeroAdventTotalReturn();
+                foreach (IndexRow indexRow in indexRows)
+                    indexRow.CalculateAdventTotalReturn();
+
+                double AdventTotalReturn = IndexRows.AdventTotalReturn;
+                AdventTotalReturn = Math.Round(AdventTotalReturn, totalReturnPrecision, MidpointRounding.AwayFromZero);
+
+                sharedData.AddTotalReturn(sDate, sIndexName, Vendors.Russell.ToString(), sVendorFormat, AdventTotalReturn, "AdvReturn");
+
+
+                double AdventVsVendorDiff = VendorTotalReturn - AdventTotalReturn;
+
+                AdventVsVendorDiff = Math.Round(AdventVsVendorDiff, totalReturnPrecision, MidpointRounding.AwayFromZero);
+
+                sharedData.AddTotalReturn(sDate, sIndexName, Vendors.Russell.ToString(), sVendorFormat, AdventVsVendorDiff, "Diff");
+
+
+                IndexRows.CalculateAddlContribution(AdventVsVendorDiff, sVendorFormat);
+
+                foreach (IndexRow indexRow in indexRows)
                 {
-                    indexRow.ZeroAdventTotalReturn();
-                    i++;
+                    indexRow.CalculateAdventAdjustedReturn();
                 }
-                indexRow.CalculateAdventTotalReturn();
+
+
+                double AdventTotalReturnAdjusted = IndexRows.AdventTotalReturnAdjusted;
+                AdventTotalReturnAdjusted = Math.Round(AdventTotalReturnAdjusted, totalReturnPrecision, MidpointRounding.AwayFromZero);
+                sharedData.AddTotalReturn(sDate, sIndexName, Vendors.Russell.ToString(), sVendorFormat, AdventTotalReturnAdjusted, "AdvReturnAdj");
             }
 
-            double AdventTotalReturn = indexRows[0].AdventTotalReturn;
-            AdventTotalReturn = Math.Round(AdventTotalReturn, totalReturnPrecision, MidpointRounding.AwayFromZero);
-
-            double AdventVsVendorDiff = VendorTotalReturn - AdventTotalReturn;
-
-            AdventVsVendorDiff = Math.Round(AdventVsVendorDiff, totalReturnPrecision, MidpointRounding.AwayFromZero);
-
-            indexRows[0].CalculateAddlContribution(AdventVsVendorDiff);
-
-            foreach (IndexRow indexRow in indexRows)
-            {
-                indexRow.CalculateAdventAdjustedReturn();
-            }
-
-            double AdventTotalReturnAdjusted = indexRows[0].AdventTotalReturnAdjusted;
-            AdventTotalReturnAdjusted = Math.Round(AdventTotalReturnAdjusted, totalReturnPrecision, MidpointRounding.AwayFromZero);
         }
 
         private void RollUpRatesOfReturn(List<IndexRow> indexRowsRollUp, List<IndexRow> indexRowsIndustrySort, 
@@ -2106,7 +2113,7 @@ CREATE TABLE [dbo].[HistoricalSymbolChanges](
             //    LogHelper.WriteLine(indexRowRollUp.Identifier + " " + indexRowRollUp.Weight.ToString() + " " + indexRowRollUp.RateOfReturn.ToString());
             //}
 
-            AdjustReturnsToMatchPublishedTotalReturns(indexRowsRollUp, sDate, sIndexName);
+            AdjustReturnsToMatchPublishedTotalReturns(indexRowsRollUp, sDate, sIndexName, vendorFormat.ToString());
             //LogHelper.WriteLine("---After---");
 
             //foreach (IndexRow indexRowRollUp in indexRowsRollUp)
@@ -2116,13 +2123,20 @@ CREATE TABLE [dbo].[HistoricalSymbolChanges](
             //LogHelper.WriteLine("---Done---");
         }
 
-        public void GenerateIndustryReturnsForDate(string sDate, string sIndexName)
+        private void InitializeIndexRows()
         {
+            IndexRows.Reset();
+            indexRowsTickerSort.Clear();
             indexRowsIndustrySort.Clear();
             indexRowsSectorLevel1RollUp.Clear();
             indexRowsSectorLevel2RollUp.Clear();
             indexRowsSectorLevel3RollUp.Clear();
+        }
 
+
+        public void GenerateIndustryReturnsForDate(string sDate, string sIndexName)
+        {
+            InitializeIndexRows();
             if (GenerateReturnsForDate(sDate, sIndexName, AdventOutputType.Sector) == true)
             {
                 for (bool GotNext = true; GotNext;)
@@ -2147,6 +2161,7 @@ CREATE TABLE [dbo].[HistoricalSymbolChanges](
                     }
                 }
 
+                
                 for (IndexRow.VendorFormat vendorFormat = IndexRow.VendorFormat.SECTOR_LEVEL1; vendorFormat <= IndexRow.VendorFormat.SECTOR_LEVEL3; vendorFormat++)
                 {
                     string sCurrentIdentifier = "";
@@ -2327,11 +2342,13 @@ CREATE TABLE [dbo].[HistoricalSymbolChanges](
 
         public void GenerateConstituentReturnsForDate(string sDate, string sIndexName)
         {
-            indexRowsTickerSort.Clear();
+            int i = 0;
+            InitializeIndexRows();
             if (GenerateReturnsForDate(sDate, sIndexName, AdventOutputType.Constituent) == true)
             {
                 for (bool GotNext = true; GotNext;)
                 {
+                    i += 1;
                     string sCusip = null;
                     string sTicker = null;
                     string sSector = null;
@@ -2351,7 +2368,7 @@ CREATE TABLE [dbo].[HistoricalSymbolChanges](
                         indexRowsTickerSort.Add(indexRow);
                     }
                 }
-                AdjustReturnsToMatchPublishedTotalReturns(indexRowsTickerSort, sDate, sIndexName);
+                AdjustReturnsToMatchPublishedTotalReturns(indexRowsTickerSort, sDate, sIndexName, IndexRow.VendorFormat.CONSTITUENT.ToString());
             }
         }
 
@@ -2882,14 +2899,11 @@ CREATE TABLE [dbo].[HistoricalSymbolChanges](
                         //LogHelper.WriteLine(sDate + " " + sReturn);
                         if (bSaveReturnInDb)
                         {
-                            foreach( string sVendorFormat in sVendorFormats )
-                                sharedData.AddTotalReturn(oDate, sIndexName, sVendorFormat, dReturn, "AdvReturn");
-
-                            //for (int i = 0; i < sVendorFormats.Length; i++)
-                            //{
-                            //    string sVendorFormat = sVendorFormats[i];
-                            //    AddTotalReturn(oDate, sIndexName, sVendorFormat, dReturn, "AdvReturn");
-                            //}
+                            foreach (string vendorFormat in Enum.GetNames(typeof(IndexRow.VendorFormat)))
+                            {
+                                if (vendorFormat.Equals("SECTOR_LEVEL4") == false)  // Russell only has 3 sector levels (Snp has 4)
+                                    sharedData.AddTotalReturn(oDate, sIndexName, Vendors.Russell.ToString(), vendorFormat, dReturn, "AdvReturnDb");
+                            }
                         }
                     }
                 }
@@ -3031,104 +3045,7 @@ CREATE TABLE [dbo].[HistoricalSymbolChanges](
         }
     }
 
-        public void AddCalculatedTotalReturn(string sDate, string sIndexName, double dReturn)
-        {
-            SqlConnection cnSql = new SqlConnection(sharedData.ConnectionStringIndexData);
-            try
-            {
-                cnSql.Open();
-                string SqlSelect = @"
-                    select count(*) from TotalReturns
-                    where IndexName = @IndexName and ReturnDate = @ReturnDate 
-                    and VendorFormat = 'RussellSecurity'
-                    ";
 
-                SqlCommand cmd = new SqlCommand(SqlSelect, cnSql);
-                cmd.Parameters.Add("@IndexName", SqlDbType.VarChar, 20);
-                cmd.Parameters.Add("@ReturnDate", SqlDbType.DateTime);
-                cmd.Parameters["@IndexName"].Value = sIndexName;
-                DateTime oDate = DateTime.MinValue;
-                oDate = DateTime.Parse(sDate);
-                cmd.Parameters["@ReturnDate"].Value = oDate;
-                int iCount = (int)cmd.ExecuteScalar();
-                if (iCount == 0)
-                {
-                    cmd.CommandText = @"
-                        insert into TotalReturns
-                        (IndexName, ReturnDate, VendorFormat AdvReturnDb) Values 
-                        (@IndexName, @ReturnDate, 'RussellSecurity', @AdvReturnDb)
-                        ";
-                }
-                else
-                {
-                    cmd.CommandText = @"
-                        update TotalReturns set AdvReturnDb = @AdvReturnDb
-                        where IndexName = @IndexName and ReturnDate = @ReturnDate 
-                        and VendorFormat = 'RussellSecurity'
-                        ";
-                }
-                cmd.Parameters.Add("@AdvReturnDb", SqlDbType.Float, 8);
-                cmd.Parameters["@AdvReturnDb"].Value = dReturn;
-                cmd.ExecuteNonQuery();
-            }
-            catch (SqlException ex)
-            {
-                if (ex.Number == 2627)
-                {
-                    Console.WriteLine(ex.Message);
-                }
-            }
-            finally
-            {
-                cnSql.Close();
-            }
-
-        }
-
-        public double GetAdvAdjReturnForDate(string sDate, string sIndexName)
-        {
-            SqlDataReader dr = null;
-            SqlConnection cnSql = new SqlConnection(sharedData.ConnectionStringIndexData);
-            double dReturn = 0.0;
-            try
-            {
-                cnSql.Open();
-                string SqlSelect = @"
-                    select AdvReturnAdj from TotalReturns
-                    where IndexName = @IndexName and ReturnDate = @ReturnDate 
-                    and VendorFormat = 'RussellSecurity'
-                    ";
-
-                SqlCommand cmd = new SqlCommand(SqlSelect, cnSql);
-                cmd.Parameters.Add("@IndexName", SqlDbType.VarChar, 20);
-                cmd.Parameters.Add("@ReturnDate", SqlDbType.DateTime);
-                cmd.Parameters["@IndexName"].Value = sIndexName;
-                DateTime oDate = DateTime.MinValue;
-                oDate = DateTime.Parse(sDate);
-                cmd.Parameters["@ReturnDate"].Value = oDate;
-
-                dr = cmd.ExecuteReader();
-                if (dr.HasRows)
-                {
-                    if (dr.Read())
-                    {
-                        dReturn = (double)dr[0];
-                    }
-                }
-            }
-            catch (SqlException ex)
-            {
-                if (ex.Number == 2627)
-                {
-                    Console.WriteLine(ex.Message);
-                }
-            }
-            finally
-            {
-                cnSql.Close();
-            }
-            return (dReturn);
-        }
 
         public double GetVendorTotalReturnForDate(string sDate, string sIndexName)
         {
@@ -3141,7 +3058,7 @@ CREATE TABLE [dbo].[HistoricalSymbolChanges](
                 string SqlSelect = @"
                     select VendorReturn from TotalReturns
                     where IndexName = @IndexName and ReturnDate = @ReturnDate 
-                    and VendorFormat = 'RussellSecurity'
+                    and Vendor = 'Russell' and VendorFormat = 'CONSTITUENT'
                     ";
 
                 SqlCommand cmd = new SqlCommand(SqlSelect, cnSql);
@@ -3179,50 +3096,6 @@ CREATE TABLE [dbo].[HistoricalSymbolChanges](
 
 
 
-        public double GetAdvVsVendorDiffForDate(string sDate, string sIndexName)
-        {
-            SqlDataReader dr = null;
-            SqlConnection cnSql = new SqlConnection(sharedData.ConnectionStringIndexData);
-            double dDiff = 0.0;
-            try
-            {
-                cnSql.Open();
-                string SqlSelect = @"
-                    select Diff from TotalReturns
-                    where IndexName = @IndexName and ReturnDate = @ReturnDate 
-                    and VendorFormat = 'RussellSecurity'
-                    ";
-
-                SqlCommand cmd = new SqlCommand(SqlSelect, cnSql);
-                cmd.Parameters.Add("@IndexName", SqlDbType.VarChar, 20);
-                cmd.Parameters.Add("@ReturnDate", SqlDbType.DateTime);
-                cmd.Parameters["@IndexName"].Value = sIndexName;
-                DateTime oDate = DateTime.MinValue;
-                oDate = DateTime.Parse(sDate);
-                cmd.Parameters["@ReturnDate"].Value = oDate;
-
-                dr = cmd.ExecuteReader();
-                if (dr.HasRows)
-                {
-                    if (dr.Read())
-                    {
-                        dDiff = (double)dr[0];
-                    }
-                }
-            }
-            catch (SqlException ex)
-            {
-                if (ex.Number == 2627)
-                {
-                    Console.WriteLine(ex.Message);
-                }
-            }
-            finally
-            {
-                cnSql.Close();
-            }
-            return (dDiff);
-        }
 
         public void CalculateVendorTotalReturnsForPeriod(string sStartDate, string sEndDate, string sIndexName)
         {
@@ -3297,14 +3170,11 @@ CREATE TABLE [dbo].[HistoricalSymbolChanges](
                             int Precision = 9;
                             CalculatedTotalReturn = Math.Round(CalculatedTotalReturn, Precision, MidpointRounding.AwayFromZero);
 
-                            foreach( string sVendorFormat in sVendorFormats)
-                                sharedData.AddTotalReturn(date, sIndexName, sVendorFormat, CalculatedTotalReturn, "VendorReturn");
-
-                            //for (int i = 0; i < sVendorFormats.Length; i++)
-                            //{
-                            //    string sVendorFormat = sVendorFormats[i];
-                            //    AddTotalReturn(date, sIndexName, sVendorFormat, CalculatedTotalReturn, "VendorReturn");
-                            //}
+                            foreach (string vendorFormat in Enum.GetNames(typeof(IndexRow.VendorFormat)))
+                            {
+                                if (vendorFormat.Equals("SECTOR_LEVEL4") == false)  // Russell only has 3 sector levels (Snp has 4)
+                                    sharedData.AddTotalReturn(date, sIndexName, Vendors.Russell.ToString(), vendorFormat, CalculatedTotalReturn, "VendorReturn");
+                            }
                         }
                     }
                 }
@@ -3350,9 +3220,9 @@ CREATE TABLE [dbo].[HistoricalSymbolChanges](
 
 
                     string SqlSelect = @"
-                    select VendorReturn, AdvReturn from TotalReturns
+                    select VendorReturn, AdvReturnDb from TotalReturns
                     where IndexName = @IndexName and ReturnDate = @ReturnDate 
-                    and VendorFormat = 'RussellSecurity'
+                    and Vendor = 'Russell' and VendorFormat = 'CONSTITUENT'
                     ";
 
                     SqlCommand cmd = new SqlCommand(SqlSelect, mSqlConn);
@@ -3368,9 +3238,9 @@ CREATE TABLE [dbo].[HistoricalSymbolChanges](
                         {
                             double dNum;
                             string s = "";
-                            s = dr["AdvReturn"].ToString();
+                            s = dr["AdvReturnDb"].ToString();
                             if(s.Length > 0 && double.TryParse(s, out dNum))
-                                dAdvReturn = Convert.ToDouble(dr["AdvReturn"].ToString());
+                                dAdvReturn = Convert.ToDouble(dr["AdvReturnDb"].ToString());
                             s = dr["VendorReturn"].ToString();
                             if (s.Length > 0 && double.TryParse(s, out dNum))
                                 dVendorReturn = Convert.ToDouble(dr["VendorReturn"].ToString());
@@ -3378,46 +3248,17 @@ CREATE TABLE [dbo].[HistoricalSymbolChanges](
 
                             if((dVendorReturn.Equals(double.MinValue) == false) && (dAdvReturn.Equals(double.MinValue) == false))
                             {
-                                //dDiff = dVendorReturn - dAdvReturn;
                                 dDiff = Math.Round((dVendorReturn - dAdvReturn), iTotalReturnPrecision, MidpointRounding.AwayFromZero);
 
-                                foreach (string sVendorFormat in sVendorFormats)
-                                    sharedData.AddTotalReturn(date, sIndexName, sVendorFormat, dDiff, "Diff");
-
-                                //for (int i = 0; i < sVendorFormats.Length; i++)
-                                //{
-                                //    string sVendorFormat = sVendorFormats[i];
-                                //    AddTotalReturn(date, sIndexName, sVendorFormat, dDiff, "Diff");
-                                //}
+                                foreach (string vendorFormat in Enum.GetNames(typeof(IndexRow.VendorFormat)))
+                                    if (vendorFormat.Equals("SECTOR_LEVEL4") == false)  // Russell only has 3 sector levels (Snp has 4)
+                                        sharedData.AddTotalReturn(date, sIndexName, Vendors.Russell.ToString(), vendorFormat, dDiff, "DiffDb");
 
                                 //double dTest = Math.Round((dAdvReturn + dDiff), iTotalReturnPrecision, MidpointRounding.AwayFromZero);
                             }
                         }
                     }
                 }
-
-
-                    /*
-                    SELECT TOP 1000 [IndexName]
-                          ,[ReturnDate]
-                          ,[VendorFormat]
-                          ,[VendorReturn]
-                          ,[AdvReturn]
-                          ,[AdvAdjFactor]
-                          ,[AdvReturnAdj]
-                          ,[AdvReturnDb]
-                          ,[Diff]
-                          ,[DiffAdj]
-                          ,[DiffDb]
-                          ,[CumltDiff]
-                          ,[dateModified]
-                          ,[ClientId]
-                          ,[RequestFile]
-                      FROM [IndexData].[dbo].[TotalReturns];
-
-                     delete FROM [IndexData].[dbo].[TotalReturns]  
-
-                                         */
                 
                 catch (SqlException ex)
                 {

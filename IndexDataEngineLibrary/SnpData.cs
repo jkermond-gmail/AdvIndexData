@@ -37,14 +37,14 @@ namespace IndexDataEngineLibrary
         private List<IndexRow> indexRowsSectorLevel3RollUp = new List<IndexRow>();
         private List<IndexRow> indexRowsSectorLevel4RollUp = new List<IndexRow>();
 
-        private string[] sVendorFormats = new string[]
-        {
-            "StandardPoorsSecurity",
-            "StandardPoorsSector",
-            "StandardPoorsIndustryGroup",
-            "StandardPoorsIndustry",
-            "StandardPoorsSubIndustry"
-        };
+        //private string[] sVendorFormats = new string[]
+        //{
+        //    "StandardPoorsSecurity",
+        //    "StandardPoorsSector",
+        //    "StandardPoorsIndustryGroup",
+        //    "StandardPoorsIndustry",
+        //    "StandardPoorsSubIndustry"
+        //};
 
 
         public SnpData()
@@ -1406,7 +1406,7 @@ namespace IndexDataEngineLibrary
 
         public void GenerateConstituentReturnsForDate(string sDate, string sIndexName)
         {
-            indexRowsTickerSort.Clear();
+            InitializeIndexRows();
 
             if (GenerateReturnsForDate(sDate, sIndexName, AdventOutputType.Constituent) == true)
             {
@@ -1436,7 +1436,7 @@ namespace IndexDataEngineLibrary
                         i = i + 1;
                     }
                 }
-                CalculateAdventTotalReturnForDate(indexRowsTickerSort, sDate, sIndexName, sVendorFormats[(int)IndexRow.VendorFormat.CONSTITUENT]);
+                CalculateAdventTotalReturnForDate(indexRowsTickerSort, sDate, sIndexName, IndexRow.VendorFormat.CONSTITUENT.ToString());
             }
         }
 
@@ -1470,13 +1470,21 @@ namespace IndexDataEngineLibrary
             //LogHelper.WriteLine("---Done---");
         }
 
-
-        public void GenerateIndustryReturnsForDate(string sDate, string sIndexName)
+        private void InitializeIndexRows()
         {
+            IndexRows.Reset();
+            indexRowsTickerSort.Clear();
             indexRowsIndustrySort.Clear();
             indexRowsSectorLevel1RollUp.Clear();
             indexRowsSectorLevel2RollUp.Clear();
             indexRowsSectorLevel3RollUp.Clear();
+            indexRowsSectorLevel4RollUp.Clear();
+        }
+
+
+        public void GenerateIndustryReturnsForDate(string sDate, string sIndexName)
+        {
+            InitializeIndexRows();
 
             if (GenerateReturnsForDate(sDate, sIndexName, AdventOutputType.Sector) == true)
             {
@@ -1585,22 +1593,20 @@ namespace IndexDataEngineLibrary
                     {
                         case IndexRow.VendorFormat.SECTOR_LEVEL1:
                             RollUpRatesOfReturn(indexRowsSectorLevel1RollUp, indexRowsIndustrySort, vendorFormat, sDate, sIndexName);
-                            CalculateAdventTotalReturnForDate(indexRowsSectorLevel1RollUp, sDate, sIndexName, sVendorFormats[(int)IndexRow.VendorFormat.SECTOR_LEVEL1]);
+                            CalculateAdventTotalReturnForDate(indexRowsSectorLevel1RollUp, sDate, sIndexName, IndexRow.VendorFormat.SECTOR_LEVEL1.ToString());
                             break;
                         case IndexRow.VendorFormat.SECTOR_LEVEL2:
                             RollUpRatesOfReturn(indexRowsSectorLevel2RollUp, indexRowsIndustrySort, vendorFormat, sDate, sIndexName);
-                            CalculateAdventTotalReturnForDate(indexRowsSectorLevel2RollUp, sDate, sIndexName, sVendorFormats[(int)IndexRow.VendorFormat.SECTOR_LEVEL2]);
+                            CalculateAdventTotalReturnForDate(indexRowsSectorLevel2RollUp, sDate, sIndexName, IndexRow.VendorFormat.SECTOR_LEVEL2.ToString());
                             break;
                         case IndexRow.VendorFormat.SECTOR_LEVEL3:
                             RollUpRatesOfReturn(indexRowsSectorLevel3RollUp, indexRowsIndustrySort, vendorFormat, sDate, sIndexName);
-                            CalculateAdventTotalReturnForDate(indexRowsSectorLevel3RollUp, sDate, sIndexName, sVendorFormats[(int)IndexRow.VendorFormat.SECTOR_LEVEL3]);
+                            CalculateAdventTotalReturnForDate(indexRowsSectorLevel3RollUp, sDate, sIndexName, IndexRow.VendorFormat.SECTOR_LEVEL3.ToString());
                             break;
                         case IndexRow.VendorFormat.SECTOR_LEVEL4:
                             RollUpRatesOfReturn(indexRowsSectorLevel4RollUp, indexRowsIndustrySort, vendorFormat, sDate, sIndexName);
-                            CalculateAdventTotalReturnForDate(indexRowsSectorLevel4RollUp, sDate, sIndexName, sVendorFormats[(int)IndexRow.VendorFormat.SECTOR_LEVEL4]);
-
+                            CalculateAdventTotalReturnForDate(indexRowsSectorLevel4RollUp, sDate, sIndexName, IndexRow.VendorFormat.SECTOR_LEVEL4.ToString());
                             break;
-
                     }
                 }
             }
@@ -1610,39 +1616,14 @@ namespace IndexDataEngineLibrary
         {
             int totalReturnPrecision = 9;
 
-            //double VendorTotalReturn = GetVendorTotalReturnForDate(sDate, sIndexName);
-
-            //VendorTotalReturn = Math.Round(VendorTotalReturn, totalReturnPrecision, MidpointRounding.AwayFromZero);
-
-            int i = 0;
+            IndexRows.ZeroAdventTotalReturn();
             foreach (IndexRow indexRow in indexRows)
-            {
-                if (i == 0)
-                {
-                    indexRow.ZeroAdventTotalReturn();
-                    i++;
-                }
                 indexRow.CalculateAdventTotalReturn();
-            }
 
-            double AdventTotalReturn = indexRows[0].AdventTotalReturn;
+            double AdventTotalReturn = IndexRows.AdventTotalReturn;
             AdventTotalReturn = Math.Round(AdventTotalReturn, totalReturnPrecision, MidpointRounding.AwayFromZero);
 
-            sharedData.AddTotalReturn(sDate, sIndexName, sVendorFormat, AdventTotalReturn, "AdvReturn");
-
-            //double AdventVsVendorDiff = VendorTotalReturn - AdventTotalReturn;
-
-            //AdventVsVendorDiff = Math.Round(AdventVsVendorDiff, totalReturnPrecision, MidpointRounding.AwayFromZero);
-
-            //indexRows[0].CalculateAddlContribution(AdventVsVendorDiff);
-
-            //foreach (IndexRow indexRow in indexRows)
-            //{
-            //    indexRow.CalculateAdventAdjustedReturn();
-            //}
-
-            //double AdventTotalReturnAdjusted = indexRows[0].AdventTotalReturnAdjusted;
-            //AdventTotalReturnAdjusted = Math.Round(AdventTotalReturnAdjusted, totalReturnPrecision, MidpointRounding.AwayFromZero);
+            sharedData.AddTotalReturn(sDate, sIndexName, Vendors.Snp.ToString(), sVendorFormat, AdventTotalReturn, "AdvReturn");
         }
 
 
@@ -1704,14 +1685,8 @@ namespace IndexDataEngineLibrary
                         //LogHelper.WriteLine(sDate + " " + sReturn);
                         if (bSaveReturnInDb)
                         {
-                            foreach (string sVendorFormat in sVendorFormats)
-                                sharedData.AddTotalReturn(oDate, sIndexName, sVendorFormat, dReturn, "AdvReturn");
-
-                            //for (int i = 0; i < sVendorFormats.Length; i++)
-                            //{
-                            //    string sVendorFormat = sVendorFormats[i];
-                            //    AddTotalReturn(oDate, sIndexName, sVendorFormat, dReturn, "AdvReturn");
-                            //}
+                            foreach (string vendorFormat in Enum.GetNames(typeof(IndexRow.VendorFormat)))
+                                sharedData.AddTotalReturn(oDate, sIndexName, Vendors.Snp.ToString(), vendorFormat, dReturn, "AdvReturn");
                         }
                     }
                 }
@@ -1808,8 +1783,8 @@ namespace IndexDataEngineLibrary
                             int Precision = 9;
                             CalculatedTotalReturn = Math.Round(CalculatedTotalReturn, Precision, MidpointRounding.AwayFromZero);
 
-                            foreach (string sVendorFormat in sVendorFormats)
-                                sharedData.AddTotalReturn(date, sIndexName, sVendorFormat, CalculatedTotalReturn, "VendorReturn");
+                            foreach (string vendorFormat in Enum.GetNames(typeof(IndexRow.VendorFormat)))
+                                sharedData.AddTotalReturn(date, sIndexName, Vendors.Snp.ToString(), vendorFormat, CalculatedTotalReturn, "VendorReturn");
                         }
                     }
                 }

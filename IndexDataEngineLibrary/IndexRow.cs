@@ -9,13 +9,12 @@ namespace IndexDataEngineLibrary
 {
     internal sealed class IndexRow
     {
-        private double mWeight; 
+        private double mWeight;
         private bool mWeightIsMktValue;
-        private double mRateOfReturn; 
+        private double mRateOfReturn;
         private double mRateOfReturnAdjustment;
         private double mRateOfReturnAdjusted;
-        private static double mTotalReturn = 0;
-        private static double mTotalReturnAdjusted = 0;
+
         public enum VendorFormat
         {
             CONSTITUENT,
@@ -24,24 +23,8 @@ namespace IndexDataEngineLibrary
             SECTOR_LEVEL3,
             SECTOR_LEVEL4
         }
-        private static uint mConstituentCount;
-        private static uint mSectorLevel1Count;
-        private static uint mSectorLevel2Count;
-        private static uint mSectorLevel3Count;
-        private static uint mSectorLevel4Count;
 
         private static VendorFormat mVendorFormat;
-
-        /*
-        mIndexDate = sIndexDate;
-            mIndexname = sIndexname;
-            mCUSIP = sCUSIP;
-            mTicker = sTicker;
-            mSectorLevel1 = sSector;
-            mWeight = sWeight;
-            mSecurityReturn = sSecurityReturn;
-            */
-
 
         private DateTime mIndexDate;
         private string mIndexname;
@@ -54,16 +37,14 @@ namespace IndexDataEngineLibrary
 
         private string mIdentifier;
 
-        private static double mAdventVsVendorDiff;
-        private static double mAddlContribution;
 
         private CultureInfo mCultureInfo = new CultureInfo("en-US");
 
 
         internal double AdventVsVendorDiff
         {
-            get { return mAdventVsVendorDiff; }
-            set { mAdventVsVendorDiff = value; }
+            get { return IndexRows.AdventVsVendorDiff; }
+            set { IndexRows.AdventVsVendorDiff = value; }
         }
 
 
@@ -116,14 +97,10 @@ namespace IndexDataEngineLibrary
             get { return mSectorLevel4; }
         }
 
-
-
         internal string Identifier
         {
             get { return mIdentifier; }
         }
-
-
 
         internal double Weight
         {
@@ -140,8 +117,8 @@ namespace IndexDataEngineLibrary
 
         internal uint ConstituentCount
         {
-            get { return mConstituentCount; }
-            set { mConstituentCount = value; }
+            get { return IndexRows.ConstituentCount; }
+            set { IndexRows.ConstituentCount = value; }
         }
 
         internal double TotalReturn
@@ -151,23 +128,6 @@ namespace IndexDataEngineLibrary
                 return Weight * RateOfReturn * 0.01;
             }
         }
-
-        internal double AdventTotalReturn
-        {
-            get
-            {
-                return mTotalReturn;
-            }
-        }
-
-        internal double AdventTotalReturnAdjusted
-        {
-            get
-            {
-                return mTotalReturnAdjusted;
-            }
-        }
-
 
         internal string GetIdentifier( VendorFormat vendorFormat)
         {
@@ -189,52 +149,24 @@ namespace IndexDataEngineLibrary
             return (identifier);
         }
 
-        internal void CalculateAddlContribution(double AdventVsVendorDiff)
-        {
-            mAdventVsVendorDiff = AdventVsVendorDiff;
-
-            uint count = 0;
-            
-            switch(mVendorFormat)
-            {
-                case VendorFormat.CONSTITUENT:
-                    count = mConstituentCount; break;
-                case VendorFormat.SECTOR_LEVEL1:
-                    count = mSectorLevel1Count; break;
-                case VendorFormat.SECTOR_LEVEL2:
-                    count = mSectorLevel2Count; break;
-                case VendorFormat.SECTOR_LEVEL3:
-                    count = mSectorLevel3Count; break;
-                case VendorFormat.SECTOR_LEVEL4:
-                    count = mSectorLevel4Count; break;
-            }
-
-            if (count > 0)
-                mAddlContribution = mAdventVsVendorDiff / count;
-        }
 
         internal void CalculateAdventAdjustedReturn()
         {
-            mRateOfReturnAdjustment = 100 * (mAddlContribution / mWeight); ;
+            mRateOfReturnAdjustment = 100 * (IndexRows.AddlContribution / mWeight); ;
             mRateOfReturnAdjusted = mRateOfReturn + mRateOfReturnAdjustment;
-            mTotalReturnAdjusted += mWeight * mRateOfReturnAdjusted * .01; 
+            IndexRows.TotalReturnAdjusted += mWeight * mRateOfReturnAdjusted * .01; 
         }
 
-        internal void ZeroAdventTotalReturn()
-        {
-            mTotalReturn = 0;
-            mTotalReturnAdjusted = 0;
-        }
 
         internal void CalculateAdventTotalReturn()
         {
-            mTotalReturn += mWeight * mRateOfReturn * .01;
+            IndexRows.TotalReturn += mWeight * mRateOfReturn * .01;
         }
 
 
         internal IndexRow(string sIndexDate, string sIndexname, string sCUSIP, string sTicker, 
             string sSectorLevel1, string sSectorLevel2, string sSectorLevel3, string sSectorLevel4,
-            string sWeight, string sSecurityReturn, VendorFormat vendorFormat )
+            string sWeight, string sSecurityReturn, VendorFormat vendorFormat)
         {
             mIndexDate = DateTime.Parse(sIndexDate);
             mIndexname = sIndexname;
@@ -259,23 +191,23 @@ namespace IndexDataEngineLibrary
             switch(vendorFormat)
             {
                 case VendorFormat.CONSTITUENT:
-                    mConstituentCount += 1;
+                    IndexRows.ConstituentCount += 1;
                     mIdentifier = mTicker;
                     break;
                 case VendorFormat.SECTOR_LEVEL1:
-                    mSectorLevel1Count += 1;
+                    IndexRows.SectorLevel1Count += 1;
                     mIdentifier = sSectorLevel1;
                     break;
                 case VendorFormat.SECTOR_LEVEL2:
-                    mSectorLevel2Count += 1;
+                    IndexRows.SectorLevel2Count += 1;
                     mIdentifier = sSectorLevel2;
                     break;
                 case VendorFormat.SECTOR_LEVEL3:
-                    mSectorLevel3Count += 1;
+                    IndexRows.SectorLevel3Count += 1;
                     mIdentifier = sSectorLevel3;
                     break;
                 case VendorFormat.SECTOR_LEVEL4:
-                    mSectorLevel4Count += 1;
+                    IndexRows.SectorLevel4Count += 1;
                     mIdentifier = sSectorLevel4;
                     break;
             }

@@ -160,15 +160,15 @@ namespace IndexDataEngineLibrary
             return (Indices);
         }
 
-        public void AddTotalReturn(string sDate, string sIndexName, string sVendorFormat,
+        public void AddTotalReturn(string sDate, string sIndexName, string sVendor, string sVendorFormat,
                                    double dReturn, string sWhichReturn)
         {
             DateTime oDate = DateTime.Parse(sDate);
-            AddTotalReturn(oDate, sIndexName, sVendorFormat, dReturn, sWhichReturn);
+            AddTotalReturn(oDate, sIndexName, sVendor, sVendorFormat, dReturn, sWhichReturn);
         }
 
 
-        public void AddTotalReturn(DateTime oDate, string sIndexName, string sVendorFormat,
+        public void AddTotalReturn(DateTime oDate, string sIndexName, string sVendor, string sVendorFormat,
                                    double dReturn, string sWhichReturn)
         {
             try
@@ -182,27 +182,30 @@ namespace IndexDataEngineLibrary
                     select count(*) from TotalReturns
                     where IndexName = @IndexName 
                     and ReturnDate = @ReturnDate 
+                    and Vendor = @Vendor
                     and VendorFormat = @VendorFormat
                     ";
                 SqlCommand cmd = new SqlCommand(SqlSelect, mSqlConn);
                 cmd.Parameters.Add("@IndexName", SqlDbType.VarChar);
                 cmd.Parameters.Add("@ReturnDate", SqlDbType.DateTime);
+                cmd.Parameters.Add("@Vendor", SqlDbType.VarChar);
                 cmd.Parameters.Add("@VendorFormat", SqlDbType.VarChar);
                 cmd.Parameters["@IndexName"].Value = sIndexName;
                 cmd.Parameters["@ReturnDate"].Value = oDate;
+                cmd.Parameters["@Vendor"].Value = sVendor;
                 cmd.Parameters["@VendorFormat"].Value = sVendorFormat;
                 int iCount = (int)cmd.ExecuteScalar();
                 if (iCount == 0)
                 {
                     cmd.CommandText =
-                        "insert into TotalReturns (IndexName, ReturnDate, VendorFormat, " + sWhichReturn + ") " +
-                        "Values (@IndexName, @ReturnDate, @VendorFormat, @" + sWhichReturn + ")";
+                        "insert into TotalReturns (IndexName, ReturnDate, Vendor, VendorFormat, " + sWhichReturn + ") " +
+                        "Values (@IndexName, @ReturnDate, @Vendor, @VendorFormat, @" + sWhichReturn + ")";
                 }
                 else
                 {
                     cmd.CommandText =
                         "update TotalReturns set " + sWhichReturn + " = @" + sWhichReturn + " " +
-                        "where IndexName = @IndexName and ReturnDate = @ReturnDate and VendorFormat = @VendorFormat";
+                        "where IndexName = @IndexName and ReturnDate = @ReturnDate and Vendor = @Vendor and VendorFormat = @VendorFormat";
                 }
                 cmd.Parameters.Add("@" + sWhichReturn, SqlDbType.Float, 8);
                 cmd.Parameters["@" + sWhichReturn].Value = dReturn;

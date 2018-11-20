@@ -61,8 +61,7 @@ namespace IndexDataEngineLibrary
             if (testing)
             {
                 string sToday = DateTime.Now.ToString("MM/dd/yyyy");
-                //if (sVifsProcessDate.Equals(sToday)) // JK to do change
-                if (sVifsProcessDate.Equals("01/05/2018")) // JK to do change
+                if (sVifsProcessDate.Equals(sToday)) // JK to do change
                 {
                     testing = false;
                 }
@@ -73,7 +72,7 @@ namespace IndexDataEngineLibrary
                 setVIFsProcessDate(sVifsProcessDate);
                 }
             }
-            // should there be an endsql() here?
+            EndSql();
         }
 
         private void InitializeProcessStatus(string sProcessDate)

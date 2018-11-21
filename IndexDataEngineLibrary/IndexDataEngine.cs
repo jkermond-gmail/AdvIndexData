@@ -24,13 +24,13 @@ namespace IndexDataEngineLibrary
         private DateTime VifsProcessDate;
         private string sIndexDataProcessDate;
         private DateTime IndexDataProcessDate;
-        private bool testing = true;
+        private bool testing = false;
 
 
         public IndexDataEngine()
         {
             LogHelper.Info("IndexDataEngine()", "IndexDataEngineLibrary");
-
+            testing = AppSettings.Get<bool>("testingIndexDataEngine");
         }
 
 

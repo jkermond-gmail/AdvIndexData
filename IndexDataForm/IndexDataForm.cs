@@ -17,10 +17,11 @@ namespace IndexDataForm
 {
     public partial class IndexDataForm : Form
     {
-        internal int TIMER_INTERVAL = 1000 * 2;                         // 2 seconds
-        //internal int TIMER_INTERVAL = 1000 * 20;                         // 20 seconds
-        //internal int TIMER_INTERVAL = 60 * 1000 * 2;                         // 2 min
-        //internal int TIMER_HOLD_WHILE_WORKING_INTERVAL = 60 * 1000 * 200 ;   // 200 min
+        internal int defaultTimerInterval = 1000 * 2;                           // 2 seconds
+        internal int timerInterval = 1000 * 2;                                  // 2 seconds
+        //internal int defaultTimerInterval = 1000 * 20;                        // 20 seconds
+        //internal int defaultTimerInterval = 60 * 1000 * 2;                    // 2 min
+        //internal int TIMER_HOLD_WHILE_WORKING_INTERVAL = 60 * 1000 * 200 ;    // 200 min
 
         //private System.Timers.Timer timer1 = new System.Timers.Timer();
 
@@ -38,7 +39,11 @@ namespace IndexDataForm
 
             russellData = new RussellData();
             snpData = new SnpData();
-
+            var v = AppSettings.Get<int>("timerInterval");
+            if (v.Equals(0))
+                timerInterval = defaultTimerInterval;
+            else
+                timerInterval = v;
         }
 
         private void btnStart_Click(object sender, EventArgs e)
@@ -56,15 +61,13 @@ namespace IndexDataForm
         {
             LogHelper.Info("timerRunIndexData_Tick", "IndexDataForm");
             TimerEnableDisable("Start Working", false);
-
             // Begin checking if there is any index data work to do
+            Console.WriteLine("Index Data Engine Running");
             indexDataEngine = new IndexDataEngine();
             indexDataEngine.Run();
-
+            Console.WriteLine("Index Data Engine Waiting " + timerInterval/1000 + " seconds ");
             // End checking if there is any index data work to do
-
-            TimerEnableDisable("Stop Working", true);
-
+            TimerEnableDisable("Done Working", true);
         }
 
         private void TimerEnableDisable(string message, bool enable)
@@ -74,7 +77,7 @@ namespace IndexDataForm
 
             if (enable)
             {
-                timerRunIndexData.Interval = TIMER_INTERVAL;
+                timerRunIndexData.Interval = timerInterval;
             }
             else
             {

@@ -31,6 +31,7 @@ namespace IndexDataEngineLibrary
         {
             LogHelper.Info("IndexDataEngine()", "IndexDataEngineLibrary");
             testing = AppSettings.Get<bool>("testingIndexDataEngine");
+            LogHelper.WriteLine("testingIndexDataEngine = " + testing);
         }
 
 
@@ -80,7 +81,7 @@ namespace IndexDataEngineLibrary
             string Vendor = "";
             string Dataset = "";
             string IndexName = "";
-            LogHelper.WriteLine("InitializeProcessDate: " + sProcessDate.ToString());
+            LogHelper.WriteLine("InitializeProcessStatus: " + sProcessDate.ToString());
 
             ProcessStatus.Initialize();
             List<KeyValuePair<string, string>> listVendorDatasets = null;
@@ -132,7 +133,6 @@ namespace IndexDataEngineLibrary
                 vendor = element.Key.ToString();
                 dataset = element.Value.ToString();
 
-                bool testing = true;
                 if (testing)
                     VendorDatasetFilesUpdateLastProcessDate(vendor, dataset, sProcessDate);
 

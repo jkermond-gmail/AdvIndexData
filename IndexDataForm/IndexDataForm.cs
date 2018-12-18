@@ -34,8 +34,8 @@ namespace IndexDataForm
         public IndexDataForm()
         {
             InitializeComponent();
-            bool deleteExisting = false;
-            LogHelper.StartLog("IndexDataLog.txt", @"\IndexData\Logs\", deleteExisting);
+            //LogHelper.StartLog("IndexDataLog.txt", @"\IndexData\Logs\", deleteExisting);
+            LogHelper.StartLog();
 
             russellData = new RussellData();
             snpData = new SnpData();
@@ -59,7 +59,7 @@ namespace IndexDataForm
 
         private void timerRunIndexData_Tick(object sender, EventArgs e)
         {
-            LogHelper.Info("timerRunIndexData_Tick", "IndexDataForm");
+            //LogHelper.Info("timerRunIndexData_Tick", "IndexDataForm");
             TimerEnableDisable("Start Working", false);
             // Begin checking if there is any index data work to do
             Console.WriteLine("Index Data Engine Running");

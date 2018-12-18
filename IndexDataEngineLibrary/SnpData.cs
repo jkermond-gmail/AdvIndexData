@@ -7,7 +7,6 @@ using System.Globalization;
 using System.IO;
 using System.Data.SqlClient;
 using System.Data;
-using System.Configuration;
 
 using AdventUtilityLibrary;
 using LumenWorks.Framework.IO.Csv;
@@ -49,7 +48,7 @@ namespace IndexDataEngineLibrary
 
         public SnpData()
         {
-            LogHelper.Info("SnpData()", "SnpData");
+            //LogHelper.Info("SnpData()", "SnpData");
             sharedData = new SharedData();
             DateHelper.ConnectionString = sharedData.ConnectionStringAmdVifs;
             sharedData.Vendor = Vendors.Snp;
@@ -225,7 +224,7 @@ namespace IndexDataEngineLibrary
         {
             DateTime oProcessDate;
             int DateCompare;
-            string FilePath = ConfigurationManager.AppSettings["VifsPath.Snp"];
+            string FilePath = AppSettings.Get<string>("VifsPath.Snp");
             string FileName;
             string sMsg = "ProcessVendorFiles: " + oStartDate.ToShortDateString() + " to " + oEndDate.ToShortDateString() + " " + Dataset;
 
@@ -1266,7 +1265,7 @@ namespace IndexDataEngineLibrary
             // rl-20170714-xse-r3000.XSX
 
             mAxmlFilename = "ix-" + DateHelper.ConvertToYYYYMMDD(sDate) + "-xse-" + sIndexName + ".XSX";
-            string sAxmlOutputPath = ConfigurationManager.AppSettings["AxmlOutputPath"];
+            string sAxmlOutputPath = AppSettings.Get<string>("AxmlOutputPath");
             string filename = (sAxmlOutputPath + mAxmlFilename);
 
             if (File.Exists(filename))
@@ -1332,7 +1331,7 @@ namespace IndexDataEngineLibrary
              */
 
             mAxmlFilename = "ix-" + DateHelper.ConvertToYYYYMMDD(sDate) + "-xnf-" + sIndexName + ".XNX";
-            string sAxmlOutputPath = ConfigurationManager.AppSettings["AxmlOutputPath"];
+            string sAxmlOutputPath = AppSettings.Get<string>("AxmlOutputPath");
             string filename = (sAxmlOutputPath + mAxmlFilename);
 
             if (File.Exists(filename))

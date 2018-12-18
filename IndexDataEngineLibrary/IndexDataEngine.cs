@@ -29,15 +29,15 @@ namespace IndexDataEngineLibrary
 
         public IndexDataEngine()
         {
-            LogHelper.Info("IndexDataEngine()", "IndexDataEngineLibrary");
+            //LogHelper.Info("IndexDataEngine()", "IndexDataEngineLibrary");
             testing = AppSettings.Get<bool>("testingIndexDataEngine");
-            LogHelper.WriteLine("testingIndexDataEngine = " + testing);
+            //LogHelper.WriteLine("testingIndexDataEngine = " + testing);
         }
 
 
         public void Run()
         {
-            LogHelper.Info("IndexDataEngine.Run", "IndexDataEngineLibrary");
+            //LogHelper.Info("IndexDataEngine.Run", "IndexDataEngineLibrary");
             sConnectionIndexData = ConfigurationManager.ConnectionStrings["dbConnectionIndexData"].ConnectionString;
             sConnectionAmdVifs = ConfigurationManager.ConnectionStrings["dbConnectionAmdVifs"].ConnectionString;
             DateHelper.ConnectionString = sConnectionAmdVifs;
@@ -54,6 +54,7 @@ namespace IndexDataEngineLibrary
             if (VifsProcessDate.Date > IndexDataProcessDate.Date)
             {
                 // Initialize everything cuz its a new day
+                LogHelper.ArchiveLog(IndexDataProcessDate.Date);
                 InitializeProcessStatus(sVifsProcessDate);
                 setIndexDataProcessDate(sVifsProcessDate);
             }
@@ -113,7 +114,7 @@ namespace IndexDataEngineLibrary
 
         private void ProcessIndexDataWork(string sProcessDate)
         {
-            LogHelper.WriteLine("ProcessIndexDataWork: " + sProcessDate.ToString());
+            //LogHelper.WriteLine("ProcessIndexDataWork: " + sProcessDate.ToString());
 
             List<KeyValuePair<string, string>> listVendorDatasets = null;
 
@@ -138,13 +139,14 @@ namespace IndexDataEngineLibrary
 
                 if (VendorDatasetFilesDownloaded(vendor, dataset, sProcessDate, out FilesTotal, out FilesDownloaded))
                 {
-
-                    LogHelper.WriteLine("Vendor | " + vendor + " | Dataset | " + dataset + " | sProcessDate | " + sProcessDate + " | FilesDownloaded | "
-                                        + FilesDownloaded + " | FilesTotal | " + FilesTotal);
+                    if (FilesDownloaded < FilesTotal)
+                        LogHelper.WriteLine("Vendor | " + vendor + " | Dataset | " + dataset + " | sProcessDate | " + sProcessDate + " | FilesDownloaded | "
+                                            + FilesDownloaded + " | FilesTotal | " + FilesTotal);
 
                     if (VendorDatasetJobsProcessed(vendor, dataset, sProcessDate, out JobsTotal, out JobsProcessed))
                     {
-                        LogHelper.WriteLine("Vendor | " + vendor + " | Dataset | " + dataset + " | sProcessDate | " + sProcessDate + " | JobsProcessed | "
+                        if (JobsProcessed < JobsTotal)
+                            LogHelper.WriteLine("Vendor | " + vendor + " | Dataset | " + dataset + " | sProcessDate | " + sProcessDate + " | JobsProcessed | "
                                             + JobsProcessed + " | JobsTotal | " + JobsTotal);
 
                         //if (VendorDatasetFilesGenerated(vendor, dataset, sProcessDate, out FilesTotal, out FilesGenerated))
@@ -235,7 +237,7 @@ namespace IndexDataEngineLibrary
             }
             finally
             {
-                LogHelper.WriteLine(logFuncName + " done " );
+                //LogHelper.WriteLine(logFuncName + " done " );
             }
 
             return (isDownloaded);
@@ -342,7 +344,7 @@ namespace IndexDataEngineLibrary
             }
             finally
             {
-                LogHelper.WriteLine(logFuncName + " done ");
+                //LogHelper.WriteLine(logFuncName + " done ");
             }
 
             return (Processed);
@@ -451,7 +453,7 @@ namespace IndexDataEngineLibrary
             }
             finally
             {
-                LogHelper.WriteLine(logFuncName + " done " );
+                //LogHelper.WriteLine(logFuncName + " done " );
             }
             return;
         }

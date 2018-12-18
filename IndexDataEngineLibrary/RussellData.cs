@@ -7,7 +7,6 @@ using System.IO;
 using System.Data.SqlClient;
 using System.Data;
 using System.Globalization;
-using System.Configuration;
 
 using AdventUtilityLibrary;
 
@@ -102,7 +101,7 @@ namespace IndexDataEngineLibrary
         public RussellData()
         {
             //dateHelper = 
-            LogHelper.Info("RussellData()", "RussellData");
+            //LogHelper.Info("RussellData()", "RussellData");
             sharedData = new SharedData();
             DateHelper.ConnectionString = sharedData.ConnectionStringAmdVifs;
             sharedData.Vendor = Vendors.Russell;
@@ -118,7 +117,7 @@ namespace IndexDataEngineLibrary
         {
             //private const string PATH = @"D:\IndexData\Russell\Test\";
             //private const string LOG_FILE = "RussellData.txt";
-            LogFileName = ConfigurationManager.AppSettings["RussellLogFile"];
+            LogFileName = AppSettings.Get<string>("RussellLogFile");
             //if (File.Exists(LogFileName))
             //    File.Delete(LogFileName);
             if (swLogFile == null)
@@ -313,7 +312,7 @@ namespace IndexDataEngineLibrary
         {
             DateTime oProcessDate;
             int DateCompare;
-            string FilePath = ConfigurationManager.AppSettings["VifsPath.Russell"];
+            string FilePath = AppSettings.Get<string>("VifsPath.Russell");
             string FileName;
             string sMsg = "ProcessVendorFiles: ";
 
@@ -2399,7 +2398,8 @@ CREATE TABLE [dbo].[HistoricalSymbolChanges](
             // rl-20170714-xse-r3000.XSX
 
             mAxmlFilename = "rl-" + DateHelper.ConvertToYYYYMMDD(sDate) + "-xse-" + sIndexName + ".XSX";
-            string sAxmlOutputPath = ConfigurationManager.AppSettings["AxmlOutputPath"];
+            string sAxmlOutputPath = AppSettings.Get<string>("AxmlOutputPath");
+            
             string filename = (sAxmlOutputPath + mAxmlFilename);
 
             if (File.Exists(filename))
@@ -2457,7 +2457,7 @@ CREATE TABLE [dbo].[HistoricalSymbolChanges](
              */
 
             mAxmlFilename = "rl-" + DateHelper.ConvertToYYYYMMDD(sDate) + "-xnf-" + sIndexName + ".XNX";
-            string sAxmlOutputPath = ConfigurationManager.AppSettings["AxmlOutputPath"];
+            string sAxmlOutputPath = AppSettings.Get<string>("AxmlOutputPath");
             string filename = (sAxmlOutputPath + mAxmlFilename);
 
             if (File.Exists(filename))

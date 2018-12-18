@@ -7,43 +7,74 @@ namespace AdventUtilityLibrary
     public static class LogHelper
     {
         private static StreamWriter swLogFile = null;
-        private static string LogFileName;
-        //private static string OutputPath = @"C:\A_Development\visual studio 2017\Projects\AdvIndexData\IndexDataForm\Output\";
-        private static bool LogFileOpened = false;
+        private static string mLogFileNameWithPath;
+        private static string mLogFileNameOnly;
+        private static string mLogFilePath;        
+        private static bool mLogFileOpened = false;
 
-        /*
-        private static void StartLog()
-        {
-            LogFileName = OutputPath + "AdvIndexDataLog.txt";
-            if (File.Exists(LogFileName))
-                File.Delete(LogFileName);
-            swLogFile = File.CreateText(LogFileName);
-            swLogFile.WriteLine(LogFileName + DateTime.Now);
-            swLogFile.Flush();
-        }
+        /* ToDo
+
+        '/////////////////////////////////////////////////////////////////////////////
+        ' DeleteOldLogFiles -
+        '/////////////////////////////////////////////////////////////////////////////
+        Public Sub DeleteOldLogFiles(ByVal vPath, ByVal vDate)
+            Dim vFileDate, vCriteriaDay, vDatePos
+            Dim oArchiveFolder As Scripting.Folder
+            Dim oLogFiles As Scripting.Files
+            Dim oLogFile As Scripting.File
+            On Error GoTo ErrorHandler
+    
+            Call gHCU.VerifyFolder(vPath)
+            Set oArchiveFolder = gFSO.GetFolder(vPath)
+            Set oLogFiles = oArchiveFolder.Files
+            For Each oLogFile In oLogFiles
+                ' Format of filename is: FILENAME.YYYYMMDD.log. Therefore:
+                vDatePos = Len(oLogFile.Name) - 11
+                vFileDate = gU.ConvertDate(Mid(oLogFile.Name, vDatePos, 8), "YYYYMMDD")
+                vCriteriaDay = DateDiff("y", vFileDate, vDate)
+                If vCriteriaDay >= 30 Then
+                    Err.Number = eeMessage
+                    Call gErr.Log("Archive Log file " & oLogFile.Name & " deleted.")
+                    Call gFSO.DeleteFile(vPath & "\" & oLogFile.Name)
+                End If
+            Next
+
+        Exit Sub
+        ErrorHandler:
+            Call gErr.Log("DeleteOldLogFiles()")
+            Call Err.Raise(eeError)
+        End Sub
+
+
+
         */
 
-        public static void StartLog(string logFileName, string logFilePath, bool deleteExisting)
+        public static void StartLog()
         {
-            if (LogFileOpened)
+            mLogFileNameOnly = AppSettings.Get<string>("logFileName");
+            mLogFilePath = AppSettings.Get<string>("logFilePath");
+            bool deleteExisting = AppSettings.Get<bool>("deleteLog");
+
+            if (mLogFileOpened)
                 CloseAndFlush(ref swLogFile);
-            LogFileName = Path.Combine(logFilePath, logFileName);
-            if (deleteExisting && File.Exists(LogFileName))
+
+            mLogFileNameWithPath = Path.Combine(mLogFilePath, mLogFileNameOnly);
+            if (deleteExisting && File.Exists(mLogFileNameWithPath))
             {
-                File.Delete(LogFileName);
-                swLogFile = new StreamWriter(Path.Combine(logFilePath, logFileName));
+                File.Delete(mLogFileNameWithPath);
+                swLogFile = new StreamWriter(mLogFileNameWithPath);
             }
-            else if( !File.Exists(LogFileName))
+            else if( !File.Exists(mLogFileNameWithPath))
             {
-                swLogFile = new StreamWriter(Path.Combine(logFilePath, logFileName));
+                swLogFile = new StreamWriter(mLogFileNameWithPath);
             }
             else
             {
                 bool append = true;
-                swLogFile = new StreamWriter(Path.Combine(logFilePath, logFileName), append);
+                swLogFile = new StreamWriter(mLogFileNameWithPath, append);
             }
-            LogFileOpened = true;
-            string message = LogFileName + " opened " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+            mLogFileOpened = true;
+            string message = mLogFileNameWithPath + " opened " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
             //WriteLine(message);
             swLogFile.Flush();
         }
@@ -64,7 +95,7 @@ namespace AdventUtilityLibrary
                 WriteFile.Flush();
                 WriteFile.Close();
                 WriteFile = null;
-                LogFileOpened = false;
+                mLogFileOpened = false;
             }
         }
 
@@ -119,5 +150,17 @@ namespace AdventUtilityLibrary
             WriteLine(message);
         }
 
+        public static void ArchiveLog( DateTime ArchiveDate)
+        {
+            EndLog();
+            string archiveFilename = mLogFileNameOnly.Substring(0, mLogFileNameOnly.Length - 4);
+            archiveFilename += "." + ArchiveDate.ToString("yyyyMMdd") + ".txt";
+            archiveFilename = Path.Combine(mLogFilePath, "LogFileArchive", archiveFilename);
+
+            if (File.Exists(mLogFileNameWithPath) && !File.Exists(archiveFilename))
+                File.Copy(mLogFileNameWithPath, archiveFilename);
+
+            StartLog();
+        }
     }
 }

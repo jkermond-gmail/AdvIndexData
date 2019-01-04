@@ -45,6 +45,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="IndexDataEngine.cs" />
+    <Compile Include="IndexDataQA.cs" />
     <Compile Include="IndexRow.cs" />
     <Compile Include="IndexRows.cs" />
     <Compile Include="ProcessStatus.cs" />

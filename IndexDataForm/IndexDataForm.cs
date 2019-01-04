@@ -28,8 +28,6 @@ namespace IndexDataForm
         private IndexDataEngine indexDataEngine;
         private RussellData russellData = null;
         private SnpData snpData = null;
-        //private SharedData 
-
 
         public IndexDataForm()
         {
@@ -281,6 +279,12 @@ namespace IndexDataForm
                 cbRussellIndices.Items.AddRange(Indices);
                 cbRussellIndices.SelectedItem = "sp500";
             }
+        }
+
+        private void btnTestAxmlOutput_Click(object sender, EventArgs e)
+        {
+            IndexDataQA indexDataQA = new IndexDataQA();
+            indexDataQA.RunCompare();
         }
     }
 }

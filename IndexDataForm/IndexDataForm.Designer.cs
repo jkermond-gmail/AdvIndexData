@@ -48,6 +48,7 @@
             this.lblStartDate = new System.Windows.Forms.Label();
             this.cboVendor = new System.Windows.Forms.ComboBox();
             this.lblVendor = new System.Windows.Forms.Label();
+            this.btnTestAxmlOutput = new System.Windows.Forms.Button();
             this.tabUnitTest.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.SuspendLayout();
@@ -87,6 +88,7 @@
             // 
             // tabPage1
             // 
+            this.tabPage1.Controls.Add(this.btnTestAxmlOutput);
             this.tabPage1.Controls.Add(this.cboOutputType);
             this.tabPage1.Controls.Add(this.btnCalculateTotalReturns);
             this.tabPage1.Controls.Add(this.btnUpdateRussellHoldings);
@@ -248,6 +250,16 @@
             this.lblVendor.TabIndex = 4;
             this.lblVendor.Text = "Vendor";
             // 
+            // btnTestAxmlOutput
+            // 
+            this.btnTestAxmlOutput.Location = new System.Drawing.Point(256, 298);
+            this.btnTestAxmlOutput.Name = "btnTestAxmlOutput";
+            this.btnTestAxmlOutput.Size = new System.Drawing.Size(121, 23);
+            this.btnTestAxmlOutput.TabIndex = 12;
+            this.btnTestAxmlOutput.Text = "TestAxmlOutput";
+            this.btnTestAxmlOutput.UseVisualStyleBackColor = true;
+            this.btnTestAxmlOutput.Click += new System.EventHandler(this.btnTestAxmlOutput_Click);
+            // 
             // IndexDataForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -289,6 +301,7 @@
         private System.Windows.Forms.ComboBox cboVendor;
         private System.Windows.Forms.Label lblVendor;
         private System.Windows.Forms.ComboBox cboOutputType;
+        private System.Windows.Forms.Button btnTestAxmlOutput;
     }
 }
 

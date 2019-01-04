@@ -47,48 +47,64 @@ namespace IndexDataEngineLibrary
 
         public void RunCompare()
         {
+            /*
+             For a given date
+                For each vendor
+                    For each output type
+                        For each index
+                            Add AxmlData Dev
+                            Add AxmlData Prod
+                            Compare AxmlData
+                                Do securities/sectors match?
+                                Do weights match?
+                                Do Irrs match?
+                                Do they roll up to the same value? and does valeu match published vendor Total Return?
+
+             */ 
             string Source = "";
             string Indexfilename = @"";
             string IndexName = "";
             DateTime ReturnDate = DateTime.MinValue;
-            string VendorFormat = "";
+            string OutputType = "";
 
             Source = "Dev";
             Indexfilename = @"C:\IndexData\AxmlOutputDev\ix-20181231-xse-sp500.XSX";
-            AddAxmlSecurityData(Indexfilename, Source, out IndexName, out ReturnDate, out VendorFormat);
+            AddAxmlSecurityData(Indexfilename, Source, out IndexName, out ReturnDate, out OutputType);
 
             Source = "Prod";
             Indexfilename = @"C:\IndexData\AxmlOutputProd\ix-20181231-xse-sp500.XSX";
-            AddAxmlSecurityData(Indexfilename, Source, out IndexName, out ReturnDate, out VendorFormat);
+            AddAxmlSecurityData(Indexfilename, Source, out IndexName, out ReturnDate, out OutputType);
+
+            CompareAxmlOutput(IndexName, out ReturnDate, out OutputType);
 
             Source = "Dev";
             Indexfilename = @"C:\IndexData\AxmlOutputDev\ix-20181231-xnf-sp500.XNX";
-            AddAxmlSectorData(Indexfilename, Source, out IndexName, out ReturnDate, out VendorFormat);
+            AddAxmlSectorData(Indexfilename, Source, out IndexName, out ReturnDate, out OutputType);
 
             Source = "Prod";
             Indexfilename = @"C:\IndexData\AxmlOutputProd\ix-20181231-xnf-sp500.XNX";
-            AddAxmlSectorData(Indexfilename, Source, out IndexName, out ReturnDate, out VendorFormat);
+            AddAxmlSectorData(Indexfilename, Source, out IndexName, out ReturnDate, out OutputType);
 
             Source = "Dev";
             Indexfilename = @"C:\IndexData\AxmlOutputDev\rl-20181231-xse-r3000.XSX";
-            AddAxmlSecurityData(Indexfilename, Source, out IndexName, out ReturnDate, out VendorFormat);
+            AddAxmlSecurityData(Indexfilename, Source, out IndexName, out ReturnDate, out OutputType);
 
             Source = "Prod";
             Indexfilename = @"C:\IndexData\AxmlOutputProd\rl-20181231-xse-r3000.XSX";
-            AddAxmlSecurityData(Indexfilename, Source, out IndexName, out ReturnDate, out VendorFormat);
+            AddAxmlSecurityData(Indexfilename, Source, out IndexName, out ReturnDate, out OutputType);
 
             Source = "Dev";
             Indexfilename = @"C:\IndexData\AxmlOutputDev\rl-20181231-xnf-r3000.XNX";
-            AddAxmlSectorData(Indexfilename, Source, out IndexName, out ReturnDate, out VendorFormat);
+            AddAxmlSectorData(Indexfilename, Source, out IndexName, out ReturnDate, out OutputType);
 
             Source = "Prod";
             Indexfilename = @"C:\IndexData\AxmlOutputProd\rl-20181231-xnf-r3000.XNX";
-            AddAxmlSectorData(Indexfilename, Source, out IndexName, out ReturnDate, out VendorFormat);
+            AddAxmlSectorData(Indexfilename, Source, out IndexName, out ReturnDate, out OutputType);
 
 
         }
 
-        public void AddAxmlSectorData(string FileName, string Source, out string IndexName, out DateTime ReturnDate, out string VendorFormat)
+        public void AddAxmlSectorData(string FileName, string Source, out string IndexName, out DateTime ReturnDate, out string OutputType)
         {
 
             string TextLine;
@@ -96,8 +112,8 @@ namespace IndexDataEngineLibrary
 
             IndexName = "";
             ReturnDate = DateTime.MinValue;
-            VendorFormat = "";
-            
+            OutputType = "Sector";
+            string OutputSubType = "";
             string Identifier = "";
             string Indexname = "";
             string IRR = "";
@@ -136,7 +152,7 @@ namespace IndexDataEngineLibrary
                         Split = TextLine.Split('\"');
                         string sDate = Split[3];
                         DateTime.TryParseExact(sDate, "yyyyMMdd", enUS, DateTimeStyles.None, out ReturnDate);
-                        VendorFormat = Split[7];
+                        OutputSubType = Split[7];
                     }
                 }
 
@@ -146,7 +162,7 @@ namespace IndexDataEngineLibrary
                     Identifier = Split[1];
                     Weight = Split[3];
                     IRR = Split[5];
-                    AddAxmlDailyOutput(Indexname, ReturnDate, VendorFormat, Source, Identifier, Weight, IRR, AddCount);
+                    AddAxmlDailyOutput(Indexname, ReturnDate, OutputType, OutputSubType, Source, Identifier, Weight, IRR, AddCount);
                     AddCount += 1;
                 }
 
@@ -160,15 +176,15 @@ namespace IndexDataEngineLibrary
         }
 
 
-        public void AddAxmlSecurityData(string FileName, string Source, out string IndexName, out DateTime ReturnDate, out string VendorFormat )
+        public void AddAxmlSecurityData(string FileName, string Source, out string IndexName, out DateTime ReturnDate, out string OutputType )
         {
 
             string TextLine;
             CultureInfo enUS = new CultureInfo("en-US");
-
+            string OutputSubType = "";
             IndexName = "";
             ReturnDate = DateTime.MinValue;
-            VendorFormat = "";
+            OutputType = "Constituent";
             string Ticker = "";
             string IRR = "";
             string Weight = "";
@@ -215,8 +231,7 @@ namespace IndexDataEngineLibrary
                     Ticker = Split[5];
                     Weight = Split[7];
                     IRR = Split[9];
-                    VendorFormat = "Security";
-                    AddAxmlDailyOutput(IndexName, ReturnDate, VendorFormat, Source, Ticker, Weight, IRR, AddCount);
+                    AddAxmlDailyOutput(IndexName, ReturnDate, OutputType, OutputSubType, Source, Ticker, Weight, IRR, AddCount);
                     AddCount += 1;
                 }
             }
@@ -226,7 +241,8 @@ namespace IndexDataEngineLibrary
         public void AddAxmlDailyOutput(
             string IndexName,
             DateTime ReturnDate,
-            string VendorFormat,
+            string OutputType,
+            string OutputSubType,
             string Source,
             string Identifier,
             string Weight,
@@ -246,19 +262,21 @@ namespace IndexDataEngineLibrary
                     delete from AxmlOutput where 
                     IndexName = @IndexName and 
                     ReturnDate = @ReturnDate and 
-                    VendorFormat = @VendorFormat and
+                    OutputType = @OutputType and
                     Source = @Source
                     ";
 
                 SqlCommand cmd = new SqlCommand(SqlSelect, mSqlConn);
                 cmd.Parameters.Add("@IndexName", SqlDbType.VarChar);
                 cmd.Parameters.Add("@ReturnDate", SqlDbType.DateTime);
-                cmd.Parameters.Add("@VendorFormat", SqlDbType.VarChar);
+                cmd.Parameters.Add("@OutputType", SqlDbType.VarChar);
+                cmd.Parameters.Add("@OutputSubType", SqlDbType.VarChar);
                 cmd.Parameters.Add("@Source", SqlDbType.VarChar);
                 cmd.Parameters.Add("@Identifier", SqlDbType.VarChar);
                 cmd.Parameters["@IndexName"].Value = IndexName;
                 cmd.Parameters["@ReturnDate"].Value = ReturnDate;
-                cmd.Parameters["@VendorFormat"].Value = VendorFormat;
+                cmd.Parameters["@OutputType"].Value = OutputType;
+                cmd.Parameters["@OutputSubType"].Value = OutputSubType;
                 cmd.Parameters["@Source"].Value = Source;
                 cmd.Parameters["@Identifier"].Value = Identifier;
 
@@ -269,7 +287,7 @@ namespace IndexDataEngineLibrary
                     select count(*) from AxmlOutput where 
                     IndexName = @IndexName and 
                     ReturnDate = @ReturnDate and 
-                    VendorFormat = @VendorFormat and
+                    OutputType = @OutputType and
                     Source = @Source and
                     Identifier = @Identifier                    
                     ";
@@ -279,8 +297,8 @@ namespace IndexDataEngineLibrary
                 {
                     cmd.CommandText = @"
                         insert into AxmlOutput
-                        (IndexName, ReturnDate, VendorFormat, Source, Identifier, Weight, IRR) Values
-                        (@IndexName, @ReturnDate, @VendorFormat, @Source, @Identifier, @Weight, @IRR)
+                        (IndexName, ReturnDate, OutputType, OutputSubType, Source, Identifier, Weight, IRR) Values
+                        (@IndexName, @ReturnDate, @OutputType, @OutputSubType, @Source, @Identifier, @Weight, @IRR)
                         ";
                 }
 
@@ -301,5 +319,11 @@ namespace IndexDataEngineLibrary
             {
             }
         }
+
+        public void CompareAxmlOutput(string IndexName, DateTime ReturnDate, string OutputType)
+        {
+
+        }
+
     }
 }

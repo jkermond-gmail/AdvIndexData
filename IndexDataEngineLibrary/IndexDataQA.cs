@@ -75,7 +75,7 @@ namespace IndexDataEngineLibrary
             Indexfilename = @"C:\IndexData\AxmlOutputProd\ix-20181231-xse-sp500.XSX";
             AddAxmlSecurityData(Indexfilename, Source, out IndexName, out ReturnDate, out OutputType);
 
-            CompareAxmlOutput(IndexName, out ReturnDate, out OutputType);
+            CompareAxmlOutput(IndexName, ReturnDate, OutputType);
 
             Source = "Dev";
             Indexfilename = @"C:\IndexData\AxmlOutputDev\ix-20181231-xnf-sp500.XNX";
@@ -85,6 +85,8 @@ namespace IndexDataEngineLibrary
             Indexfilename = @"C:\IndexData\AxmlOutputProd\ix-20181231-xnf-sp500.XNX";
             AddAxmlSectorData(Indexfilename, Source, out IndexName, out ReturnDate, out OutputType);
 
+            CompareAxmlOutput(IndexName, ReturnDate, OutputType);
+
             Source = "Dev";
             Indexfilename = @"C:\IndexData\AxmlOutputDev\rl-20181231-xse-r3000.XSX";
             AddAxmlSecurityData(Indexfilename, Source, out IndexName, out ReturnDate, out OutputType);
@@ -92,6 +94,8 @@ namespace IndexDataEngineLibrary
             Source = "Prod";
             Indexfilename = @"C:\IndexData\AxmlOutputProd\rl-20181231-xse-r3000.XSX";
             AddAxmlSecurityData(Indexfilename, Source, out IndexName, out ReturnDate, out OutputType);
+
+            CompareAxmlOutput(IndexName, ReturnDate, OutputType);
 
             Source = "Dev";
             Indexfilename = @"C:\IndexData\AxmlOutputDev\rl-20181231-xnf-r3000.XNX";
@@ -101,7 +105,7 @@ namespace IndexDataEngineLibrary
             Indexfilename = @"C:\IndexData\AxmlOutputProd\rl-20181231-xnf-r3000.XNX";
             AddAxmlSectorData(Indexfilename, Source, out IndexName, out ReturnDate, out OutputType);
 
-
+            CompareAxmlOutput(IndexName, ReturnDate, OutputType);
         }
 
         public void AddAxmlSectorData(string FileName, string Source, out string IndexName, out DateTime ReturnDate, out string OutputType)
@@ -249,7 +253,7 @@ namespace IndexDataEngineLibrary
             string IRR,
             int AddCount
             )
-                {
+        {
             try
             {
                 if (mSqlConn == null)
@@ -322,6 +326,136 @@ namespace IndexDataEngineLibrary
 
         public void CompareAxmlOutput(string IndexName, DateTime ReturnDate, string OutputType)
         {
+            if ( CompareAxmlIdentifiers(IndexName, ReturnDate, OutputType) == true )
+            {
+                CompareAxmlWeights(IndexName, ReturnDate, OutputType);
+                CompareAxmlReturns(IndexName, ReturnDate, OutputType);
+            }
+        }
+
+        private bool CompareAxmlIdentifiers(string IndexName, DateTime ReturnDate, string OutputType)
+        {
+            bool compare1 = false;
+            bool compare2 = false;
+            string Identifier = "";
+            string Source1 = "";
+            string Source2 = "";
+            /*
+            SELECT Identifier
+            FROM AxmlOutput
+            where Source = 'Dev' and OutputType = 'Security' and IndexName = 'r3000'
+            and Identifier not in (
+            SELECT Identifier
+            FROM AxmlOutput
+            where Source = 'Prod' and OutputType = 'Security' and IndexName = 'r3000'
+            )
+            */
+
+            LogHelper.WriteLine("CompareAxmlIdentifiers: " + IndexName + " " + ReturnDate.ToShortDateString() + " " + OutputType);
+
+            try
+            {
+                if (mSqlConn == null)
+                {
+                    mSqlConn = new SqlConnection(sharedData.ConnectionStringIndexData);
+                    mSqlConn.Open();
+                }
+
+                for (int i = 1; i <= 2; i++)
+                {
+                    if( i.Equals(1))
+                    {
+                        Source1 = "Dev";
+                        Source2 = "Prod";
+                    }
+                    else if( i.Equals(2))
+                    {
+                        Source1 = "Prod";
+                        Source2 = "Dev";
+                    }
+
+                    string SqlSelect = @"
+                    SELECT Identifier
+                    FROM AxmlOutput
+                    where Source = @Source1 and OutputType = @OutputType 
+                    and IndexName = @IndexName and ReturnDate = @ReturnDate
+                    and Identifier not in (
+                        SELECT Identifier
+                        FROM AxmlOutput
+                        where Source = @Source2 and OutputType = @OutputType 
+                        and IndexName = @IndexName and ReturnDate = @ReturnDate
+                    )
+                    ";
+
+                    SqlCommand cmd = new SqlCommand(SqlSelect, mSqlConn);
+                    cmd.Parameters.Add("@IndexName", SqlDbType.VarChar);
+                    cmd.Parameters.Add("@ReturnDate", SqlDbType.DateTime);
+                    cmd.Parameters.Add("@OutputType", SqlDbType.VarChar);
+                    cmd.Parameters.Add("@Source1", SqlDbType.VarChar);
+                    cmd.Parameters.Add("@Source2", SqlDbType.VarChar);
+                    cmd.Parameters["@IndexName"].Value = IndexName;
+                    cmd.Parameters["@ReturnDate"].Value = ReturnDate;
+                    cmd.Parameters["@OutputType"].Value = OutputType;
+                    cmd.Parameters["@Source1"].Value = Source1;
+                    cmd.Parameters["@Source2"].Value = Source2;
+
+                    SqlDataReader dr = null;
+                    dr = cmd.ExecuteReader();
+                    int rows = 0;
+                    if (dr.HasRows)
+                    {
+                        while (dr.Read())
+                        {
+                            rows += 1;
+                            Identifier = dr["Identifier"].ToString();
+                            LogHelper.WriteLine( Source1 + " Identifier " + Identifier + " missing from " + Source2);
+                        }
+                    }
+                    else
+                    {
+                        LogHelper.WriteLine("No " + Source1 + " Identifiers missing from " + Source2);
+                        if (i.Equals(1))
+                        {
+                            compare1 = true;
+                        }
+                        else if (i.Equals(2))
+                        {
+                            compare2 = true;
+                        }
+                    }
+                    dr.Close();
+                }
+            }
+            catch (SqlException ex)
+            {
+                if (ex.Number == 2627)
+                {
+                    Console.WriteLine(ex.Message);
+                }
+            }
+            finally
+            {
+            }
+
+            if (compare1.Equals(true) || compare2.Equals(true))
+                return (true);
+            else
+                return (false);
+
+        }
+
+        private bool CompareAxmlWeights(string IndexName, DateTime ReturnDate, string OutputType)
+        {
+            bool compare = false;
+
+            return (compare);
+
+        }
+        private bool CompareAxmlReturns(string IndexName, DateTime ReturnDate, string OutputType)
+        {
+            bool compare = false;
+
+            return (compare);
 
         }
 

@@ -2476,6 +2476,7 @@ CREATE TABLE [dbo].[HistoricalSymbolChanges](
                         sSector = mSqlDr["Sector"].ToString();
                         sSubSector = mSqlDr["SubSector"].ToString();
                         sIndustry = mSqlDr["Industry"].ToString();
+                        string sFileDate = mSqlDr["FileDate"].ToString(); ;
 
                         ConstituentCount += 1;
                         //string sCmpCusip = null;
@@ -2504,7 +2505,7 @@ CREATE TABLE [dbo].[HistoricalSymbolChanges](
                             smCusip = sNewCusip;
 
 
-                        string smTicker = GetSecurityMasterTicker(smCusip);
+                        string smTicker = GetSecurityMasterTicker(smCusip, sFileDate);
                         if (smTicker.Length > 0)
                             sTicker = smTicker;
                         else
@@ -2817,7 +2818,7 @@ CREATE TABLE [dbo].[HistoricalSymbolChanges](
             return (sNewCUSIP);
         }
 
-        public string GetSecurityMasterTicker(string sCUSIP)
+        public string GetSecurityMasterTicker(string sCUSIP, string sFileDate)
         {
             SqlConnection cnSql = new SqlConnection(sharedData.ConnectionStringIndexData);
             SqlDataReader dr = null;
@@ -2828,11 +2829,14 @@ CREATE TABLE [dbo].[HistoricalSymbolChanges](
                 cnSql.Open();
                 string SqlSelect = @"
                     SELECT Ticker FROM HistoricalSecurityMasterFull WHERE Cusip = @Cusip
+                    and (@FileDate >= BeginDate and @FileDate <= @EndDate)
                     ";
 
                 SqlCommand cmd = new SqlCommand(SqlSelect, cnSql);
                 cmd.Parameters.Add("@Cusip", SqlDbType.VarChar, 8);
                 cmd.Parameters["@Cusip"].Value = sCUSIP;
+                cmd.Parameters.Add("@FileDate", SqlDbType.Date);
+                cmd.Parameters["@Cusip"].Value = sFileDate;
                 dr = cmd.ExecuteReader();
                 if (dr.HasRows)
                 {

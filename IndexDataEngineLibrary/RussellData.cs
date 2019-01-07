@@ -2170,9 +2170,11 @@ CREATE TABLE [dbo].[HistoricalSymbolChanges](
             DateTime processDate;
             int DateCompare;
 
+
+
             for (processDate = startDate
-               ; (DateCompare = processDate.CompareTo(endDate)) <= 0
-               ; processDate = processDate.AddDays(1))
+            ; (DateCompare = processDate.CompareTo(endDate)) <= 0
+            ; processDate = DateHelper.NextBusinessDay(processDate))
             {
                 if (adventOutputType.Equals(AdventOutputType.Constituent))
                 {

@@ -7,6 +7,7 @@ dev
 <XSXDetail type="cs" iso="usd" symbol="sgy" weight="0.001315817" irr="-0.488355138"/>
 prod
 <XSXDetail type="cs" iso="usd" symbol="argo" weight="0.008593533" irr="1.020945623"/>
+argo = G0464B107
 <XSXDetail type="cs" iso="usd" symbol="cbre" weight="0.050801841" irr="0.375990802"/>
 <XSXDetail type="cs" iso="usd" symbol="pte" weight="0.000537683" irr="-0.148869089"/>
 <XSXDetail type="cs" iso="usd" symbol="hwc" weight="0.011702414" irr="0.376960069"/>

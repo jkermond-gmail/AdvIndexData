@@ -45,6 +45,51 @@ namespace IndexDataEngineLibrary
         }
 
 
+        public void CompareAxmlForDateRange(string Vendor, string OutputType, string Indexname, string sStartDate, string sEndDate)
+        {
+            DateTime startDate = Convert.ToDateTime(sStartDate);
+            DateTime endDate = Convert.ToDateTime(sEndDate);
+            DateTime returnDate;
+            int DateCompare;
+
+            for (returnDate = startDate
+            ; (DateCompare = returnDate.CompareTo(endDate)) <= 0
+            ; returnDate = DateHelper.NextBusinessDay(returnDate))
+            {
+                string IndexnameNotUsed = "";
+                DateTime ReturnDateNotUsed = DateTime.MinValue;
+                string Source = "";
+                string AxmlFilename = "";
+                string AxmlFilenameFullPath = "";
+                string prefix = "";
+
+                if (Vendor.Equals("Russell"))
+                    prefix = "rl";
+                else if (Vendor.Equals("Snp"))
+                    prefix = "ix";
+
+                if (OutputType.Equals("Constituent"))
+                    //Indexfilename = @"rl-20181231-xse-r3000.XSX";                        
+                    AxmlFilename = prefix + "-" + DateHelper.ConvertToYYYYMMDD(returnDate.ToShortDateString()) + "-xse-" + Indexname + ".XSX";
+                else if (OutputType.Equals("Sector"))
+                    //Indexfilename = @"rl-20180103-xnf-r1000.XNX";
+                    AxmlFilename = prefix + "-" + DateHelper.ConvertToYYYYMMDD(returnDate.ToShortDateString()) + "-xnf-" + Indexname + ".XNX";
+
+                string sAxmlOutputPathDev = AppSettings.Get<string>("AxmlOutputPath");
+                Source = "Dev";
+                AxmlFilenameFullPath = sAxmlOutputPathDev + AxmlFilename;
+                AddAxmlSecurityData(AxmlFilenameFullPath, Source, out IndexnameNotUsed, out ReturnDateNotUsed, out OutputType);
+
+                string sAxmlOutputPathProd = AppSettings.Get<string>("AxmlOutputPathProd");
+                Source = "Prod";
+                AxmlFilenameFullPath = sAxmlOutputPathProd + AxmlFilename;
+                AddAxmlSecurityData(AxmlFilenameFullPath, Source, out IndexnameNotUsed, out ReturnDateNotUsed, out OutputType);
+
+                CompareAxmlOutput(Indexname, returnDate, OutputType);
+            }
+        }
+
+
         public void RunCompare()
         {
             /*

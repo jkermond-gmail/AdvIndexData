@@ -233,12 +233,12 @@
             this.cboVendor.FormattingEnabled = true;
             this.cboVendor.Items.AddRange(new object[] {
             "Russell",
-            "S&P"});
+            "Snp"});
             this.cboVendor.Location = new System.Drawing.Point(204, 15);
             this.cboVendor.Name = "cboVendor";
             this.cboVendor.Size = new System.Drawing.Size(121, 21);
             this.cboVendor.TabIndex = 3;
-            this.cboVendor.Text = "S&P";
+            this.cboVendor.Text = "Snp";
             this.cboVendor.SelectedIndexChanged += new System.EventHandler(this.cboVendor_SelectedIndexChanged);
             // 
             // lblVendor

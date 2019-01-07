@@ -136,7 +136,7 @@ namespace IndexDataForm
                 else if (cboOutputType.Text.Equals("Sector"))
                     russellData.GenerateReturnsForDateRange(lnkStartDate.Text, lnkEndDate.Text, Indexname, AdventOutputType.Sector);
             }
-            else if (cboVendor.SelectedItem.Equals("S&P"))
+            else if (cboVendor.SelectedItem.Equals("Snp"))
             {
                 if (cboOutputType.Text.Equals("Constituent"))
                     snpData.GenerateReturnsForDateRange(lnkStartDate.Text, lnkEndDate.Text, Indexname, AdventOutputType.Constituent);
@@ -161,9 +161,9 @@ namespace IndexDataForm
             {
                 russellData.ProcessVendorFiles(startDate, endDate, DataSet, true, true, true, true, true);
             }
-            else if (cboVendor.SelectedItem.Equals("S&P"))
+            else if (cboVendor.SelectedItem.Equals("Snp"))
             {
-                snpData.ProcessVendorFiles(startDate, endDate, DataSet, true, true, true, true, true);                
+                snpData.ProcessVendorFiles(startDate, endDate, DataSet, true, true, true, true, true);
             }
         }
 
@@ -183,7 +183,7 @@ namespace IndexDataForm
                 }
 
             }
-            else if (cboVendor.SelectedItem.Equals("S&P"))
+            else if (cboVendor.SelectedItem.Equals("Snp"))
             {
                 //Indices = snpData.GetIndices();
                 //for (int i = 0; i < Indices.Length; i++)
@@ -192,8 +192,8 @@ namespace IndexDataForm
                 //    snpData.CalculateVendorTotalReturnsForPeriod(lnkStartDate.Text, lnkEndDate.Text, Indices[i]);
                 //    snpData.CalculateAdventTotalReturnsForPeriod(lnkStartDate.Text, lnkEndDate.Text, Indices[i]);                    
                 //}
-                    snpData.CalculateVendorTotalReturnsForPeriod(lnkStartDate.Text, lnkEndDate.Text, "500");
-                    //snpData.CalculateAdventTotalReturnsForPeriod(lnkStartDate.Text, lnkEndDate.Text, "500");                    
+                snpData.CalculateVendorTotalReturnsForPeriod(lnkStartDate.Text, lnkEndDate.Text, "500");
+                //snpData.CalculateAdventTotalReturnsForPeriod(lnkStartDate.Text, lnkEndDate.Text, "500");                    
             }
         }
 
@@ -271,9 +271,9 @@ namespace IndexDataForm
             {
                 Indices = russellData.GetIndices();
                 cbRussellIndices.Items.AddRange(Indices);
-                cbRussellIndices.SelectedItem = "r3000";                
+                cbRussellIndices.SelectedItem = "r3000";
             }
-            else if (cboVendor.SelectedItem.Equals("S&P"))
+            else if (cboVendor.SelectedItem.Equals("Snp"))
             {
                 Indices = snpData.GetIndices();
                 cbRussellIndices.Items.AddRange(Indices);
@@ -284,7 +284,12 @@ namespace IndexDataForm
         private void btnTestAxmlOutput_Click(object sender, EventArgs e)
         {
             IndexDataQA indexDataQA = new IndexDataQA();
-            indexDataQA.RunCompare();
+            string Indexname = cbRussellIndices.SelectedItem.ToString();
+            string Vendor = cboVendor.SelectedItem.ToString();
+            string OutputType = cboOutputType.SelectedItem.ToString();
+
+            //indexDataQA.RunCompare();
+            indexDataQA.CompareAxmlForDateRange(Vendor, OutputType, Indexname, lnkStartDate.Text, lnkEndDate.Text);
         }
     }
 }

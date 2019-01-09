@@ -2358,7 +2358,7 @@ CREATE TABLE [dbo].[HistoricalSymbolChanges](
             try
             {
                 sMsg = "GenerateReturnsForDate: " + sDate + " Index: " + sIndexName;
-                LogHelper.WriteLine(sMsg + sDate);
+                LogHelper.WriteLine(sMsg);
                 /*
                 declare
                     @FileDate datetime,
@@ -2831,14 +2831,14 @@ CREATE TABLE [dbo].[HistoricalSymbolChanges](
                 cnSql.Open();
                 string SqlSelect = @"
                     SELECT Ticker FROM HistoricalSecurityMasterFull WHERE Cusip = @Cusip
-                    and (@FileDate >= BeginDate and @FileDate <= @EndDate)
+                    and (@FileDate >= BeginDate and @FileDate <= EndDate)
                     ";
 
                 SqlCommand cmd = new SqlCommand(SqlSelect, cnSql);
                 cmd.Parameters.Add("@Cusip", SqlDbType.VarChar, 8);
                 cmd.Parameters["@Cusip"].Value = sCUSIP;
                 cmd.Parameters.Add("@FileDate", SqlDbType.Date);
-                cmd.Parameters["@Cusip"].Value = sFileDate;
+                cmd.Parameters["@FileDate"].Value = sFileDate;
                 dr = cmd.ExecuteReader();
                 if (dr.HasRows)
                 {

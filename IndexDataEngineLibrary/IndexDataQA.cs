@@ -75,17 +75,29 @@ namespace IndexDataEngineLibrary
                     //Indexfilename = @"rl-20180103-xnf-r1000.XNX";
                     AxmlFilename = prefix + "-" + DateHelper.ConvertToYYYYMMDD(returnDate.ToShortDateString()) + "-xnf-" + Indexname + ".XNX";
 
-                string sAxmlOutputPathDev = AppSettings.Get<string>("AxmlOutputPath");
-                Source = "Dev";
-                AxmlFilenameFullPath = sAxmlOutputPathDev + AxmlFilename;
-                AddAxmlSecurityData(AxmlFilenameFullPath, Source, out IndexnameNotUsed, out ReturnDateNotUsed, out OutputType);
+                string sAxmlFilePathDev = AppSettings.Get<string>("AxmlOutputPath");
+                sAxmlFilePathDev = sAxmlFilePathDev + AxmlFilename;
+                string sAxmlFilePathProd = AppSettings.Get<string>("AxmlOutputPathProd");
+                sAxmlFilePathProd = sAxmlFilePathProd + AxmlFilename;
 
-                string sAxmlOutputPathProd = AppSettings.Get<string>("AxmlOutputPathProd");
-                Source = "Prod";
-                AxmlFilenameFullPath = sAxmlOutputPathProd + AxmlFilename;
-                AddAxmlSecurityData(AxmlFilenameFullPath, Source, out IndexnameNotUsed, out ReturnDateNotUsed, out OutputType);
+                if( File.Exists(sAxmlFilePathDev) && File.Exists(sAxmlFilePathProd))
+                {
+                    LogHelper.WriteLine("CompareAxmlForDateRange: " + sAxmlFilePathDev + " " + sAxmlFilePathProd);
+                    Source = "Dev";
+                    AddAxmlSecurityData(sAxmlFilePathDev, Source, out IndexnameNotUsed, out ReturnDateNotUsed, out OutputType);
 
-                CompareAxmlOutput(Indexname, returnDate, OutputType);
+                    Source = "Prod";
+                    AddAxmlSecurityData(sAxmlFilePathProd, Source, out IndexnameNotUsed, out ReturnDateNotUsed, out OutputType);
+                    CompareAxmlOutput(Indexname, returnDate, OutputType);
+                }
+                else
+                {
+                    if( !File.Exists(sAxmlFilePathDev))
+                        LogHelper.WriteLine("CompareAxmlForDateRange: missing dev  file " + sAxmlFilePathDev);
+
+                    if ( !File.Exists(sAxmlFilePathProd))
+                        LogHelper.WriteLine("CompareAxmlForDateRange: missing prod file " + sAxmlFilePathProd);
+                }
             }
         }
 

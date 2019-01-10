@@ -60,7 +60,6 @@ namespace IndexDataEngineLibrary
                 DateTime ReturnDateNotUsed = DateTime.MinValue;
                 string Source = "";
                 string AxmlFilename = "";
-                string AxmlFilenameFullPath = "";
                 string prefix = "";
 
                 if (Vendor.Equals("Russell"))
@@ -84,10 +83,17 @@ namespace IndexDataEngineLibrary
                 {
                     LogHelper.WriteLine("CompareAxmlForDateRange: " + sAxmlFilePathDev + " " + sAxmlFilePathProd);
                     Source = "Dev";
-                    AddAxmlSecurityData(sAxmlFilePathDev, Source, out IndexnameNotUsed, out ReturnDateNotUsed, out OutputType);
+                    if (OutputType.Equals("Constituent"))
+                        AddAxmlConstituentData(sAxmlFilePathDev, Source, out IndexnameNotUsed, out ReturnDateNotUsed, out OutputType);
+                    else if (OutputType.Equals("Sector"))
+                        AddAxmlSectorData(sAxmlFilePathDev, Source, out IndexnameNotUsed, out ReturnDateNotUsed, out OutputType);
 
                     Source = "Prod";
-                    AddAxmlSecurityData(sAxmlFilePathProd, Source, out IndexnameNotUsed, out ReturnDateNotUsed, out OutputType);
+                    if (OutputType.Equals("Constituent"))
+                        AddAxmlConstituentData(sAxmlFilePathProd, Source, out IndexnameNotUsed, out ReturnDateNotUsed, out OutputType);
+                    else if (OutputType.Equals("Sector"))
+                        AddAxmlSectorData(sAxmlFilePathProd, Source, out IndexnameNotUsed, out ReturnDateNotUsed, out OutputType);
+
                     CompareAxmlOutput(Indexname, returnDate, OutputType);
                 }
                 else
@@ -126,11 +132,11 @@ namespace IndexDataEngineLibrary
 
             Source = "Dev";
             Indexfilename = @"C:\IndexData\AxmlOutputDev\ix-20181231-xse-sp500.XSX";
-            AddAxmlSecurityData(Indexfilename, Source, out IndexName, out ReturnDate, out OutputType);
+            AddAxmlConstituentData(Indexfilename, Source, out IndexName, out ReturnDate, out OutputType);
 
             Source = "Prod";
             Indexfilename = @"C:\IndexData\AxmlOutputProd\ix-20181231-xse-sp500.XSX";
-            AddAxmlSecurityData(Indexfilename, Source, out IndexName, out ReturnDate, out OutputType);
+            AddAxmlConstituentData(Indexfilename, Source, out IndexName, out ReturnDate, out OutputType);
 
             CompareAxmlOutput(IndexName, ReturnDate, OutputType);
 
@@ -146,11 +152,11 @@ namespace IndexDataEngineLibrary
 
             Source = "Dev";
             Indexfilename = @"C:\IndexData\AxmlOutputDev\rl-20181231-xse-r3000.XSX";
-            AddAxmlSecurityData(Indexfilename, Source, out IndexName, out ReturnDate, out OutputType);
+            AddAxmlConstituentData(Indexfilename, Source, out IndexName, out ReturnDate, out OutputType);
 
             Source = "Prod";
             Indexfilename = @"C:\IndexData\AxmlOutputProd\rl-20181231-xse-r3000.XSX";
-            AddAxmlSecurityData(Indexfilename, Source, out IndexName, out ReturnDate, out OutputType);
+            AddAxmlConstituentData(Indexfilename, Source, out IndexName, out ReturnDate, out OutputType);
 
             CompareAxmlOutput(IndexName, ReturnDate, OutputType);
 
@@ -237,7 +243,7 @@ namespace IndexDataEngineLibrary
         }
 
 
-        public void AddAxmlSecurityData(string FileName, string Source, out string IndexName, out DateTime ReturnDate, out string OutputType )
+        public void AddAxmlConstituentData(string FileName, string Source, out string IndexName, out DateTime ReturnDate, out string OutputType )
         {
 
             string TextLine;

@@ -22,9 +22,6 @@ namespace IndexDataEngineLibrary
         private CultureInfo mEnUS = null;
         private string mPrevId;
         private int ConstituentCount = 0;
-        private string mAxmlFilename;
-        //private double mRolledUpWeight;
-        //private double mRolledUpReturn;
         private const string NumberFormat = "0.#########";
         private CultureInfo mCultureInfo = new CultureInfo("en-US");
 
@@ -35,16 +32,6 @@ namespace IndexDataEngineLibrary
         private List<IndexRow> indexRowsSectorLevel2RollUp = new List<IndexRow>();
         private List<IndexRow> indexRowsSectorLevel3RollUp = new List<IndexRow>();
         private List<IndexRow> indexRowsSectorLevel4RollUp = new List<IndexRow>();
-
-        //private string[] sVendorFormats = new string[]
-        //{
-        //    "StandardPoorsSecurity",
-        //    "StandardPoorsSector",
-        //    "StandardPoorsIndustryGroup",
-        //    "StandardPoorsIndustry",
-        //    "StandardPoorsSubIndustry"
-        //};
-
 
         public SnpData()
         {
@@ -87,6 +74,18 @@ namespace IndexDataEngineLibrary
             //mRolledUpReturn = 0.0;
 
         }
+
+        public void TestEndOfMonthDates(string sStartDate, string sEndDate)
+        {
+            DateTime startDate = DateTime.Parse(sStartDate);
+            DateTime endDate = DateTime.Parse(sEndDate);
+
+            for (DateTime date = startDate; date <= endDate; date = DateHelper.NextBusinessDay(date))
+            {
+                DateHelper.IsPrevEndofMonthOnWeekend(date);
+            }
+        }
+
 
         #region ProcessVendorDatasetJobs
 
@@ -1239,145 +1238,6 @@ namespace IndexDataEngineLibrary
             return (GetNext);
         }
 
-        public void GenerateAxmlFileConstituents(string sDate, string sIndexName /*, VendorFormats vendorFormat */)
-        {
-
-            /*
-             <?xml version="1.0"?>
-            <AdventXML version="3.0">
-            <AccountProvider name="Russell" code="rl">
-            <XSXList index="r3000" date="20170609" batch="1">
-            <XSXPeriod from="20170608" through="20170609" indexperfiso="usd">
-            <XSXDetail type="cs" iso="usd" symbol="a" weight="0.077572343" irr="-1.56300165"/>
-
-            </XSXPeriod>
-            </XSXList>
-            </AccountProvider>
-            </AdventXML>
-             */
-            // https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/file-system/how-to-write-to-a-text-file
-            // Example #3: Write only some strings in an array to a file.
-            // The using statement automatically flushes AND CLOSES the stream and calls 
-            // IDisposable.Dispose on the stream object.
-            // NOTE: do not use FileStream for text files because it writes bytes, but StreamWriter
-            // encodes the output as text.
-
-            // rl-20170714-xse-r3000.XSX
-
-            mAxmlFilename = "ix-" + DateHelper.ConvertToYYYYMMDD(sDate) + "-xse-" + sIndexName + ".XSX";
-            string sAxmlOutputPath = AppSettings.Get<string>("AxmlOutputPath");
-            string filename = (sAxmlOutputPath + mAxmlFilename);
-
-            if (File.Exists(filename))
-                File.Delete(filename);
-
-            using (StreamWriter file = new StreamWriter(filename))
-            {
-                file.WriteLine("<?xml version=\"1.0\"?>");
-                file.WriteLine("<AdventXML version=\"3.0\">");
-                file.WriteLine("<AccountProvider name=\"StandardAndPoors\" code=\"ix\">");
-                file.WriteLine("<XSXList index=\"" + sIndexName + "\" date=\"" + DateHelper.ConvertToYYYYMMDD(sDate) + "\" batch=\"7\">");
-                file.WriteLine("<XSXPeriod from=\"" + DateHelper.PrevBusinessDay(sDate) + "\" through=\"" + DateHelper.ConvertToYYYYMMDD(sDate) + "\" indexperfiso=\"usd\">");
-
-                foreach (IndexRow indexRow in indexRowsTickerSort)
-                {
-                    //                elSuffixDetail.SetAttribute("weight", indexRow.Weight.ToString(NumberFormat, inputFormat.OutputCultureInfo));
-                    //elSuffixDetail.SetAttribute("irr", indexRow.RateOfReturn.ToString(NumberFormat, inputFormat.OutputCultureInfo));
-
-                    file.WriteLine("<XSXDetail type=\"cs\" iso=\"usd\" symbol=\"" + indexRow.Ticker + "\" weight=\"" + indexRow.Weight.ToString(NumberFormat, mCultureInfo) + "\" irr=\"" + indexRow.RateOfReturn.ToString(NumberFormat, mCultureInfo) + "\"/>");
-                }
-
-                file.WriteLine("</XSXPeriod>");
-                file.WriteLine("</XSXList>");
-                file.WriteLine("</AccountProvider>");
-                file.Write("</AdventXML>");
-            }
-        }
-
-        public void GenerateAxmlFileSectors(string sDate, string sIndexName /*, VendorFormats vendorFormat */)
-        {
-
-            /*
-             filename: ix-20180105-xnf-sp500.XNX
-
-            <?xml version="1.0"?>
-            <AdventXML version="3.0">
-            <AccountProvider name="StandardAndPoors" code="ix">
-            <XNXList index="sp500" date="20180105" batch="7">
-            <XNXPeriod from="20180104" through="20180105" indexperfiso="usd" class="GICSSector">
-            <XNXDetail code="10" weight="6.198880486" irr="-0.017663738"/>
-            .
-            .
-            </XNXPeriod>
-            <XNXPeriod from="20180104" through="20180105" indexperfiso="usd" class="GICSIndGrp">
-            <XNXDetail code="1010" weight="6.198880486" irr="-0.017663738"/>
-            .
-            .
-            </XNXPeriod>
-            <XNXPeriod from="20180104" through="20180105" indexperfiso="usd" class="GICSIndustry">
-            <XNXDetail code="101010" weight="0.848158765" irr="0.392416422"/>
-            .
-            .
-            </XNXPeriod>
-            <XNXPeriod from="20180104" through="20180105" indexperfiso="usd" class="GICSSubInd">
-            <XNXDetail code="10101010" weight="0.03102317" irr="0.451807229"/>
-            .
-            .
-            </XNXPeriod>
-            </XNXList>
-            </AccountProvider>
-            </AdventXML>
-
-             */
-
-            mAxmlFilename = "ix-" + DateHelper.ConvertToYYYYMMDD(sDate) + "-xnf-" + sIndexName + ".XNX";
-            string sAxmlOutputPath = AppSettings.Get<string>("AxmlOutputPath");
-            string filename = (sAxmlOutputPath + mAxmlFilename);
-
-            if (File.Exists(filename))
-                File.Delete(filename);
-
-            using (StreamWriter file = new StreamWriter(filename))
-            {
-                file.WriteLine("<?xml version=\"1.0\"?>");
-                file.WriteLine("<AdventXML version=\"3.0\">");
-                file.WriteLine("<AccountProvider name=\"StandardAndPoors\" code=\"ix\">");
-                file.WriteLine("<XNXList index=\"" + sIndexName + "\" date=\"" + DateHelper.ConvertToYYYYMMDD(sDate) + "\" batch=\"7\">");
-
-                file.WriteLine("<XNXPeriod from=\"" + DateHelper.PrevBusinessDay(sDate) + "\" through=\"" + DateHelper.ConvertToYYYYMMDD(sDate) + "\" indexperfiso=\"usd\" class=\"GICSSector\"> ");
-                foreach (IndexRow indexRow in indexRowsSectorLevel1RollUp)
-                {
-                    file.WriteLine("<XNXDetail code=\"" + indexRow.SectorLevel1 + "\" weight=\"" + indexRow.Weight.ToString(NumberFormat, mCultureInfo) + "\" irr=\"" + indexRow.RateOfReturn.ToString(NumberFormat, mCultureInfo) + "\"/>");
-                }
-                file.WriteLine("</XNXPeriod>");
-
-                file.WriteLine("<XNXPeriod from=\"" + DateHelper.PrevBusinessDay(sDate) + "\" through=\"" + DateHelper.ConvertToYYYYMMDD(sDate) + "\" indexperfiso=\"usd\" class=\"GICSIndGrp\"> ");
-                foreach (IndexRow indexRow in indexRowsSectorLevel2RollUp)
-                {
-                    file.WriteLine("<XNXDetail code=\"" + indexRow.SectorLevel2 + "\" weight=\"" + indexRow.Weight.ToString(NumberFormat, mCultureInfo) + "\" irr=\"" + indexRow.RateOfReturn.ToString(NumberFormat, mCultureInfo) + "\"/>");
-                }
-                file.WriteLine("</XNXPeriod>");
-
-                file.WriteLine("<XNXPeriod from=\"" + DateHelper.PrevBusinessDay(sDate) + "\" through=\"" + DateHelper.ConvertToYYYYMMDD(sDate) + "\" indexperfiso=\"usd\" class=\"GICSIndustry\"> ");
-                foreach (IndexRow indexRow in indexRowsSectorLevel3RollUp)
-                {
-                    file.WriteLine("<XNXDetail code=\"" + indexRow.SectorLevel3 + "\" weight=\"" + indexRow.Weight.ToString(NumberFormat, mCultureInfo) + "\" irr=\"" + indexRow.RateOfReturn.ToString(NumberFormat, mCultureInfo) + "\"/>");
-                }
-                file.WriteLine("</XNXPeriod>");
-
-                file.WriteLine("<XNXPeriod from=\"" + DateHelper.PrevBusinessDay(sDate) + "\" through=\"" + DateHelper.ConvertToYYYYMMDD(sDate) + "\" indexperfiso=\"usd\" class=\"GICSSubInd\"> ");
-                foreach (IndexRow indexRow in indexRowsSectorLevel4RollUp)
-                {
-                    file.WriteLine("<XNXDetail code=\"" + indexRow.SectorLevel4 + "\" weight=\"" + indexRow.Weight.ToString(NumberFormat, mCultureInfo) + "\" irr=\"" + indexRow.RateOfReturn.ToString(NumberFormat, mCultureInfo) + "\"/>");
-                }
-                file.WriteLine("</XNXPeriod>");
-
-                file.WriteLine("</XNXList>");
-                file.WriteLine("</AccountProvider>");
-                file.Write("</AdventXML>");
-            }
-        }
-
         public void GenerateReturnsForDateRange(string sStartDate, string sEndDate, string sIndexName, AdventOutputType adventOutputType)
         {       
             DateTime startDate = Convert.ToDateTime(sStartDate);
@@ -1392,12 +1252,12 @@ namespace IndexDataEngineLibrary
                 if (adventOutputType.Equals(AdventOutputType.Constituent))
                 { 
                     GenerateConstituentReturnsForDate(processDate.ToString("MM/dd/yyyy"), sIndexName);
-                    GenerateAxmlFileConstituents(processDate.ToString("MM/dd/yyyy"), sIndexName);
+                    sharedData.GenerateAxmlFileConstituents(processDate.ToString("MM/dd/yyyy"), sIndexName, Vendors.Snp, indexRowsTickerSort);
                 }
                 else if (adventOutputType.Equals(AdventOutputType.Sector))
                 { 
                     GenerateIndustryReturnsForDate(processDate.ToString("MM/dd/yyyy"), sIndexName);
-                    GenerateAxmlFileSectors(processDate.ToString("MM/dd/yyyy"), sIndexName);
+                    sharedData.GenerateAxmlFileSectors(processDate.ToString("MM/dd/yyyy"), sIndexName, Vendors.Snp, indexRowsSectorLevel1RollUp, indexRowsSectorLevel2RollUp, indexRowsSectorLevel3RollUp, indexRowsSectorLevel4RollUp);
                 }
             }
         }

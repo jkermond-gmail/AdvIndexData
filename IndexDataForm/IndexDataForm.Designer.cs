@@ -34,6 +34,8 @@
             this.timerRunIndexData = new System.Windows.Forms.Timer(this.components);
             this.tabUnitTest = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.btnTestEndOfMonthDates = new System.Windows.Forms.Button();
+            this.btnTestAxmlOutput = new System.Windows.Forms.Button();
             this.cboOutputType = new System.Windows.Forms.ComboBox();
             this.btnCalculateTotalReturns = new System.Windows.Forms.Button();
             this.btnUpdateRussellHoldings = new System.Windows.Forms.Button();
@@ -48,7 +50,6 @@
             this.lblStartDate = new System.Windows.Forms.Label();
             this.cboVendor = new System.Windows.Forms.ComboBox();
             this.lblVendor = new System.Windows.Forms.Label();
-            this.btnTestAxmlOutput = new System.Windows.Forms.Button();
             this.tabUnitTest.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.SuspendLayout();
@@ -88,6 +89,7 @@
             // 
             // tabPage1
             // 
+            this.tabPage1.Controls.Add(this.btnTestEndOfMonthDates);
             this.tabPage1.Controls.Add(this.btnTestAxmlOutput);
             this.tabPage1.Controls.Add(this.cboOutputType);
             this.tabPage1.Controls.Add(this.btnCalculateTotalReturns);
@@ -109,6 +111,26 @@
             this.tabPage1.Text = "Russell";
             this.tabPage1.UseVisualStyleBackColor = true;
             this.tabPage1.Click += new System.EventHandler(this.tabPage1_Click);
+            // 
+            // btnTestEndOfMonthDates
+            // 
+            this.btnTestEndOfMonthDates.Location = new System.Drawing.Point(256, 328);
+            this.btnTestEndOfMonthDates.Name = "btnTestEndOfMonthDates";
+            this.btnTestEndOfMonthDates.Size = new System.Drawing.Size(121, 23);
+            this.btnTestEndOfMonthDates.TabIndex = 13;
+            this.btnTestEndOfMonthDates.Text = "Test EOM Dates";
+            this.btnTestEndOfMonthDates.UseVisualStyleBackColor = true;
+            this.btnTestEndOfMonthDates.Click += new System.EventHandler(this.btnTestEndOfMonthDates_Click);
+            // 
+            // btnTestAxmlOutput
+            // 
+            this.btnTestAxmlOutput.Location = new System.Drawing.Point(256, 298);
+            this.btnTestAxmlOutput.Name = "btnTestAxmlOutput";
+            this.btnTestAxmlOutput.Size = new System.Drawing.Size(121, 23);
+            this.btnTestAxmlOutput.TabIndex = 12;
+            this.btnTestAxmlOutput.Text = "TestAxmlOutput";
+            this.btnTestAxmlOutput.UseVisualStyleBackColor = true;
+            this.btnTestAxmlOutput.Click += new System.EventHandler(this.btnTestAxmlOutput_Click);
             // 
             // cboOutputType
             // 
@@ -196,7 +218,7 @@
             this.lnkEndDate.Size = new System.Drawing.Size(53, 13);
             this.lnkEndDate.TabIndex = 3;
             this.lnkEndDate.TabStop = true;
-            this.lnkEndDate.Text = "01/03/18";
+            this.lnkEndDate.Text = "01/05/18";
             this.lnkEndDate.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.lnkEndDate_LinkClicked);
             // 
             // lnkStartDate
@@ -207,7 +229,7 @@
             this.lnkStartDate.Size = new System.Drawing.Size(53, 13);
             this.lnkStartDate.TabIndex = 2;
             this.lnkStartDate.TabStop = true;
-            this.lnkStartDate.Text = "01/03/18";
+            this.lnkStartDate.Text = "01/02/18";
             this.lnkStartDate.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.lnkStartDate_LinkClicked);
             // 
             // lblEndDate
@@ -249,16 +271,6 @@
             this.lblVendor.Size = new System.Drawing.Size(41, 13);
             this.lblVendor.TabIndex = 4;
             this.lblVendor.Text = "Vendor";
-            // 
-            // btnTestAxmlOutput
-            // 
-            this.btnTestAxmlOutput.Location = new System.Drawing.Point(256, 298);
-            this.btnTestAxmlOutput.Name = "btnTestAxmlOutput";
-            this.btnTestAxmlOutput.Size = new System.Drawing.Size(121, 23);
-            this.btnTestAxmlOutput.TabIndex = 12;
-            this.btnTestAxmlOutput.Text = "TestAxmlOutput";
-            this.btnTestAxmlOutput.UseVisualStyleBackColor = true;
-            this.btnTestAxmlOutput.Click += new System.EventHandler(this.btnTestAxmlOutput_Click);
             // 
             // IndexDataForm
             // 
@@ -302,6 +314,7 @@
         private System.Windows.Forms.Label lblVendor;
         private System.Windows.Forms.ComboBox cboOutputType;
         private System.Windows.Forms.Button btnTestAxmlOutput;
+        private System.Windows.Forms.Button btnTestEndOfMonthDates;
     }
 }
 

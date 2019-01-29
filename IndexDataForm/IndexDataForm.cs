@@ -72,6 +72,7 @@ namespace IndexDataForm
         {
 
             LogHelper.Info(message, "IndexDataForm");
+            LogHelper.Flush();
 
             if (enable)
             {
@@ -290,6 +291,12 @@ namespace IndexDataForm
 
             //indexDataQA.RunCompare();
             indexDataQA.CompareAxmlForDateRange(Vendor, OutputType, Indexname, lnkStartDate.Text, lnkEndDate.Text);
+        }
+
+        private void btnTestEndOfMonthDates_Click(object sender, EventArgs e)
+        {
+            snpData.TestEndOfMonthDates(lnkStartDate.Text, lnkEndDate.Text);
+
         }
     }
 }

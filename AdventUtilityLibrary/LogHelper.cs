@@ -99,6 +99,15 @@ namespace AdventUtilityLibrary
             }
         }
 
+        public static void Flush()
+        {
+            if (swLogFile.BaseStream != null)
+            {
+                swLogFile.Flush();
+            }
+        }
+
+
         public static void Error(string message, string module)
         {
             WriteEntry(message, "error", module);
@@ -158,7 +167,10 @@ namespace AdventUtilityLibrary
             archiveFilename = Path.Combine(mLogFilePath, "LogFileArchive", archiveFilename);
 
             if (File.Exists(mLogFileNameWithPath) && !File.Exists(archiveFilename))
+            { 
                 File.Copy(mLogFileNameWithPath, archiveFilename);
+                File.Delete(mLogFileNameWithPath);
+            }
 
             StartLog();
         }

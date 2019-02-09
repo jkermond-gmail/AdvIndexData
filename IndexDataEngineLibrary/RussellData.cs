@@ -2168,12 +2168,14 @@ CREATE TABLE [dbo].[HistoricalSymbolChanges](
                 if (adventOutputType.Equals(AdventOutputType.Constituent))
                 {
                     GenerateConstituentReturnsForDate(processDate.ToString("MM/dd/yyyy"), sIndexName);
-                    sharedData.GenerateAxmlFileConstituents(processDate.ToString("MM/dd/yyyy"), sIndexName, Vendors.Russell, indexRowsTickerSort);
+                    sharedData.GenerateAxmlFileConstituents(processDate.ToString("MM/dd/yyyy"), sIndexName, Vendors.Russell, indexRowsTickerSort, true, true);
                 }
                 else if (adventOutputType.Equals(AdventOutputType.Sector))
                 {
                     GenerateIndustryReturnsForDate(processDate.ToString("MM/dd/yyyy"), sIndexName);
-                    sharedData.GenerateAxmlFileSectors(processDate.ToString("MM/dd/yyyy"), sIndexName, Vendors.Russell, indexRowsSectorLevel1RollUp, indexRowsSectorLevel2RollUp, indexRowsSectorLevel3RollUp);
+                    sharedData.GenerateAxmlFileSectors(processDate.ToString("MM/dd/yyyy"), sIndexName, Vendors.Russell, 
+                                                       indexRowsSectorLevel1RollUp, indexRowsSectorLevel2RollUp, indexRowsSectorLevel3RollUp,
+                                                       true, true);
                 }
             }
         }

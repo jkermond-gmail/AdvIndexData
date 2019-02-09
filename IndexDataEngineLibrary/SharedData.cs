@@ -257,7 +257,8 @@ namespace IndexDataEngineLibrary
 </AccountProvider>
 </AdventXML>
          */
-        public void GenerateAxmlFileConstituents(string sBusinessDate, string sIndexName, Vendors vendor, List<IndexRow> indexRowsTickerSort)
+
+        public void GenerateAxmlFileConstituents(string sBusinessDate, string sIndexName, Vendors vendor, List<IndexRow> indexRowsTickerSort, bool IsFirstDate, bool IsLastDate)
         {
             string mAxmlFilename = "";
             bool addDummyEndOfMonthAXML = DateHelper.IsPrevEndofMonthOnWeekend(sBusinessDate);
@@ -308,17 +309,22 @@ namespace IndexDataEngineLibrary
             string sAxmlOutputPath = AppSettings.Get<string>("AxmlOutputPath");
             string filename = (sAxmlOutputPath + mAxmlFilename);
 
-            if (File.Exists(filename))
-                File.Delete(filename);
-
-            using (StreamWriter file = new StreamWriter(filename))
+            if( IsFirstDate )
             {
-                file.WriteLine("<?xml version=\"1.0\"?>");
-                file.WriteLine("<AdventXML version=\"3.0\">");
-                file.WriteLine(accountProvider);
-                file.WriteLine("<XSXList index=\"" + sIndexName + "\" date=\"" + DateHelper.ConvertToYYYYMMDD(sBusinessDate) + "\" " + batch);
+                if (File.Exists(filename))
+                    File.Delete(filename);
 
-                if ( addDummyEndOfMonthAXML )
+                using (StreamWriter file = new StreamWriter(filename))
+                {
+                    file.WriteLine("<?xml version=\"1.0\"?>");
+                    file.WriteLine("<AdventXML version=\"3.0\">");
+                    file.WriteLine(accountProvider);
+                    file.WriteLine("<XSXList index=\"" + sIndexName + "\" date=\"" + DateHelper.ConvertToYYYYMMDD(sBusinessDate) + "\" " + batch);
+                }
+            }
+            using (StreamWriter file = new StreamWriter(filename, true))
+            {
+                if (addDummyEndOfMonthAXML)
                 {
                     file.WriteLine("<XSXPeriod from=\"" + sPrevBusinessDate + "\" through=\"" + sPrevEndOfMonthDate + "\" indexperfiso=\"usd\">");
                     foreach (IndexRow indexRow in indexRowsTickerSort)
@@ -339,21 +345,31 @@ namespace IndexDataEngineLibrary
                 }
 
                 file.WriteLine("</XSXPeriod>");
-                file.WriteLine("</XSXList>");
-                file.WriteLine("</AccountProvider>");
-                file.Write("</AdventXML>");
+            }
+
+            if( IsLastDate )
+            {
+                using (StreamWriter file = new StreamWriter(filename, true))
+                {
+                    file.WriteLine("</XSXList>");
+                    file.WriteLine("</AccountProvider>");
+                    file.Write("</AdventXML>");
+                }
             }
         }
 
         public void GenerateAxmlFileSectors(string sBusinessDate, string sIndexName, Vendors vendor,
-            List<IndexRow> indexRowsSectorLevel1RollUp, List<IndexRow> indexRowsSectorLevel2RollUp, List<IndexRow> indexRowsSectorLevel3RollUp)
+            List<IndexRow> indexRowsSectorLevel1RollUp, List<IndexRow> indexRowsSectorLevel2RollUp, List<IndexRow> indexRowsSectorLevel3RollUp,
+            bool IsFirstDate, bool IsLastDate)
         {
             List<IndexRow> indexRowsLevel4NotUsed = new List<IndexRow>();
-            GenerateAxmlFileSectors(sBusinessDate, sIndexName, vendor, indexRowsSectorLevel1RollUp, indexRowsSectorLevel2RollUp, indexRowsSectorLevel3RollUp, indexRowsLevel4NotUsed);
+            GenerateAxmlFileSectors(sBusinessDate, sIndexName, vendor, indexRowsSectorLevel1RollUp, indexRowsSectorLevel2RollUp, indexRowsSectorLevel3RollUp, indexRowsLevel4NotUsed,
+                                    IsFirstDate, IsLastDate);
         }
 
         public void GenerateAxmlFileSectors(string sBusinessDate, string sIndexName, Vendors vendor,
-            List<IndexRow> indexRowsSectorLevel1RollUp, List<IndexRow> indexRowsSectorLevel2RollUp, List<IndexRow> indexRowsSectorLevel3RollUp, List<IndexRow> indexRowsSectorLevel4RollUp )
+            List<IndexRow> indexRowsSectorLevel1RollUp, List<IndexRow> indexRowsSectorLevel2RollUp, List<IndexRow> indexRowsSectorLevel3RollUp, List<IndexRow> indexRowsSectorLevel4RollUp,
+             bool IsFirstDate, bool IsLastDate)
         {
             string mAxmlFilename = "";
             bool addDummyEndOfMonthAXML = DateHelper.IsPrevEndofMonthOnWeekend(sBusinessDate);
@@ -428,18 +444,22 @@ namespace IndexDataEngineLibrary
             string sAxmlOutputPath = AppSettings.Get<string>("AxmlOutputPath");
             string filename = (sAxmlOutputPath + mAxmlFilename);
 
-            if (File.Exists(filename))
-                File.Delete(filename);
-
-            using (StreamWriter file = new StreamWriter(filename))
+            if (IsFirstDate)
             {
-                file.WriteLine("<?xml version=\"1.0\"?>");
-                file.WriteLine("<AdventXML version=\"3.0\">");
-                file.WriteLine(accountProvider);
-                file.WriteLine("<XNXList index=\"" + sIndexName + "\" date=\"" + DateHelper.ConvertToYYYYMMDD(sBusinessDate) + "\" " + batch);
+                if (File.Exists(filename))
+                    File.Delete(filename);
+                using (StreamWriter file = new StreamWriter(filename))
+                {
+                    file.WriteLine("<?xml version=\"1.0\"?>");
+                    file.WriteLine("<AdventXML version=\"3.0\">");
+                    file.WriteLine(accountProvider);
+                    file.WriteLine("<XNXList index=\"" + sIndexName + "\" date=\"" + DateHelper.ConvertToYYYYMMDD(sBusinessDate) + "\" " + batch);
+                }
+            }
 
+            using (StreamWriter file = new StreamWriter(filename, true))
+            {
                 /////////////////////////////////////////// Level 1
-
                 if (addDummyEndOfMonthAXML)
                 {
                     file.WriteLine("<XSXPeriod from=\"" + sPrevBusinessDate + "\" through=\"" + sPrevEndOfMonthDate + "\" indexperfiso=\"usd\" " + level1Class + "> ");
@@ -530,10 +550,15 @@ namespace IndexDataEngineLibrary
                     }
                     file.WriteLine("</XNXPeriod>");
                 }
-
-                file.WriteLine("</XNXList>");
-                file.WriteLine("</AccountProvider>");
-                file.Write("</AdventXML>");
+            }
+            if (IsLastDate)
+            {
+                using (StreamWriter file = new StreamWriter(filename, true))
+                {
+                    file.WriteLine("</XNXList>");
+                    file.WriteLine("</AccountProvider>");
+                    file.Write("</AdventXML>");
+                }
             }
         }
     }

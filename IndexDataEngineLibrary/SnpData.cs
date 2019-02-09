@@ -1252,12 +1252,14 @@ namespace IndexDataEngineLibrary
                 if (adventOutputType.Equals(AdventOutputType.Constituent))
                 { 
                     GenerateConstituentReturnsForDate(processDate.ToString("MM/dd/yyyy"), sIndexName);
-                    sharedData.GenerateAxmlFileConstituents(processDate.ToString("MM/dd/yyyy"), sIndexName, Vendors.Snp, indexRowsTickerSort);
+                    sharedData.GenerateAxmlFileConstituents(processDate.ToString("MM/dd/yyyy"), sIndexName, Vendors.Snp, indexRowsTickerSort, true, true);
                 }
                 else if (adventOutputType.Equals(AdventOutputType.Sector))
                 { 
                     GenerateIndustryReturnsForDate(processDate.ToString("MM/dd/yyyy"), sIndexName);
-                    sharedData.GenerateAxmlFileSectors(processDate.ToString("MM/dd/yyyy"), sIndexName, Vendors.Snp, indexRowsSectorLevel1RollUp, indexRowsSectorLevel2RollUp, indexRowsSectorLevel3RollUp, indexRowsSectorLevel4RollUp);
+                    sharedData.GenerateAxmlFileSectors(processDate.ToString("MM/dd/yyyy"), sIndexName, Vendors.Snp, 
+                                                       indexRowsSectorLevel1RollUp, indexRowsSectorLevel2RollUp, indexRowsSectorLevel3RollUp, indexRowsSectorLevel4RollUp,
+                                                       true, true);
                 }
             }
         }

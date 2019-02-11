@@ -183,9 +183,9 @@ namespace IndexDataEngineLibrary
                     IndexName = Indices[i];
                     if (ProcessStatus.GenerateReturns(sProcessDate, Vendors.Russell.ToString(), Dataset, IndexName))
                     {
-                        GenerateReturnsForDateRange(sProcessDate, sProcessDate, IndexName, AdventOutputType.Constituent);
+                        GenerateReturnsForDateRange(sProcessDate, sProcessDate, IndexName, AdventOutputType.Constituent, false);
                         ProcessStatus.Update(sProcessDate, Vendors.Russell.ToString(), Dataset, IndexName, ProcessStatus.WhichStatus.AxmlConstituentData, ProcessStatus.StatusValue.Pass);
-                        GenerateReturnsForDateRange(sProcessDate, sProcessDate, IndexName, AdventOutputType.Sector);
+                        GenerateReturnsForDateRange(sProcessDate, sProcessDate, IndexName, AdventOutputType.Sector, false);
                         ProcessStatus.Update(sProcessDate, Vendors.Russell.ToString(), Dataset, IndexName, ProcessStatus.WhichStatus.AxmlSectorData, ProcessStatus.StatusValue.Pass);
                     }
                 }
@@ -2152,30 +2152,53 @@ CREATE TABLE [dbo].[HistoricalSymbolChanges](
         #endregion
 #endif
 
-        public void GenerateReturnsForDateRange(string sStartDate, string sEndDate, string sIndexName, AdventOutputType adventOutputType)
+        public void GenerateReturnsForDateRange(string sStartDate, string sEndDate, string sIndexName, AdventOutputType adventOutputType, bool isHistoricalAxmlFile)
         {
             DateTime startDate = Convert.ToDateTime(sStartDate);
             DateTime endDate = Convert.ToDateTime(sEndDate);
             DateTime processDate;
             int DateCompare;
 
-
+            bool isFirstDate = true;
+            bool isLastDate = true; ;
 
             for (processDate = startDate
             ; (DateCompare = processDate.CompareTo(endDate)) <= 0
             ; processDate = DateHelper.NextBusinessDay(processDate))
             {
+                if( isHistoricalAxmlFile)
+                {
+                    if (processDate.Equals(startDate))
+                        isFirstDate = true;
+                    else
+                        isFirstDate = false;
+
+                    if (processDate.Equals(endDate))
+                        isLastDate = true;
+                    else
+                        isLastDate = false;
+                }
+                else
+                {
+                    isFirstDate = true;
+                    isLastDate = true;
+                }
+
+
                 if (adventOutputType.Equals(AdventOutputType.Constituent))
                 {
                     GenerateConstituentReturnsForDate(processDate.ToString("MM/dd/yyyy"), sIndexName);
-                    sharedData.GenerateAxmlFileConstituents(processDate.ToString("MM/dd/yyyy"), sIndexName, Vendors.Russell, indexRowsTickerSort, true, true);
+                    sharedData.GenerateAxmlFileConstituents(processDate.ToString("MM/dd/yyyy"), endDate.ToString("MM/dd/yyyy"),
+                                                            sIndexName, Vendors.Russell, indexRowsTickerSort,
+                                                            isFirstDate, isLastDate);
                 }
                 else if (adventOutputType.Equals(AdventOutputType.Sector))
                 {
                     GenerateIndustryReturnsForDate(processDate.ToString("MM/dd/yyyy"), sIndexName);
-                    sharedData.GenerateAxmlFileSectors(processDate.ToString("MM/dd/yyyy"), sIndexName, Vendors.Russell, 
+                    sharedData.GenerateAxmlFileSectors(processDate.ToString("MM/dd/yyyy"), endDate.ToString("MM/dd/yyyy"),
+                                                       sIndexName, Vendors.Russell, 
                                                        indexRowsSectorLevel1RollUp, indexRowsSectorLevel2RollUp, indexRowsSectorLevel3RollUp,
-                                                       true, true);
+                                                       isFirstDate, isLastDate);
                 }
             }
         }

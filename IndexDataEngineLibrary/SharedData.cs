@@ -258,7 +258,7 @@ namespace IndexDataEngineLibrary
 </AdventXML>
          */
 
-        public void GenerateAxmlFileConstituents(string sBusinessDate, string sIndexName, Vendors vendor, List<IndexRow> indexRowsTickerSort, bool IsFirstDate, bool IsLastDate)
+        public void GenerateAxmlFileConstituents(string sBusinessDate, string sFileDate, string sIndexName, Vendors vendor, List<IndexRow> indexRowsTickerSort, bool IsFirstDate, bool IsLastDate)
         {
             string mAxmlFilename = "";
             bool addDummyEndOfMonthAXML = DateHelper.IsPrevEndofMonthOnWeekend(sBusinessDate);
@@ -305,7 +305,7 @@ namespace IndexDataEngineLibrary
                 batch = "batch=\"1\">";
             }
 
-            mAxmlFilename = prefix + DateHelper.ConvertToYYYYMMDD(sBusinessDate) + "-xse-" + sIndexName + ".XSX";
+            mAxmlFilename = prefix + DateHelper.ConvertToYYYYMMDD(sFileDate) + "-xse-" + sIndexName + ".XSX";
             string sAxmlOutputPath = AppSettings.Get<string>("AxmlOutputPath");
             string filename = (sAxmlOutputPath + mAxmlFilename);
 
@@ -319,7 +319,7 @@ namespace IndexDataEngineLibrary
                     file.WriteLine("<?xml version=\"1.0\"?>");
                     file.WriteLine("<AdventXML version=\"3.0\">");
                     file.WriteLine(accountProvider);
-                    file.WriteLine("<XSXList index=\"" + sIndexName + "\" date=\"" + DateHelper.ConvertToYYYYMMDD(sBusinessDate) + "\" " + batch);
+                    file.WriteLine("<XSXList index=\"" + sIndexName + "\" date=\"" + DateHelper.ConvertToYYYYMMDD(sFileDate) + "\" " + batch);
                 }
             }
             using (StreamWriter file = new StreamWriter(filename, true))
@@ -358,16 +358,16 @@ namespace IndexDataEngineLibrary
             }
         }
 
-        public void GenerateAxmlFileSectors(string sBusinessDate, string sIndexName, Vendors vendor,
+        public void GenerateAxmlFileSectors(string sBusinessDate, string sFileDate, string sIndexName, Vendors vendor,
             List<IndexRow> indexRowsSectorLevel1RollUp, List<IndexRow> indexRowsSectorLevel2RollUp, List<IndexRow> indexRowsSectorLevel3RollUp,
             bool IsFirstDate, bool IsLastDate)
         {
             List<IndexRow> indexRowsLevel4NotUsed = new List<IndexRow>();
-            GenerateAxmlFileSectors(sBusinessDate, sIndexName, vendor, indexRowsSectorLevel1RollUp, indexRowsSectorLevel2RollUp, indexRowsSectorLevel3RollUp, indexRowsLevel4NotUsed,
+            GenerateAxmlFileSectors(sBusinessDate, sFileDate, sIndexName, vendor, indexRowsSectorLevel1RollUp, indexRowsSectorLevel2RollUp, indexRowsSectorLevel3RollUp, indexRowsLevel4NotUsed,
                                     IsFirstDate, IsLastDate);
         }
 
-        public void GenerateAxmlFileSectors(string sBusinessDate, string sIndexName, Vendors vendor,
+        public void GenerateAxmlFileSectors(string sBusinessDate, string sFileDate, string sIndexName, Vendors vendor,
             List<IndexRow> indexRowsSectorLevel1RollUp, List<IndexRow> indexRowsSectorLevel2RollUp, List<IndexRow> indexRowsSectorLevel3RollUp, List<IndexRow> indexRowsSectorLevel4RollUp,
              bool IsFirstDate, bool IsLastDate)
         {
@@ -439,8 +439,7 @@ namespace IndexDataEngineLibrary
                 level3Class = "class=\"RGSIndustry\"";
             }
 
-
-            mAxmlFilename = prefix + DateHelper.ConvertToYYYYMMDD(sBusinessDate) + "-xnf-" + sIndexName + ".XNX";
+            mAxmlFilename = prefix + DateHelper.ConvertToYYYYMMDD(sFileDate) + "-xnf-" + sIndexName + ".XNX";
             string sAxmlOutputPath = AppSettings.Get<string>("AxmlOutputPath");
             string filename = (sAxmlOutputPath + mAxmlFilename);
 
@@ -448,12 +447,13 @@ namespace IndexDataEngineLibrary
             {
                 if (File.Exists(filename))
                     File.Delete(filename);
+
                 using (StreamWriter file = new StreamWriter(filename))
                 {
                     file.WriteLine("<?xml version=\"1.0\"?>");
                     file.WriteLine("<AdventXML version=\"3.0\">");
                     file.WriteLine(accountProvider);
-                    file.WriteLine("<XNXList index=\"" + sIndexName + "\" date=\"" + DateHelper.ConvertToYYYYMMDD(sBusinessDate) + "\" " + batch);
+                    file.WriteLine("<XNXList index=\"" + sIndexName + "\" date=\"" + DateHelper.ConvertToYYYYMMDD(sFileDate) + "\" " + batch);
                 }
             }
 

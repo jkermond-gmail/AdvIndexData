@@ -50,6 +50,7 @@
             this.lblStartDate = new System.Windows.Forms.Label();
             this.cboVendor = new System.Windows.Forms.ComboBox();
             this.lblVendor = new System.Windows.Forms.Label();
+            this.chkHistoricalAxmlFile = new System.Windows.Forms.CheckBox();
             this.tabUnitTest.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.SuspendLayout();
@@ -89,6 +90,7 @@
             // 
             // tabPage1
             // 
+            this.tabPage1.Controls.Add(this.chkHistoricalAxmlFile);
             this.tabPage1.Controls.Add(this.btnTestEndOfMonthDates);
             this.tabPage1.Controls.Add(this.btnTestAxmlOutput);
             this.tabPage1.Controls.Add(this.cboOutputType);
@@ -114,7 +116,7 @@
             // 
             // btnTestEndOfMonthDates
             // 
-            this.btnTestEndOfMonthDates.Location = new System.Drawing.Point(256, 328);
+            this.btnTestEndOfMonthDates.Location = new System.Drawing.Point(348, 329);
             this.btnTestEndOfMonthDates.Name = "btnTestEndOfMonthDates";
             this.btnTestEndOfMonthDates.Size = new System.Drawing.Size(121, 23);
             this.btnTestEndOfMonthDates.TabIndex = 13;
@@ -124,7 +126,7 @@
             // 
             // btnTestAxmlOutput
             // 
-            this.btnTestAxmlOutput.Location = new System.Drawing.Point(256, 298);
+            this.btnTestAxmlOutput.Location = new System.Drawing.Point(348, 287);
             this.btnTestAxmlOutput.Name = "btnTestAxmlOutput";
             this.btnTestAxmlOutput.Size = new System.Drawing.Size(121, 23);
             this.btnTestAxmlOutput.TabIndex = 12;
@@ -272,6 +274,16 @@
             this.lblVendor.TabIndex = 4;
             this.lblVendor.Text = "Vendor";
             // 
+            // chkHistoricalAxmlFile
+            // 
+            this.chkHistoricalAxmlFile.AutoSize = true;
+            this.chkHistoricalAxmlFile.Location = new System.Drawing.Point(228, 305);
+            this.chkHistoricalAxmlFile.Name = "chkHistoricalAxmlFile";
+            this.chkHistoricalAxmlFile.Size = new System.Drawing.Size(113, 17);
+            this.chkHistoricalAxmlFile.TabIndex = 14;
+            this.chkHistoricalAxmlFile.Text = "Historical Axml File";
+            this.chkHistoricalAxmlFile.UseVisualStyleBackColor = true;
+            // 
             // IndexDataForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -315,6 +327,7 @@
         private System.Windows.Forms.ComboBox cboOutputType;
         private System.Windows.Forms.Button btnTestAxmlOutput;
         private System.Windows.Forms.Button btnTestEndOfMonthDates;
+        private System.Windows.Forms.CheckBox chkHistoricalAxmlFile;
     }
 }
 

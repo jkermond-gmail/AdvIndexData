@@ -2157,6 +2157,7 @@ CREATE TABLE [dbo].[HistoricalSymbolChanges](
             DateTime startDate = Convert.ToDateTime(sStartDate);
             DateTime endDate = Convert.ToDateTime(sEndDate);
             DateTime processDate;
+            DateTime fileDate;
             int DateCompare;
 
             bool isFirstDate = true;
@@ -2177,25 +2178,27 @@ CREATE TABLE [dbo].[HistoricalSymbolChanges](
                         isLastDate = true;
                     else
                         isLastDate = false;
+                    fileDate = endDate;
                 }
                 else
                 {
                     isFirstDate = true;
                     isLastDate = true;
+                    fileDate = processDate;
                 }
 
 
                 if (adventOutputType.Equals(AdventOutputType.Constituent))
                 {
                     GenerateConstituentReturnsForDate(processDate.ToString("MM/dd/yyyy"), sIndexName);
-                    sharedData.GenerateAxmlFileConstituents(processDate.ToString("MM/dd/yyyy"), endDate.ToString("MM/dd/yyyy"),
+                    sharedData.GenerateAxmlFileConstituents(processDate.ToString("MM/dd/yyyy"), fileDate.ToString("MM/dd/yyyy"),
                                                             sIndexName, Vendors.Russell, indexRowsTickerSort,
                                                             isFirstDate, isLastDate);
                 }
                 else if (adventOutputType.Equals(AdventOutputType.Sector))
                 {
                     GenerateIndustryReturnsForDate(processDate.ToString("MM/dd/yyyy"), sIndexName);
-                    sharedData.GenerateAxmlFileSectors(processDate.ToString("MM/dd/yyyy"), endDate.ToString("MM/dd/yyyy"),
+                    sharedData.GenerateAxmlFileSectors(processDate.ToString("MM/dd/yyyy"), fileDate.ToString("MM/dd/yyyy"),
                                                        sIndexName, Vendors.Russell, 
                                                        indexRowsSectorLevel1RollUp, indexRowsSectorLevel2RollUp, indexRowsSectorLevel3RollUp,
                                                        isFirstDate, isLastDate);

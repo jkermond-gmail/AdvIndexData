@@ -305,7 +305,11 @@ namespace IndexDataEngineLibrary
                 batch = "batch=\"1\">";
             }
 
-            mAxmlFilename = prefix + DateHelper.ConvertToYYYYMMDD(sFileDate) + "-xse-" + sIndexName + ".XSX";
+            if( IsFirstDate && IsLastDate)
+                mAxmlFilename = prefix + DateHelper.ConvertToYYYYMMDD(sFileDate) + "-xse-" + sIndexName + ".XSX";
+            else
+                mAxmlFilename = prefix + DateHelper.ConvertToYYYYMMDD(sFileDate) + "-xse-h" + sIndexName + ".XSX";
+
             string sAxmlOutputPath = AppSettings.Get<string>("AxmlOutputPath");
             string filename = (sAxmlOutputPath + mAxmlFilename);
 
@@ -439,7 +443,11 @@ namespace IndexDataEngineLibrary
                 level3Class = "class=\"RGSIndustry\"";
             }
 
-            mAxmlFilename = prefix + DateHelper.ConvertToYYYYMMDD(sFileDate) + "-xnf-" + sIndexName + ".XNX";
+            if (IsFirstDate && IsLastDate)
+                mAxmlFilename = prefix + DateHelper.ConvertToYYYYMMDD(sFileDate) + "-xnf-" + sIndexName + ".XNX";
+            else
+                mAxmlFilename = prefix + DateHelper.ConvertToYYYYMMDD(sFileDate) + "-xnf-h" + sIndexName + ".XNX";
+
             string sAxmlOutputPath = AppSettings.Get<string>("AxmlOutputPath");
             string filename = (sAxmlOutputPath + mAxmlFilename);
 

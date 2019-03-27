@@ -259,6 +259,14 @@ namespace IndexDataEngineLibrary
                             AddSnpOpeningData(FileName, oProcessDate);
                             ProcessStatus.Update(oProcessDate, Vendors.Snp.ToString(), Dataset, "", ProcessStatus.WhichStatus.OpenData, ProcessStatus.StatusValue.Pass);
                         }
+                        // 20150408_SP500_ADJ.SPC old
+                        FileName = FilePath + oProcessDate.ToString("yyyyMMdd") + "_SP500_ADJ.SPC";
+                        if (File.Exists(FileName) && (Dataset.Equals("All") || Dataset.Equals("sp500")))
+                        {
+                            AddSnpOpeningData(FileName, oProcessDate);
+                            ProcessStatus.Update(oProcessDate, Vendors.Snp.ToString(), Dataset, "", ProcessStatus.WhichStatus.OpenData, ProcessStatus.StatusValue.Pass);
+                        }
+
                         FileName = FilePath + oProcessDate.ToString("yyyyMMdd") + "_SP600_ADJ.SDC";
                         if (File.Exists(FileName) && (Dataset.Equals("All") || Dataset.Equals("sp600")))
                         { 
@@ -305,6 +313,15 @@ namespace IndexDataEngineLibrary
                             AddSnpClosingData(FileName, oProcessDate);
                             ProcessStatus.Update(oProcessDate, Vendors.Snp.ToString(), Dataset, "", ProcessStatus.WhichStatus.CloseData, ProcessStatus.StatusValue.Pass);
                         }
+                        // 20150408_SP500_ADJ.SPC old
+                        FileName = FilePath + oProcessDate.ToString("yyyyMMdd") + "_SP500_CLS.SPC";
+                        if (File.Exists(FileName) && (Dataset.Equals("All") || Dataset.Equals("sp500")))
+                        {
+                            AddSnpClosingData(FileName, oProcessDate);
+                            ProcessStatus.Update(oProcessDate, Vendors.Snp.ToString(), Dataset, "", ProcessStatus.WhichStatus.OpenData, ProcessStatus.StatusValue.Pass);
+                        }
+
+
                         FileName = FilePath + oProcessDate.ToString("yyyyMMdd") + "_SP600_CLS.SDC";
                         if (File.Exists(FileName) && (Dataset.Equals("All") || Dataset.Equals("sp600")))
                         {
@@ -411,50 +428,82 @@ namespace IndexDataEngineLibrary
             return (IndexCode.ToLower());
         }
 
+        private void ConvertOldFileFormatToCsv(string Filename, out string NewFilename, out string IndexnameParsed, out string IndexCodeParsed)
+        {
+            NewFilename = "";
+            IndexnameParsed = "";
+            IndexCodeParsed = "";
 
-        /*
-        // Filename 20180102_SP500_ADJ.SDC
-        _ADJ.SDC - the opening file
-        INDEX CODE  EFFECTIVE DATE  CUSIP TICKER  STOCK KEY   GICS CODE GROWTH VALUE INDEX MARKET CAP INDEX WEIGHT
 
-        _CLS.SDC - the closing file
-        INDEX CODE	EFFECTIVE DATE	CUSIP   TICKER	STOCK KEY	GICS CODE	GROWTH	VALUE	DAILY TOTAL RETURN
+            bool foundHeaderLine = false;
+            StreamWriter file = null;
+            string filenameTemp = null;
+            for (StreamReader srFile = new StreamReader(Filename); srFile.EndOfStream == false;)
+            {
+                string TextLine = srFile.ReadLine();
+                if (foundHeaderLine.Equals(false))
+                {
 
-        .SDL - Total returns for all indices
-        CHANGE?	DATE OF INDEX	INDEX CODE	|JK to check which fields ->|	INDEX VALUE	CLOSE MARKET CAP	CLOSE DIVISOR	CLOSE COUNT	DAILY RETURN	INDEX DIVIDEND	ADJ MARKET CAP	ADJ DIVISOR	ADJ COUNT
-        */
-        /*INDEX CODE  EFFECTIVE DATE  CUSIP TICKER  STOCK KEY   GICS CODE GROWTH VALUE INDEX MARKET CAP INDEX WEIGHT
+                    if (TextLine.StartsWith("INDEX NAME"))
+                    {
+                        int index = TextLine.IndexOf("S&P");
+                        IndexnameParsed = TextLine.Substring(index);
+                        IndexCodeParsed = IndexnameParsed;
+                    }
 
-         CREATE TABLE [dbo].[SnpDailyOpeningHoldings](
-            [FileDate] [dbo].[DateOnly_Type] NOT NULL,
-            [IndexCode] [varchar](8) NOT NULL,
-            [StockKey] [varchar](7) NOT NULL,
-            [EffectiveDate] [dbo].[DateOnly_Type] NOT NULL,
-            [CUSIP] [varchar](9) NULL,
-            [Ticker] [varchar](7) NULL,
-            [GicsCode] [varchar](9) NULL,
-            [MarketCap] [varchar](13) NULL,
-            [Weight] [varchar](20) NULL,
-            CONSTRAINT [PK_SnpDailyHoldings] PRIMARY KEY CLUSTERED 
-        (
-            [FileDate] ASC,
-            [IndexCode] ASC,
-            [StockKey] ASC
-        )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
-        ) ON [PRIMARY]
+                    if (TextLine.StartsWith("CHANGE"))
+                    {
+                        foundHeaderLine = true;
+                        filenameTemp = Filename + ".tmp";
+                        if (File.Exists(filenameTemp))
+                            File.Delete(filenameTemp);
 
-        GO
-        */
+                        file = new StreamWriter(filenameTemp);
+                        file.WriteLine(TextLine);
+                    }
+                }
+                else if (foundHeaderLine.Equals(true) && (TextLine.StartsWith("LINE COUNT").Equals(false)))
+                    file.WriteLine(TextLine);
+
+                if (TextLine.StartsWith("LINE COUNT").Equals(true))
+                    ;
+            }
+
+            if (file.BaseStream != null)
+            {
+                file.Flush();
+                file.Close();
+                NewFilename = filenameTemp;
+            }
+
+
+        }
+
+
+
         private void AddSnpOpeningData(string Filename, DateTime FileDate)
         {
             string SqlDelete;
             string SqlWhere;
             SqlCommand cmd = null;
             DateTime oDate = DateTime.MinValue;
+            bool isOldFormat = false;
+            string IndexnameParsed = "";
+            string IndexCodeParsed = "";
+            string IndexCodeParsed2 = "";
 
             LogHelper.WriteLine("AddSnpOpeningData Processing: " + Filename + " " + FileDate.ToShortDateString());
 
             string IndexCode = GetIndexCodeFromFilename(Filename);
+
+            if (Filename.EndsWith("SPC"))
+            {
+                isOldFormat = true;
+                string NewFilename = "";
+                ConvertOldFileFormatToCsv(Filename, out NewFilename, out IndexnameParsed, out IndexCodeParsed);
+                Filename = NewFilename;
+                IndexCodeParsed = IndexCode;
+            }
 
             string Tablename = " SnpDailyOpeningHoldings ";  // Note leading and trailing spaces
             SqlDelete = "delete FROM" + Tablename ;
@@ -504,24 +553,26 @@ namespace IndexDataEngineLibrary
 
             foreach (DataRow dr in dt.Rows)
             {
-                string IndexnameParsed = ParseColumn(dr, "INDEX NAME");
-                string IndexCodeParsed = ParseColumn(dr, "INDEX CODE");
-                string IndexCodeParsed2;
+                if (isOldFormat.Equals(false))
+                {
+                    IndexnameParsed = ParseColumn(dr, "INDEX NAME");
+                    IndexCodeParsed = ParseColumn(dr, "INDEX CODE");
+                    
+                    if (IndexCodeParsed.Equals("SPMLP"))
+                        IndexCodeParsed = IndexCodeParsed.ToLower();
+                    else
+                        IndexCodeParsed = "sp" + IndexCodeParsed;
 
-                if (IndexCodeParsed.Equals("SPMLP"))
-                    IndexCodeParsed = IndexCodeParsed.ToLower();
-                else
-                    IndexCodeParsed = "sp" + IndexCodeParsed;
+                    if (IndexCode.Equals("sp1000") && (IndexCodeParsed.Equals("sp400") || IndexCodeParsed.Equals("sp600")))
+                        IndexCodeParsed = "sp1000";
 
-                if (IndexCode.Equals("sp1000") && (IndexCodeParsed.Equals("sp400") || IndexCodeParsed.Equals("sp600")))
-                    IndexCodeParsed = "sp1000";
-
-                if (IndexCodeParsed.Equals("sp500"))
-                    IndexCodeParsed2 = "sp900";
-                else if (IndexCodeParsed.Equals("sp400"))
-                    IndexCodeParsed2 = "sp900";
-                else
-                    IndexCodeParsed2 = "";
+                    if (IndexCodeParsed.Equals("sp500"))
+                        IndexCodeParsed2 = "sp900";
+                    else if (IndexCodeParsed.Equals("sp400"))
+                        IndexCodeParsed2 = "sp900";
+                    else
+                        IndexCodeParsed2 = "";
+                }
 
                 if (IndexnameParsed.StartsWith("S&P ") && IndexCodeParsed.Equals(IndexCode))
                 {
@@ -586,12 +637,12 @@ namespace IndexDataEngineLibrary
                     {
                     }
                 }
-                else if (sValue.Equals("LINE COUNT:"))
-                {
-                    sValue = ParseColumn(dr, "INDEX CODE");
-                    int LineCount = Convert.ToInt32(sValue);
-                    LogHelper.WriteLine("finished " + DateTime.Now + " " + Filename + " adds = " + AddCount + " Linecount = " + LineCount);
-                }
+                //else if (sValue.Equals("LINE COUNT:"))
+                //{
+                //    sValue = ParseColumn(dr, "INDEX CODE");
+                //    int LineCount = Convert.ToInt32(sValue);
+                //    LogHelper.WriteLine("finished " + DateTime.Now + " " + Filename + " adds = " + AddCount + " Linecount = " + LineCount);
+                //}
             }
             LogHelper.WriteLine("AddSnpOpeningData Done: " + Filename + " " + DateTime.Now);
         }
@@ -602,10 +653,25 @@ namespace IndexDataEngineLibrary
             string SqlWhere;
             SqlCommand cmd = null;
             DateTime oDate = DateTime.MinValue;
+            bool isOldFormat = false;
+            string IndexnameParsed = "";
+            string IndexCodeParsed = "";
+            string IndexCodeParsed2 = "";
 
-            LogHelper.WriteLine("AddSnpOpeningData Processing: " + Filename + " " + DateTime.Now);
+            LogHelper.WriteLine("AddSnpClosingData Processing: " + Filename + " " + DateTime.Now);
 
             string IndexCode = GetIndexCodeFromFilename(Filename);
+
+            if (Filename.EndsWith("SPC"))
+            {
+                isOldFormat = true;
+                string NewFilename = "";
+                ConvertOldFileFormatToCsv(Filename, out NewFilename, out IndexnameParsed, out IndexCodeParsed);
+                Filename = NewFilename;
+                IndexCodeParsed = IndexCode;
+            }
+
+
             string Tablename = " SnpDailyClosingHoldings ";  // Note leading and trailing spaces
             SqlDelete = "delete FROM" + Tablename;
             SqlWhere = "where FileDate = @FileDate and IndexCode = @IndexCode";
@@ -655,24 +721,27 @@ namespace IndexDataEngineLibrary
 
             foreach (DataRow dr in dt.Rows)
             {
-                string IndexnameParsed = ParseColumn(dr, "INDEX NAME");
-                string IndexCodeParsed = ParseColumn(dr, "INDEX CODE");
-                string IndexCodeParsed2;
+                if (isOldFormat.Equals(false))
+                {
 
-                if (IndexCodeParsed.Equals("SPMLP"))
-                    IndexCodeParsed = IndexCodeParsed.ToLower();
-                else
-                    IndexCodeParsed = "sp" + IndexCodeParsed;
+                    IndexnameParsed = ParseColumn(dr, "INDEX NAME");
+                    IndexCodeParsed = ParseColumn(dr, "INDEX CODE");
 
-                if (IndexCode.Equals("sp1000") && (IndexCodeParsed.Equals("sp400") || IndexCodeParsed.Equals("sp600")))
-                    IndexCodeParsed = "sp1000";
+                    if (IndexCodeParsed.Equals("SPMLP"))
+                        IndexCodeParsed = IndexCodeParsed.ToLower();
+                    else
+                        IndexCodeParsed = "sp" + IndexCodeParsed;
 
-                if (IndexCodeParsed.Equals("sp500"))
-                    IndexCodeParsed2 = "sp900";
-                else if (IndexCodeParsed.Equals("sp400"))
-                    IndexCodeParsed2 = "sp900";
-                else
-                    IndexCodeParsed2 = "";
+                    if (IndexCode.Equals("sp1000") && (IndexCodeParsed.Equals("sp400") || IndexCodeParsed.Equals("sp600")))
+                        IndexCodeParsed = "sp1000";
+
+                    if (IndexCodeParsed.Equals("sp500"))
+                        IndexCodeParsed2 = "sp900";
+                    else if (IndexCodeParsed.Equals("sp400"))
+                        IndexCodeParsed2 = "sp900";
+                    else
+                        IndexCodeParsed2 = "";
+                }
 
                 if (IndexnameParsed.StartsWith("S&P ") && IndexCodeParsed.Equals(IndexCode))
                 {
@@ -702,6 +771,20 @@ namespace IndexDataEngineLibrary
                     cmd.Parameters["@Weight"].Value = sValue;
 
                     sValue = ParseColumn(dr, "DAILY TOTAL RETURN");
+                    if( isOldFormat )
+                    {
+                        if (sValue.Length > 0 && double.TryParse(sValue, out double dNum))
+                        {
+                            double dValue = Convert.ToDouble(sValue.ToString());
+                            dValue = dValue * .01;
+                            string NumberFormat = "0.################";
+                            CultureInfo mCultureInfo = new CultureInfo("en-US");
+                            sValue = dValue.ToString(NumberFormat, mCultureInfo);
+                        }
+                        else
+                            sValue = "";
+                    }
+
                     cmd.Parameters["@TotalReturn"].Value = sValue;
 
                     try

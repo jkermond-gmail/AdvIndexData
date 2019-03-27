@@ -34,6 +34,7 @@
             this.timerRunIndexData = new System.Windows.Forms.Timer(this.components);
             this.tabUnitTest = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.chkHistoricalAxmlFile = new System.Windows.Forms.CheckBox();
             this.btnTestEndOfMonthDates = new System.Windows.Forms.Button();
             this.btnTestAxmlOutput = new System.Windows.Forms.Button();
             this.cboOutputType = new System.Windows.Forms.ComboBox();
@@ -50,7 +51,6 @@
             this.lblStartDate = new System.Windows.Forms.Label();
             this.cboVendor = new System.Windows.Forms.ComboBox();
             this.lblVendor = new System.Windows.Forms.Label();
-            this.chkHistoricalAxmlFile = new System.Windows.Forms.CheckBox();
             this.tabUnitTest.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.SuspendLayout();
@@ -113,6 +113,16 @@
             this.tabPage1.Text = "Russell";
             this.tabPage1.UseVisualStyleBackColor = true;
             this.tabPage1.Click += new System.EventHandler(this.tabPage1_Click);
+            // 
+            // chkHistoricalAxmlFile
+            // 
+            this.chkHistoricalAxmlFile.AutoSize = true;
+            this.chkHistoricalAxmlFile.Location = new System.Drawing.Point(228, 305);
+            this.chkHistoricalAxmlFile.Name = "chkHistoricalAxmlFile";
+            this.chkHistoricalAxmlFile.Size = new System.Drawing.Size(113, 17);
+            this.chkHistoricalAxmlFile.TabIndex = 14;
+            this.chkHistoricalAxmlFile.Text = "Historical Axml File";
+            this.chkHistoricalAxmlFile.UseVisualStyleBackColor = true;
             // 
             // btnTestEndOfMonthDates
             // 
@@ -203,7 +213,7 @@
             this.cbRussellIndices.Name = "cbRussellIndices";
             this.cbRussellIndices.Size = new System.Drawing.Size(121, 21);
             this.cbRussellIndices.TabIndex = 5;
-            this.cbRussellIndices.Text = "r3000";
+            this.cbRussellIndices.Text = "sp500";
             // 
             // monthCalendar1
             // 
@@ -220,7 +230,7 @@
             this.lnkEndDate.Size = new System.Drawing.Size(53, 13);
             this.lnkEndDate.TabIndex = 3;
             this.lnkEndDate.TabStop = true;
-            this.lnkEndDate.Text = "01/05/18";
+            this.lnkEndDate.Text = "04/08/15";
             this.lnkEndDate.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.lnkEndDate_LinkClicked);
             // 
             // lnkStartDate
@@ -231,7 +241,7 @@
             this.lnkStartDate.Size = new System.Drawing.Size(53, 13);
             this.lnkStartDate.TabIndex = 2;
             this.lnkStartDate.TabStop = true;
-            this.lnkStartDate.Text = "01/02/18";
+            this.lnkStartDate.Text = "04/08/15";
             this.lnkStartDate.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.lnkStartDate_LinkClicked);
             // 
             // lblEndDate
@@ -273,16 +283,6 @@
             this.lblVendor.Size = new System.Drawing.Size(41, 13);
             this.lblVendor.TabIndex = 4;
             this.lblVendor.Text = "Vendor";
-            // 
-            // chkHistoricalAxmlFile
-            // 
-            this.chkHistoricalAxmlFile.AutoSize = true;
-            this.chkHistoricalAxmlFile.Location = new System.Drawing.Point(228, 305);
-            this.chkHistoricalAxmlFile.Name = "chkHistoricalAxmlFile";
-            this.chkHistoricalAxmlFile.Size = new System.Drawing.Size(113, 17);
-            this.chkHistoricalAxmlFile.TabIndex = 14;
-            this.chkHistoricalAxmlFile.Text = "Historical Axml File";
-            this.chkHistoricalAxmlFile.UseVisualStyleBackColor = true;
             // 
             // IndexDataForm
             // 

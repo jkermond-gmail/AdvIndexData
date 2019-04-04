@@ -158,7 +158,7 @@ namespace IndexDataEngineLibrary
                     {
                         ProcessVendorDatasetJobs(vendor, dataset, sProcessDate, out JobsTotal, out JobsProcessed);
                         VendorDatasetJobsUpdateProcessDate(vendor, dataset, sProcessDate);
-                        }
+                    }
                 }
 
             }
@@ -181,12 +181,25 @@ namespace IndexDataEngineLibrary
             FilesDownloaded = 0;
             bool isDownloaded = false;
             SqlCommand cmd = null;
+            string Dataset1 = "";
+            string Dataset2 = "";
             string logFuncName = "AreVendorDatasetFilesDownloaded: ";
 
 
+            if( Dataset.Equals("sp900"))
+            {
+                Dataset1 = "sp400";
+                Dataset2 = "sp500";
+            }
+            else
+            {
+                Dataset1 = Dataset;
+                Dataset2 = Dataset;
+            }
+
             string commandText = @"
                 select count(*) as FilesTotal from VIFs
-                where Vendor = @Vendor and DataSet = @Dataset and [Application] = 'IDX' and Active = 'Yes'
+                where Vendor = @Vendor and (DataSet = @Dataset1 or DataSet = @Dataset2)  and [Application] = 'IDX' and Active = 'Yes'
                 ";
             try
             {
@@ -198,8 +211,10 @@ namespace IndexDataEngineLibrary
 
                 cmd.Parameters.Add("@Vendor", SqlDbType.VarChar);
                 cmd.Parameters["@Vendor"].Value = Vendor;
-                cmd.Parameters.Add("@Dataset", SqlDbType.VarChar);
-                cmd.Parameters["@Dataset"].Value = Dataset;
+                cmd.Parameters.Add("@Dataset1", SqlDbType.VarChar);
+                cmd.Parameters["@Dataset1"].Value = Dataset1;
+                cmd.Parameters.Add("@Dataset2", SqlDbType.VarChar);
+                cmd.Parameters["@Dataset2"].Value = Dataset2;
 
                 SqlDataReader dr = null;
                 dr = cmd.ExecuteReader();
@@ -217,7 +232,7 @@ namespace IndexDataEngineLibrary
                     cmd.Parameters["@ProcessDate"].Value = sProcessDate;
                     cmd.CommandText = @"
                         select count(*) as FilesDownloaded from VIFs
-                        where Vendor = @Vendor and DataSet = @Dataset and LastProcessDate = @ProcessDate 
+                        where Vendor = @Vendor and (DataSet = @Dataset1 or DataSet = @Dataset2) and LastProcessDate = @ProcessDate 
                         and [Application] = 'IDX' and Active = 'Yes'
                         ";
                     dr = cmd.ExecuteReader();

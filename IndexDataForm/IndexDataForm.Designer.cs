@@ -230,7 +230,7 @@
             this.lnkEndDate.Size = new System.Drawing.Size(53, 13);
             this.lnkEndDate.TabIndex = 3;
             this.lnkEndDate.TabStop = true;
-            this.lnkEndDate.Text = "04/08/15";
+            this.lnkEndDate.Text = "10/12/18";
             this.lnkEndDate.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.lnkEndDate_LinkClicked);
             // 
             // lnkStartDate
@@ -241,7 +241,7 @@
             this.lnkStartDate.Size = new System.Drawing.Size(53, 13);
             this.lnkStartDate.TabIndex = 2;
             this.lnkStartDate.TabStop = true;
-            this.lnkStartDate.Text = "04/08/15";
+            this.lnkStartDate.Text = "10/09/18";
             this.lnkStartDate.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.lnkStartDate_LinkClicked);
             // 
             // lblEndDate

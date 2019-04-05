@@ -475,13 +475,20 @@ namespace IndexDataEngineLibrary
                             ProcessStatus.Update(oProcessDate, Vendors.Snp.ToString(), Dataset, "", ProcessStatus.WhichStatus.TotalReturnData, ProcessStatus.StatusValue.Pass);
                         }
 
-                        // Uncomment when 900 is resolved
-                        //FileName = FilePath + oProcessDate.ToString("yyyyMMdd") + "_SP900.SDL";
-                        //if (File.Exists(FileName) && (Dataset.Equals("All") || Dataset.Equals("sp600")))
-                        //{
-                        //    AddSnpTotalReturnData(FileName, oProcessDate);
-                        //    ProcessStatus.Update(oProcessDate, Vendors.Snp.ToString(), Dataset, "", ProcessStatus.WhichStatus.TotalReturnData, ProcessStatus.StatusValue.Pass);
-                        //}
+                       FileName = FilePath + oProcessDate.ToString("yyyyMMdd") + "_SP900.SDL";
+                        if (File.Exists(FileName) && (Dataset.Equals("All") || Dataset.Equals("sp900")))
+                        {
+                            AddSnpTotalReturnData(FileName, oProcessDate);
+                            ProcessStatus.Update(oProcessDate, Vendors.Snp.ToString(), Dataset, "", ProcessStatus.WhichStatus.TotalReturnData, ProcessStatus.StatusValue.Pass);
+                        }
+
+                        FileName = FilePath + oProcessDate.ToString("yyyyMMdd") + "_SP1000.SDL";
+                        if (File.Exists(FileName) && (Dataset.Equals("All") || Dataset.Equals("sp1000")))
+                        {
+                            AddSnpTotalReturnData(FileName, oProcessDate);
+                            ProcessStatus.Update(oProcessDate, Vendors.Snp.ToString(), Dataset, "", ProcessStatus.WhichStatus.TotalReturnData, ProcessStatus.StatusValue.Pass);
+                        }
+
 
                         FileName = FilePath + oProcessDate.ToString("yyyyMMdd") + "_SP1500.SDL";
                         if (File.Exists(FileName) && (Dataset.Equals("All") || Dataset.Equals("sp1500")))
@@ -1003,7 +1010,7 @@ namespace IndexDataEngineLibrary
                 IndexCodeList.Add("sp100");
                 SearchCodeList.Add("100TR");    // The Return for the S&P 100 is in the 500's .sdl file
             }
-            else if (IndexCode.Equals("sp1500"))
+            else if (IndexCode.Equals("sp1500") && isOldFormat.Equals(true))
             {
                 IndexCodeList.Add("sp900");
                 SearchCodeList.Add("900TR");    // The Return for the S&P 900 is in the 1500's .sdl file

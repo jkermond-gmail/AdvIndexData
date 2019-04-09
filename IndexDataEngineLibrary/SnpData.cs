@@ -293,13 +293,13 @@ namespace IndexDataEngineLibrary
                             ProcessStatus.Update(oProcessDate, Vendors.Snp.ToString(), Dataset, "", ProcessStatus.WhichStatus.OpenData, ProcessStatus.StatusValue.Pass);
                         }
 
-                        FileName = FilePath + oProcessDate.ToString("yyyyMMdd") + "_SP1000_ADJ.SDC";
+                        FileName = FilePath + oProcessDate.ToString("yyyyMMdd") + "_SP1000P_ADJ.SDC";
                         if (File.Exists(FileName) && (Dataset.Equals("All") || Dataset.Equals("sp1000")))
                         { 
                             AddSnpOpeningData(FileName, oProcessDate);
                             ProcessStatus.Update(oProcessDate, Vendors.Snp.ToString(), Dataset, "", ProcessStatus.WhichStatus.OpenData, ProcessStatus.StatusValue.Pass);
                         }
-                        FileName = FilePath + oProcessDate.ToString("yyyyMMdd") + "_SP1000_ADJ.SPC";
+                        FileName = FilePath + oProcessDate.ToString("yyyyMMdd") + "_SP1000P_ADJ.SPC";
                         if (File.Exists(FileName) && (Dataset.Equals("All") || Dataset.Equals("sp1000")))
                         {
                             AddSnpOpeningData(FileName, oProcessDate);
@@ -387,13 +387,13 @@ namespace IndexDataEngineLibrary
                             ProcessStatus.Update(oProcessDate, Vendors.Snp.ToString(), Dataset, "", ProcessStatus.WhichStatus.CloseData, ProcessStatus.StatusValue.Pass);
                         }
 
-                        FileName = FilePath + oProcessDate.ToString("yyyyMMdd") + "_SP1000_CLS.SDC";
+                        FileName = FilePath + oProcessDate.ToString("yyyyMMdd") + "_SP1000P_CLS.SDC";
                         if (File.Exists(FileName) && (Dataset.Equals("All") || Dataset.Equals("sp1000")))
                         {
                             AddSnpClosingData(FileName, oProcessDate);
                             ProcessStatus.Update(oProcessDate, Vendors.Snp.ToString(), Dataset, "", ProcessStatus.WhichStatus.CloseData, ProcessStatus.StatusValue.Pass);
                         }
-                        FileName = FilePath + oProcessDate.ToString("yyyyMMdd") + "_SP1000_CLS.SPC";
+                        FileName = FilePath + oProcessDate.ToString("yyyyMMdd") + "_SP1000P_CLS.SPC";
                         if (File.Exists(FileName) && (Dataset.Equals("All") || Dataset.Equals("sp1000")))
                         {
                             AddSnpClosingData(FileName, oProcessDate);

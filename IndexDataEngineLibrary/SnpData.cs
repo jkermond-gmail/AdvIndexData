@@ -520,6 +520,7 @@ namespace IndexDataEngineLibrary
             }
             catch
             {
+                LogHelper.WriteLine(sMsg + "Error Processing file " + FileName.ToString() + DateTime.Now);
             }
             finally
             {
@@ -592,11 +593,8 @@ namespace IndexDataEngineLibrary
                         file.WriteLine(TextLine);
                     }
                 }
-                else if (foundHeaderLine.Equals(true) && (TextLine.StartsWith("LINE COUNT").Equals(false)))
+                else if (foundHeaderLine.Equals(true) && (TextLine.StartsWith("\t").Equals(true)))                    
                     file.WriteLine(TextLine);
-
-                if (TextLine.StartsWith("LINE COUNT").Equals(true))
-                    ;
             }
 
             if (file.BaseStream != null)
@@ -605,11 +603,7 @@ namespace IndexDataEngineLibrary
                 file.Close();
                 NewFilename = filenameTemp;
             }
-
-
         }
-
-
 
         private void AddSnpOpeningData(string Filename, DateTime FileDate)
         {
@@ -680,9 +674,11 @@ namespace IndexDataEngineLibrary
             int CurrentRowCount = 0;
             int AddCount = 0;
             string sValue = "";
+            int i = 0;
 
             foreach (DataRow dr in dt.Rows)
             {
+                i += 1;
                 if (isOldFormat.Equals(false))
                 {
                     IndexnameParsed = ParseColumn(dr, "INDEX NAME");

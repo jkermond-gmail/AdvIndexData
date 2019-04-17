@@ -569,5 +569,47 @@ namespace IndexDataEngineLibrary
                 }
             }
         }
+
+        public void VendorDatasetJobsUpdateProcessDate(string Vendor, string Dataset, string sProcessDate)
+        {
+            SqlCommand cmd = null;
+            string logFuncName = "VendorDatasetJobsUpdateProcessDate: ";
+
+            string commandText = @"
+                update Jobs set LastProcessDate = @ProcessDate
+                WHERE  Vendor = @Vendor and DataSet = @Dataset and JobType = 'Vendor' and Active = 'Yes'
+                ";
+            try
+            {
+                if (mSqlConn == null)
+                {
+                    mSqlConn = new SqlConnection(mConnectionStringIndexData);
+                    mSqlConn.Open();
+                }
+
+                cmd = new SqlCommand
+                {
+                    Connection = mSqlConn,
+                    CommandText = commandText
+                };
+
+                cmd.Parameters.Add("@Vendor", SqlDbType.VarChar);
+                cmd.Parameters["@Vendor"].Value = Vendor;
+                cmd.Parameters.Add("@Dataset", SqlDbType.VarChar);
+                cmd.Parameters["@Dataset"].Value = Dataset;
+                cmd.Parameters.Add("@ProcessDate", SqlDbType.Date);
+                cmd.Parameters["@ProcessDate"].Value = sProcessDate;
+
+                cmd.ExecuteNonQuery();
+            }
+            catch (SqlException ex)
+            {
+                LogHelper.WriteLine(logFuncName + " " + ex.Message);
+            }
+            finally
+            {
+                LogHelper.WriteLine(logFuncName + " done ");
+            }
+        }
     }
 }

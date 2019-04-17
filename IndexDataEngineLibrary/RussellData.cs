@@ -189,6 +189,7 @@ namespace IndexDataEngineLibrary
                         ProcessStatus.Update(sProcessDate, Vendors.Russell.ToString(), Dataset, IndexName, ProcessStatus.WhichStatus.AxmlSectorData, ProcessStatus.StatusValue.Pass);
                     }
                 }
+                sharedData.VendorDatasetJobsUpdateProcessDate(Vendors.Russell.ToString(), Dataset, sProcessDate);
             }
             catch (SqlException ex)
             {

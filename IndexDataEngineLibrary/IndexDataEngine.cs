@@ -61,7 +61,8 @@ namespace IndexDataEngineLibrary
             ProcessIndexDataWork(sVifsProcessDate);
 
             if (testing)
-            {
+            {                
+                ProcessIndexDataWork(sVifsProcessDate); // A second call will make sure the sp 900, 1000, and 1500 are complete
                 string sToday = DateTime.Now.ToString("MM/dd/yyyy");
                 if (sVifsProcessDate.Equals(sToday)) // JK to do change
                 {
@@ -157,7 +158,6 @@ namespace IndexDataEngineLibrary
                     else
                     {
                         ProcessVendorDatasetJobs(vendor, dataset, sProcessDate, out JobsTotal, out JobsProcessed);
-                        VendorDatasetJobsUpdateProcessDate(vendor, dataset, sProcessDate);
                     }
                 }
 
@@ -183,6 +183,7 @@ namespace IndexDataEngineLibrary
             SqlCommand cmd = null;
             string Dataset1 = "";
             string Dataset2 = "";
+            string Dataset3 = "";
             string logFuncName = "AreVendorDatasetFilesDownloaded: ";
 
 
@@ -190,16 +191,31 @@ namespace IndexDataEngineLibrary
             {
                 Dataset1 = "sp400";
                 Dataset2 = "sp500";
+                Dataset2 = "sp500";
+            }
+            else if( Dataset.Equals("sp1000"))
+            {
+                Dataset1 = "sp400";
+                Dataset2 = "sp600";
+                Dataset2 = "sp600";
+            }
+            else if( Dataset.Equals("sp1500"))
+            {
+                Dataset1 = "sp400";
+                Dataset2 = "sp500";
+                Dataset2 = "sp600";
             }
             else
             {
                 Dataset1 = Dataset;
                 Dataset2 = Dataset;
+                Dataset3 = Dataset;
             }
 
             string commandText = @"
                 select count(*) as FilesTotal from VIFs
-                where Vendor = @Vendor and (DataSet = @Dataset1 or DataSet = @Dataset2)  and [Application] = 'IDX' and Active = 'Yes'
+                where Vendor = @Vendor and (DataSet = @Dataset1 or DataSet = @Dataset2 or DataSet = @Dataset3)  
+                and [Application] = 'IDX' and Active = 'Yes'
                 ";
             try
             {
@@ -215,6 +231,8 @@ namespace IndexDataEngineLibrary
                 cmd.Parameters["@Dataset1"].Value = Dataset1;
                 cmd.Parameters.Add("@Dataset2", SqlDbType.VarChar);
                 cmd.Parameters["@Dataset2"].Value = Dataset2;
+                cmd.Parameters.Add("@Dataset3", SqlDbType.VarChar);
+                cmd.Parameters["@Dataset3"].Value = Dataset3;
 
                 SqlDataReader dr = null;
                 dr = cmd.ExecuteReader();
@@ -232,7 +250,8 @@ namespace IndexDataEngineLibrary
                     cmd.Parameters["@ProcessDate"].Value = sProcessDate;
                     cmd.CommandText = @"
                         select count(*) as FilesDownloaded from VIFs
-                        where Vendor = @Vendor and (DataSet = @Dataset1 or DataSet = @Dataset2) and LastProcessDate = @ProcessDate 
+                        where Vendor = @Vendor and (DataSet = @Dataset1 or DataSet = @Dataset2 or DataSet = @Dataset3) 
+                        and LastProcessDate = @ProcessDate 
                         and [Application] = 'IDX' and Active = 'Yes'
                         ";
                     dr = cmd.ExecuteReader();
@@ -268,30 +287,77 @@ namespace IndexDataEngineLibrary
                 Update VIFs set LastProcessDate = @LastProcessDate
                 where Vendor = @Vendor and DataSet = @Dataset and [Application] = 'IDX' and Active = 'Yes'
                 ";
-            try
-            {
-                cmd = new SqlCommand
-                {
-                    Connection = cnSqlAmdVifs,
-                    CommandText = commandText
-                };
 
-                cmd.Parameters.Add("@Vendor", SqlDbType.VarChar);
-                cmd.Parameters["@Vendor"].Value = Vendor;
-                cmd.Parameters.Add("@Dataset", SqlDbType.VarChar);
-                cmd.Parameters["@Dataset"].Value = Dataset;
-                cmd.Parameters.Add("@LastProcessDate", SqlDbType.Date);
-                cmd.Parameters["@LastProcessDate"].Value = sProcessDate;
-                cmd.ExecuteNonQuery();
-            }
-            catch (SqlException ex)
+            List<string> dataSets = new List<string>();
+
+            if( Dataset.Equals("sp900"))
             {
-                LogHelper.WriteLine(logFuncName + " " + ex.Message);
+                dataSets.Add("sp400");
+                dataSets.Add("sp500");
             }
-            finally
+            else if( Dataset.Equals("sp1000"))
             {
-                LogHelper.WriteLine(logFuncName + " done ");
+                dataSets.Add("sp400");
+                dataSets.Add("sp600");
             }
+            else if (Dataset.Equals("sp1500"))
+            {
+                dataSets.Add("sp400");
+                dataSets.Add("sp500");
+                dataSets.Add("sp600");
+            }
+            else
+            {
+                dataSets.Add(Dataset);
+            }
+
+
+            foreach (string dataSet in dataSets)
+            {
+                try
+                {
+                    cmd = new SqlCommand
+                    {
+                        Connection = cnSqlAmdVifs,
+                        CommandText = commandText
+                    };
+
+                    cmd.Parameters.Add("@Vendor", SqlDbType.VarChar);
+                    cmd.Parameters["@Vendor"].Value = Vendor;
+                    cmd.Parameters.Add("@Dataset", SqlDbType.VarChar);
+                    cmd.Parameters["@Dataset"].Value = dataSet;
+                    cmd.Parameters.Add("@LastProcessDate", SqlDbType.Date);
+                    cmd.Parameters["@LastProcessDate"].Value = sProcessDate;
+                    cmd.ExecuteNonQuery();
+                }
+                catch (SqlException ex)
+                {
+                    LogHelper.WriteLine(logFuncName + " " + ex.Message);
+                }
+                finally
+                {
+                    LogHelper.WriteLine(logFuncName + " done ");
+                }
+            }
+        }
+
+        private void ProcessVendorDatasetJobs(string Vendor, string Dataset, string sProcessDate, out int JobsTotal, out int JobsProcessed)
+        {
+            JobsTotal = 0;
+            JobsProcessed = 0;
+
+            if (Vendor.Equals("Russell"))
+            {
+                RussellData russellData = new RussellData();
+                russellData.ProcessVendorDatasetJobs(Dataset, sProcessDate);
+            }
+            else if (Vendor.Equals("StandardAndPoors"))
+            {
+
+                SnpData snpData = new SnpData();
+                snpData.ProcessVendorDatasetJobs(Dataset, sProcessDate);
+            }
+            VendorDatasetJobsProcessed(Vendor, Dataset, sProcessDate, out JobsTotal, out JobsProcessed);
         }
 
 
@@ -363,61 +429,6 @@ namespace IndexDataEngineLibrary
             }
 
             return (Processed);
-        }
-
-        private void VendorDatasetJobsUpdateProcessDate(string Vendor, string Dataset, string sProcessDate)
-        {
-            SqlCommand cmd = null;
-            string logFuncName = "VendorDatasetJobsUpdateProcessDate: ";
-
-
-            string commandText = @"
-                update Jobs set LastProcessDate = @ProcessDate
-                WHERE  Vendor = @Vendor and DataSet = @Dataset and JobType = 'Vendor' and Active = 'Yes'
-                ";
-            try
-            {
-                cmd = new SqlCommand
-                {
-                    Connection = cnSqlIndexData,
-                    CommandText = commandText
-                };
-
-                cmd.Parameters.Add("@Vendor", SqlDbType.VarChar);
-                cmd.Parameters["@Vendor"].Value = Vendor;
-                cmd.Parameters.Add("@Dataset", SqlDbType.VarChar);
-                cmd.Parameters["@Dataset"].Value = Dataset;
-                cmd.Parameters.Add("@ProcessDate", SqlDbType.Date);
-                cmd.Parameters["@ProcessDate"].Value = sProcessDate;
-
-                cmd.ExecuteNonQuery();
-            }
-            catch (SqlException ex)
-            {
-                LogHelper.WriteLine(logFuncName + " " + ex.Message);
-            }
-            finally
-            {
-                LogHelper.WriteLine(logFuncName + " done ");
-            }
-        }
-
-        private void ProcessVendorDatasetJobs(string Vendor, string Dataset, string sProcessDate, out int JobsTotal, out int JobsProcessed)
-        {
-            JobsTotal = 0;
-            JobsProcessed = 0;
-
-            if (Vendor.Equals("Russell"))
-            {
-                RussellData russellData = new RussellData();
-                russellData.ProcessVendorDatasetJobs(Dataset, sProcessDate);
-            }
-            else if (Vendor.Equals("StandardAndPoors"))
-            {
-
-                SnpData snpData = new SnpData();
-                snpData.ProcessVendorDatasetJobs(Dataset, sProcessDate);
-            }
         }
 
 

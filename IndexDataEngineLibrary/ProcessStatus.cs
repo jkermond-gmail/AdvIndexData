@@ -170,14 +170,50 @@ namespace IndexDataEngineLibrary
             bool GenerateReturns = false;
             if (UseProcessStatus)
             {
-                try
-                {
-                    if (mSqlConn == null)
-                    {
-                        OpenSqlConn();
-                    }
+                List<string> dataSets = new List<string>();
+                List<string> indexNames = new List<string>();
 
-                    string Sql = @"
+
+                if (Dataset.Equals("sp900"))
+                {
+                    dataSets.Add("sp400");
+                    dataSets.Add("sp500");
+                    indexNames.Add("sp400");
+                    indexNames.Add("sp500");
+                }
+                else if (Dataset.Equals("sp1000"))
+                {
+                    dataSets.Add("sp400");
+                    dataSets.Add("sp600");
+                    indexNames.Add("sp400");
+                    indexNames.Add("sp600");
+                }
+                else if (Dataset.Equals("sp1500"))
+                {
+                    dataSets.Add("sp400");
+                    dataSets.Add("sp500");
+                    dataSets.Add("sp600");
+                    indexNames.Add("sp400");
+                    indexNames.Add("sp500");
+                    indexNames.Add("sp600");
+                }
+                else
+                {
+                    dataSets.Add(Dataset);
+                    indexNames.Add(IndexName);
+                }
+
+                int i = 0;
+                foreach (string dataSet in dataSets)
+                {
+                    try
+                    {
+                        if (mSqlConn == null)
+                        {
+                            OpenSqlConn();
+                        }
+
+                        string Sql = @"
                         select * from ProcessStatus
                         where ProcessDate = @ProcessDate 
                         and Vendor = @Vendor
@@ -185,48 +221,52 @@ namespace IndexDataEngineLibrary
                         and IndexName = @IndexName 
                         ";
 
-                    SqlCommand cmd = new SqlCommand(Sql, mSqlConn);
-                    cmd.Parameters.Add("@ProcessDate", SqlDbType.DateTime);
-                    cmd.Parameters.Add("@Vendor", SqlDbType.VarChar);
-                    cmd.Parameters.Add("@Dataset", SqlDbType.VarChar);
-                    cmd.Parameters.Add("@IndexName", SqlDbType.VarChar);
-                    cmd.Parameters["@ProcessDate"].Value = sProcessDate;
-                    cmd.Parameters["@Vendor"].Value = Vendor;
-                    cmd.Parameters["@Dataset"].Value = Dataset;
-                    cmd.Parameters["@IndexName"].Value = IndexName;
-                    SqlDataReader dr = cmd.ExecuteReader();
-                    if (dr.HasRows)
-                    {
-                        if (dr.Read())
+                        SqlCommand cmd = new SqlCommand(Sql, mSqlConn);
+                        cmd.Parameters.Add("@ProcessDate", SqlDbType.DateTime);
+                        cmd.Parameters.Add("@Vendor", SqlDbType.VarChar);
+                        cmd.Parameters.Add("@Dataset", SqlDbType.VarChar);
+                        cmd.Parameters.Add("@IndexName", SqlDbType.VarChar);
+                        cmd.Parameters["@ProcessDate"].Value = sProcessDate;
+                        cmd.Parameters["@Vendor"].Value = Vendor;
+                        cmd.Parameters["@Dataset"].Value = dataSet;
+                        cmd.Parameters["@IndexName"].Value = indexNames[i];
+                        SqlDataReader dr = cmd.ExecuteReader();
+                        if (dr.HasRows)
                         {
-                            bool bOpenData = dr["OpenData"].ToString().Equals("P");
-                            bool bCloseData = dr["CloseData"].ToString().Equals("P");
-                            bool bTotalReturnData = dr["TotalReturnData"].ToString().Equals("P");
-                            // JK:ToDo bool bSecurityMasterData = dr["SecurityMasterData"].ToString().Equals("P");
-                            bool bSymbolChangeData = dr["SymbolChangeData"].ToString().Equals("P");
-                            if (Vendor.Equals(Vendors.Russell.ToString()))
+                            if (dr.Read())
                             {
-                                GenerateReturns = (bOpenData.Equals(true) && bCloseData.Equals(true)
-                                                   && bTotalReturnData.Equals(true) && bSymbolChangeData.Equals(true));
-                            }
-                            else if (Vendor.Equals(Vendors.Snp.ToString()))
-                            {
-                                GenerateReturns = (bOpenData.Equals(true) && bCloseData.Equals(true));
+                                bool bOpenData = dr["OpenData"].ToString().Equals("P");
+                                bool bCloseData = dr["CloseData"].ToString().Equals("P");
+                                bool bTotalReturnData = dr["TotalReturnData"].ToString().Equals("P");
+                                // JK:ToDo bool bSecurityMasterData = dr["SecurityMasterData"].ToString().Equals("P");
+                                bool bSymbolChangeData = dr["SymbolChangeData"].ToString().Equals("P");
+                                if (Vendor.Equals(Vendors.Russell.ToString()))
+                                {
+                                    GenerateReturns = (bOpenData.Equals(true) && bCloseData.Equals(true)
+                                                       && bTotalReturnData.Equals(true) && bSymbolChangeData.Equals(true));
+                                }
+                                else if (Vendor.Equals(Vendors.Snp.ToString()))
+                                {
+                                    GenerateReturns = (bOpenData.Equals(true) && bCloseData.Equals(true));
+                                }
                             }
                         }
-                    }
-                    dr.Close();
+                        dr.Close();
 
-                }
-                catch (SqlException ex)
-                {
-                    if (ex.Number == 2627)
-                    {
-                        Console.WriteLine(ex.Message);
                     }
-                }
-                finally
-                {
+                    catch (SqlException ex)
+                    {
+                        if (ex.Number == 2627)
+                        {
+                            Console.WriteLine(ex.Message);
+                        }
+                    }
+                    finally
+                    {
+                    }
+                    if (GenerateReturns.Equals(false))
+                        break;
+                    i += 1;
                 }
             }
             return (GenerateReturns);

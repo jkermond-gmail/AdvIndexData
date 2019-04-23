@@ -232,10 +232,6 @@ namespace IndexDataEngineLibrary
 
             try
             {
-                //FileName = FilePath + oStartDate.ToString("yyyyMMdd") + "_SP400_ADJ.SDC";
-                //if (File.Exists(FileName))
-                //    AddSnpOpeningData(FileName, oStartDate);
-
                 for (oProcessDate = oStartDate
                    ; (DateCompare = oProcessDate.CompareTo(oEndDate)) <= 0
                    ; oProcessDate = oProcessDate.AddDays(1))
@@ -293,19 +289,6 @@ namespace IndexDataEngineLibrary
                             AddSnpOpeningData(FileName, oProcessDate);
                             ProcessStatus.Update(oProcessDate, Vendors.Snp.ToString(), Dataset, "", ProcessStatus.WhichStatus.OpenData, ProcessStatus.StatusValue.Pass);
                         }
-
-                        //FileName = FilePath + oProcessDate.ToString("yyyyMMdd") + "_SP1500_ADJ.SDC";
-                        //if (File.Exists(FileName) && (Dataset.Equals("All") || Dataset.Equals("sp1500")))
-                        //{ 
-                        //    AddSnpOpeningData(FileName, oProcessDate);
-                        //    ProcessStatus.Update(oProcessDate, Vendors.Snp.ToString(), Dataset, "", ProcessStatus.WhichStatus.OpenData, ProcessStatus.StatusValue.Pass);
-                        //}
-                        //FileName = FilePath + oProcessDate.ToString("yyyyMMdd") + "_SP1500_ADJ.SPC";
-                        //if (File.Exists(FileName) && (Dataset.Equals("All") || Dataset.Equals("sp1500")))
-                        //{
-                        //    AddSnpOpeningData(FileName, oProcessDate);
-                        //    ProcessStatus.Update(oProcessDate, Vendors.Snp.ToString(), Dataset, "", ProcessStatus.WhichStatus.OpenData, ProcessStatus.StatusValue.Pass);
-                        //}
 
                         FileName = FilePath + oProcessDate.ToString("yyyyMMdd") + "_SPMLP_ADJ.SDC";
                         if (File.Exists(FileName) && (Dataset.Equals("All") || Dataset.Equals("spMLP")))
@@ -374,19 +357,6 @@ namespace IndexDataEngineLibrary
                             AddSnpClosingData(FileName, oProcessDate);
                             ProcessStatus.Update(oProcessDate, Vendors.Snp.ToString(), Dataset, "", ProcessStatus.WhichStatus.CloseData, ProcessStatus.StatusValue.Pass);
                         }
-
-                        //FileName = FilePath + oProcessDate.ToString("yyyyMMdd") + "_SP1500_CLS.SDC";
-                        //if (File.Exists(FileName) && (Dataset.Equals("All") || Dataset.Equals("sp1500")))
-                        //{
-                        //    AddSnpClosingData(FileName, oProcessDate);
-                        //    ProcessStatus.Update(oProcessDate, Vendors.Snp.ToString(), Dataset, "", ProcessStatus.WhichStatus.CloseData, ProcessStatus.StatusValue.Pass);
-                        //}
-                        //FileName = FilePath + oProcessDate.ToString("yyyyMMdd") + "_SP1500_CLS.SPC";
-                        //if (File.Exists(FileName) && (Dataset.Equals("All") || Dataset.Equals("sp1500")))
-                        //{
-                        //    AddSnpClosingData(FileName, oProcessDate);
-                        //    ProcessStatus.Update(oProcessDate, Vendors.Snp.ToString(), Dataset, "", ProcessStatus.WhichStatus.CloseData, ProcessStatus.StatusValue.Pass);
-                        //}
 
                         FileName = FilePath + oProcessDate.ToString("yyyyMMdd") + "_SPMLP_CLS.SDC";
                         if (File.Exists(FileName) && (Dataset.Equals("All") || Dataset.Equals("spMLP")))

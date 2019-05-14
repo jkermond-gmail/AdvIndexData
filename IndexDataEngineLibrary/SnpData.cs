@@ -25,7 +25,6 @@ namespace IndexDataEngineLibrary
         private const string NumberFormat = "0.#########";
         private CultureInfo mCultureInfo = new CultureInfo("en-US");
 
-
         private List<IndexRow> indexRowsTickerSort = new List<IndexRow>();
         private List<IndexRow> indexRowsIndustrySort = new List<IndexRow>();
         private List<IndexRow> indexRowsSectorLevel1RollUp = new List<IndexRow>();
@@ -252,39 +251,39 @@ namespace IndexDataEngineLibrary
                         }
 
                         FileName = FilePath + oProcessDate.ToString("yyyyMMdd") + "_SP400_ADJ.SDC";
-                        if (File.Exists(FileName) && (Dataset.Equals("All") || Dataset.Equals("sp400") /*|| Dataset.Equals("sp900") || Dataset.Equals("sp1000") */))
+                        if (File.Exists(FileName) && (Dataset.Equals("All") || Dataset.Equals("sp400")))
                         { 
                             AddSnpOpeningData(FileName, oProcessDate);
                             ProcessStatus.Update(oProcessDate, Vendors.Snp.ToString(), Dataset, "", ProcessStatus.WhichStatus.OpenData, ProcessStatus.StatusValue.Pass);
                         }
                         FileName = FilePath + oProcessDate.ToString("yyyyMMdd") + "_SP400_ADJ.SPC";
-                        if (File.Exists(FileName) && (Dataset.Equals("All") || Dataset.Equals("sp400") /*|| Dataset.Equals("sp900") || Dataset.Equals("sp1000") */))
+                        if (File.Exists(FileName) && (Dataset.Equals("All") || Dataset.Equals("sp400")))
                         {
                             AddSnpOpeningData(FileName, oProcessDate);
                             ProcessStatus.Update(oProcessDate, Vendors.Snp.ToString(), Dataset, "", ProcessStatus.WhichStatus.OpenData, ProcessStatus.StatusValue.Pass);
                         }
 
                         FileName = FilePath + oProcessDate.ToString("yyyyMMdd") + "_SP500_ADJ.SDC";
-                        if (File.Exists(FileName) && (Dataset.Equals("All") || Dataset.Equals("sp500") /*|| Dataset.Equals("sp900") */))
+                        if (File.Exists(FileName) && (Dataset.Equals("All") || Dataset.Equals("sp500")))
                         { 
                             AddSnpOpeningData(FileName, oProcessDate);
                             ProcessStatus.Update(oProcessDate, Vendors.Snp.ToString(), Dataset, "", ProcessStatus.WhichStatus.OpenData, ProcessStatus.StatusValue.Pass);
                         }
                         FileName = FilePath + oProcessDate.ToString("yyyyMMdd") + "_SP500_ADJ.SPC";
-                        if (File.Exists(FileName) && (Dataset.Equals("All") || Dataset.Equals("sp500") /*|| Dataset.Equals("sp900") */))
+                        if (File.Exists(FileName) && (Dataset.Equals("All") || Dataset.Equals("sp500")))
                         {
                             AddSnpOpeningData(FileName, oProcessDate);
                             ProcessStatus.Update(oProcessDate, Vendors.Snp.ToString(), Dataset, "", ProcessStatus.WhichStatus.OpenData, ProcessStatus.StatusValue.Pass);
                         }
 
                         FileName = FilePath + oProcessDate.ToString("yyyyMMdd") + "_SP600_ADJ.SDC";
-                        if (File.Exists(FileName) && (Dataset.Equals("All") || Dataset.Equals("sp600") /*|| Dataset.Equals("sp1000")*/))
+                        if (File.Exists(FileName) && (Dataset.Equals("All") || Dataset.Equals("sp600")))
                         { 
                             AddSnpOpeningData(FileName, oProcessDate);
                             ProcessStatus.Update(oProcessDate, Vendors.Snp.ToString(), Dataset, "", ProcessStatus.WhichStatus.OpenData, ProcessStatus.StatusValue.Pass);
                         }
                         FileName = FilePath + oProcessDate.ToString("yyyyMMdd") + "_SP600_ADJ.SPC";
-                        if (File.Exists(FileName) && (Dataset.Equals("All") || Dataset.Equals("sp600") /*|| Dataset.Equals("sp1000") */))
+                        if (File.Exists(FileName) && (Dataset.Equals("All") || Dataset.Equals("sp600")))
                         {
                             AddSnpOpeningData(FileName, oProcessDate);
                             ProcessStatus.Update(oProcessDate, Vendors.Snp.ToString(), Dataset, "", ProcessStatus.WhichStatus.OpenData, ProcessStatus.StatusValue.Pass);
@@ -320,39 +319,39 @@ namespace IndexDataEngineLibrary
                         }
 
                         FileName = FilePath + oProcessDate.ToString("yyyyMMdd") + "_SP400_CLS.SDC";
-                        if (File.Exists(FileName) && (Dataset.Equals("All") || Dataset.Equals("sp400") /*|| Dataset.Equals("sp900") || Dataset.Equals("sp1000")*/))
+                        if (File.Exists(FileName) && (Dataset.Equals("All") || Dataset.Equals("sp400")))
                         {
                             AddSnpClosingData(FileName, oProcessDate);
                             ProcessStatus.Update(oProcessDate, Vendors.Snp.ToString(), Dataset, "", ProcessStatus.WhichStatus.CloseData, ProcessStatus.StatusValue.Pass);
                         }
                         FileName = FilePath + oProcessDate.ToString("yyyyMMdd") + "_SP400_CLS.SPC";
-                        if (File.Exists(FileName) && (Dataset.Equals("All") || Dataset.Equals("sp400") /*|| Dataset.Equals("sp900") || Dataset.Equals("sp1000")*/))
+                        if (File.Exists(FileName) && (Dataset.Equals("All") || Dataset.Equals("sp400")))
                         {
                             AddSnpClosingData(FileName, oProcessDate);
                             ProcessStatus.Update(oProcessDate, Vendors.Snp.ToString(), Dataset, "", ProcessStatus.WhichStatus.CloseData, ProcessStatus.StatusValue.Pass);
                         }
 
                         FileName = FilePath + oProcessDate.ToString("yyyyMMdd") + "_SP500_CLS.SDC";
-                        if (File.Exists(FileName) && (Dataset.Equals("All") || Dataset.Equals("sp500") /*|| Dataset.Equals("sp900")*/))
+                        if (File.Exists(FileName) && (Dataset.Equals("All") || Dataset.Equals("sp500")))
                         {
                             AddSnpClosingData(FileName, oProcessDate);
                             ProcessStatus.Update(oProcessDate, Vendors.Snp.ToString(), Dataset, "", ProcessStatus.WhichStatus.CloseData, ProcessStatus.StatusValue.Pass);
                         }
                         FileName = FilePath + oProcessDate.ToString("yyyyMMdd") + "_SP500_CLS.SPC";
-                        if (File.Exists(FileName) && (Dataset.Equals("All") || Dataset.Equals("sp500") /*|| Dataset.Equals("sp900")*/))
+                        if (File.Exists(FileName) && (Dataset.Equals("All") || Dataset.Equals("sp500")))
                         {
                             AddSnpClosingData(FileName, oProcessDate);
                             ProcessStatus.Update(oProcessDate, Vendors.Snp.ToString(), Dataset, "", ProcessStatus.WhichStatus.OpenData, ProcessStatus.StatusValue.Pass);
                         }
 
                         FileName = FilePath + oProcessDate.ToString("yyyyMMdd") + "_SP600_CLS.SDC";
-                        if (File.Exists(FileName) && (Dataset.Equals("All") || Dataset.Equals("sp600") /*|| Dataset.Equals("sp1000")*/))
+                        if (File.Exists(FileName) && (Dataset.Equals("All") || Dataset.Equals("sp600")))
                         {
                             AddSnpClosingData(FileName, oProcessDate);
                             ProcessStatus.Update(oProcessDate, Vendors.Snp.ToString(), Dataset, "", ProcessStatus.WhichStatus.CloseData, ProcessStatus.StatusValue.Pass);
                         }
                         FileName = FilePath + oProcessDate.ToString("yyyyMMdd") + "_SP600_CLS.SPC";
-                        if (File.Exists(FileName) && (Dataset.Equals("All") || Dataset.Equals("sp600") /*|| Dataset.Equals("sp1000")*/))
+                        if (File.Exists(FileName) && (Dataset.Equals("All") || Dataset.Equals("sp600")))
                         {
                             AddSnpClosingData(FileName, oProcessDate);
                             ProcessStatus.Update(oProcessDate, Vendors.Snp.ToString(), Dataset, "", ProcessStatus.WhichStatus.CloseData, ProcessStatus.StatusValue.Pass);

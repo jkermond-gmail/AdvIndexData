@@ -72,6 +72,136 @@ namespace IndexDataEngineLibrary
             mConnectionStringAmdVifs = ConfigurationManager.ConnectionStrings["dbConnectionAmdVifs"].ConnectionString;
         }
 
+        public void AddSecurityMasterFull(string Ticker, string Cusip, string Vendor, string CompanyName, string SectorCode, DateTime EndDate)
+        {
+            AddSecurityMasterFull("", Ticker, Cusip, Vendor, CompanyName, SectorCode, EndDate);
+        }
+
+
+        public void AddSecurityMasterFull(string StockKey, string Ticker, string Cusip, string Vendor, string CompanyName, string SectorCode, DateTime EndDate)
+        {
+            try
+            {
+                if (mSqlConn == null)
+                {
+                    mSqlConn = new SqlConnection(ConnectionStringIndexData);
+                    mSqlConn.Open();
+                }
+                CultureInfo enUS = new CultureInfo("en-US");
+
+                string SqlSelect = @"
+                    select count(*) from HistoricalSecurityMasterFull
+                    where Ticker = @Ticker
+                    and Cusip = @Cusip
+                    and Vendor = @Vendor
+                    ";
+                SqlCommand cmd = new SqlCommand(SqlSelect, mSqlConn);
+                cmd.Parameters.Add("@Ticker", SqlDbType.VarChar);
+                cmd.Parameters.Add("@Cusip", SqlDbType.VarChar);
+                cmd.Parameters.Add("@Vendor", SqlDbType.VarChar);
+                cmd.Parameters["@Ticker"].Value = Ticker;
+                cmd.Parameters["@Cusip"].Value = Cusip;
+                cmd.Parameters["@Vendor"].Value = Vendor;
+                int iCount = (int)cmd.ExecuteScalar();
+
+                if (iCount == 0)
+                {
+                    cmd.Parameters.Add("@BeginDate", SqlDbType.DateTime);
+                    cmd.Parameters["@BeginDate"].Value = EndDate;
+                    cmd.CommandText =
+                        "insert into HistoricalSecurityMasterFull (Ticker, Cusip, StockKey, Vendor, CompanyName, SectorCode, BeginDate, EndDate) " +
+                        "Values ( @Ticker, @Cusip, @StockKey, @Vendor, @CompanyName, @SectorCode, @BeginDate, @EndDate ) ";
+                }
+                else
+                {
+                    cmd.CommandText =
+                        "update HistoricalSecurityMasterFull  set " +
+                        "StockKey = @StockKey" +
+                        "CompanyName = @CompanyName, " +
+                        "SectorCode = @SectorCode, " +
+                        "EndDate = @EndDate " +
+                        "where Ticker = @Ticker and Cusip = @Cusip and Vendor = @Vendor";
+                }
+                cmd.Parameters.Add("@StockKey", SqlDbType.VarChar);
+                cmd.Parameters["@StockKey"].Value = StockKey;
+                cmd.Parameters.Add("@CompanyName", SqlDbType.VarChar);
+                cmd.Parameters["@CompanyName"].Value = CompanyName;
+                cmd.Parameters.Add("@SectorCode", SqlDbType.VarChar);
+                cmd.Parameters["@SectorCode"].Value = SectorCode;
+                cmd.Parameters.Add("@EndDate", SqlDbType.DateTime);
+                cmd.Parameters["@EndDate"].Value = EndDate;
+                cmd.ExecuteNonQuery();
+            }
+            catch (SqlException ex)
+            {
+                if (ex.Number == 2627)
+                {
+                    Console.WriteLine(ex.Message);
+                }
+            }
+            finally
+            {
+            }
+        }
+
+        public void AddSymbolChange(string sVendor, DateTime oChangeDate, string sOldSymbol, string sNewSymbol, string sCompanyName)
+        {
+            /*
+            CREATE TABLE [dbo].[HistoricalSymbolChanges](
+                [ChangeDate] [datetime] NOT NULL,
+                [OldSymbol] [varchar](10) NOT NULL,
+                [NewSymbol] [varchar](10) NOT NULL,
+                [CompanyName] [varchar](30) NULL
+            ) ON [PRIMARY]
+            */
+            try
+            {
+                if (mSqlConn == null)
+                {
+                    mSqlConn = new SqlConnection(ConnectionStringIndexData);
+                    mSqlConn.Open();
+                }
+                string SqlSelect = @"
+                    select count(*) from HistoricalSymbolChanges
+                    where ChangeDate = @ChangeDate 
+                    and Vendor = @Vendor
+                    and OldSymbol = @OldSymbol 
+                    and NewSymbol = @NewSymbol 
+                    ";
+                SqlCommand cmd = new SqlCommand(SqlSelect, mSqlConn);
+                cmd.Parameters.Add("@ChangeDate", SqlDbType.DateTime);
+                cmd.Parameters.Add("@Vendor", SqlDbType.VarChar);
+                cmd.Parameters.Add("@OldSymbol", SqlDbType.VarChar);
+                cmd.Parameters.Add("@NewSymbol", SqlDbType.VarChar);
+                cmd.Parameters["@ChangeDate"].Value = oChangeDate;
+                cmd.Parameters["@Vendor"].Value = sVendor;
+                cmd.Parameters["@OldSymbol"].Value = sOldSymbol;
+                cmd.Parameters["@NewSymbol"].Value = sNewSymbol;
+                int iCount = (int)cmd.ExecuteScalar();
+
+                if (iCount == 0)
+                {
+                    cmd.CommandText =
+                        "insert into HistoricalSymbolChanges (ChangeDate, Vendor, OldSymbol, NewSymbol, CompanyName) " +
+                        "Values (@ChangeDate, @Vendor, @OldSymbol, @NewSymbol, @CompanyName)";
+                    cmd.Parameters.Add("@CompanyName", SqlDbType.VarChar);
+                    cmd.Parameters["@CompanyName"].Value = sCompanyName;
+                    cmd.ExecuteNonQuery();
+                }
+            }
+            catch (SqlException ex)
+            {
+                if (ex.Number == 2627)
+                {
+                    Console.WriteLine(ex.Message);
+                }
+            }
+            finally
+            {
+            }
+        }
+
+
 
         public string[] GetIndices()
         {

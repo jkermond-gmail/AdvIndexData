@@ -545,7 +545,7 @@ namespace IndexDataEngineLibrary
                     sOldSymbol = GetField(TextLine, 10, 8);
                     sNewSymbol = GetField(TextLine, 28, 8);
                     sCompanyName = GetField(TextLine, 45, TextLine.Length - 45 + 1 );
-                    AddRussellSymbolChange( oDate, sOldSymbol, sNewSymbol, sCompanyName);
+                    sharedData.AddSymbolChange( "R", oDate, sOldSymbol, sNewSymbol, sCompanyName);
                 }
             }
             srFile.Close();
@@ -758,7 +758,7 @@ RU3000    20170103   CHF   1662.25918   1365.02441   1696.48181   1567.99955    
 
                     if (ok)
                     {
-                    AddSecurityMasterFull(sTicker, sCUSIP, "R", sCompanyName, sSector, oDate);
+                    sharedData.AddSecurityMasterFull(sTicker, sCUSIP, "R", sCompanyName, sSector, oDate);
 
                         if (r1000.Equals("Y"))
                         {
@@ -1289,95 +1289,6 @@ RU3000    20170103   CHF   1662.25918   1365.02441   1696.48181   1567.99955    
         #endregion End Get Security Return
 
         #region Security Master
-        public void AddSecurityMasterFull(string Ticker, string Cusip, string Vendor, string CompanyName, string SectorCode, DateTime EndDate)
-        {
-            /*
-            if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[HistoricalSecurityMasterFull]') and OBJECTPROPERTY(id, N'IsUserTable') = 1)
-            drop table [dbo].[HistoricalSecurityMasterFull]
-            GO
-
-            CREATE TABLE [dbo].[HistoricalSecurityMasterFull](
-	            [id] [int] IDENTITY(100000,1) NOT NULL,
-	            [Ticker] [varchar](10) NOT NULL,
-	            [Cusip] [varchar](8) NOT NULL,
-	            [Vendor] [varchar](1) NOT NULL,
-	            [CompanyName] [varchar](30) NULL,
-	            [SectorCode] [varchar](8) NULL,
-	            [BeginDate] [smalldatetime] NULL,
-	            [EndDate] [smalldatetime] NULL,
-	            [dateModified]  AS (getdate()),
-             CONSTRAINT [PK_HistoricalSecurityMasterFull] PRIMARY KEY CLUSTERED 
-            (
-	            [Ticker] ASC,
-	            [Cusip] ASC,
-	            [Vendor] ASC
-            )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
-            ) ON [PRIMARY]
-
-            GO             
-            */
-            try
-            {
-                if (mSqlConn == null)
-                {
-                    mSqlConn = new SqlConnection(sharedData.ConnectionStringIndexData);
-                    mSqlConn.Open();
-                }
-                CultureInfo enUS = new CultureInfo("en-US");
-
-
-                string SqlSelect = @"
-                    select count(*) from HistoricalSecurityMasterFull
-                    where Ticker = @Ticker
-                    and Cusip = @Cusip
-                    and Vendor = @Vendor
-                    ";
-                SqlCommand cmd = new SqlCommand(SqlSelect, mSqlConn);
-                cmd.Parameters.Add("@Ticker", SqlDbType.VarChar);
-                cmd.Parameters.Add("@Cusip", SqlDbType.VarChar);
-                cmd.Parameters.Add("@Vendor", SqlDbType.VarChar);
-                cmd.Parameters["@Ticker"].Value = Ticker;
-                cmd.Parameters["@Cusip"].Value = Cusip;
-                cmd.Parameters["@Vendor"].Value = Vendor;
-                int iCount = (int)cmd.ExecuteScalar();
-
-                if (iCount == 0)
-                {
-                    cmd.Parameters.Add("@BeginDate", SqlDbType.DateTime);
-                    cmd.Parameters["@BeginDate"].Value = EndDate;
-                    cmd.CommandText =
-                        "insert into HistoricalSecurityMasterFull (Ticker, Cusip, Vendor, CompanyName, SectorCode, BeginDate, EndDate) " +
-                        "Values ( @Ticker, @Cusip, @Vendor, @CompanyName, @SectorCode, @BeginDate, @EndDate ) ";
-                }
-                else
-                {
-                    cmd.CommandText =
-                        "update HistoricalSecurityMasterFull  set " +
-                        "CompanyName = @CompanyName, " +
-                        "SectorCode = @SectorCode, " +
-                        "EndDate = @EndDate " +
-                        "where Ticker = @Ticker and Cusip = @Cusip and Vendor = @Vendor";
-                }
-                cmd.Parameters.Add("@CompanyName", SqlDbType.VarChar);
-                cmd.Parameters["@CompanyName"].Value = CompanyName;
-                cmd.Parameters.Add("@SectorCode", SqlDbType.VarChar);
-                cmd.Parameters["@SectorCode"].Value = SectorCode;
-                cmd.Parameters.Add("@EndDate", SqlDbType.DateTime);
-                cmd.Parameters["@EndDate"].Value = EndDate;
-                cmd.ExecuteNonQuery();
-            }
-            catch (SqlException ex)
-            {
-                if (ex.Number == 2627)
-                {
-                    Console.WriteLine(ex.Message);
-                }
-            }
-            finally
-            {
-            }
-
-        }
 
         public void GenerateHistSecMasterLists(string sListDate)
         {
@@ -1564,60 +1475,6 @@ RU3000    20170103   CHF   1662.25918   1365.02441   1696.48181   1567.99955    
                 }
                 dr.Close();
 
-            }
-            catch (SqlException ex)
-            {
-                if (ex.Number == 2627)
-                {
-                    Console.WriteLine(ex.Message);
-                }
-            }
-            finally
-            {
-            }
-        }
-
-        public void AddRussellSymbolChange(DateTime oChangeDate, string sOldSymbol, string sNewSymbol, string sCompanyName)
-        {
-/*
-CREATE TABLE [dbo].[HistoricalSymbolChanges](
-	[ChangeDate] [datetime] NOT NULL,
-	[OldSymbol] [varchar](10) NOT NULL,
-	[NewSymbol] [varchar](10) NOT NULL,
-	[CompanyName] [varchar](30) NULL
-) ON [PRIMARY]
-*/
-            try
-            {
-                if (mSqlConn == null)
-                {
-                    mSqlConn = new SqlConnection(sharedData.ConnectionStringIndexData);
-                    mSqlConn.Open();
-                }
-                string SqlSelect = @"
-                    select count(*) from HistoricalSymbolChanges
-                    where ChangeDate = @ChangeDate 
-                    and OldSymbol = @OldSymbol 
-                    and NewSymbol = @NewSymbol 
-                    ";
-                SqlCommand cmd = new SqlCommand(SqlSelect, mSqlConn);
-                cmd.Parameters.Add("@ChangeDate", SqlDbType.DateTime);
-                cmd.Parameters.Add("@OldSymbol", SqlDbType.VarChar);
-                cmd.Parameters.Add("@NewSymbol", SqlDbType.VarChar);
-                cmd.Parameters["@ChangeDate"].Value = oChangeDate;
-                cmd.Parameters["@OldSymbol"].Value = sOldSymbol;
-                cmd.Parameters["@NewSymbol"].Value = sNewSymbol;
-                int iCount = (int)cmd.ExecuteScalar();
-
-                if (iCount == 0)
-                {
-                    cmd.CommandText =
-                        "insert into HistoricalSymbolChanges (ChangeDate, OldSymbol, NewSymbol, CompanyName) " +
-                        "Values (@ChangeDate, @OldSymbol, @NewSymbol, @CompanyName)";
-                    cmd.Parameters.Add("@CompanyName", SqlDbType.VarChar);
-                    cmd.Parameters["@CompanyName"].Value = sCompanyName;
-                    cmd.ExecuteNonQuery();
-                }
             }
             catch (SqlException ex)
             {

@@ -298,5 +298,11 @@ namespace IndexDataForm
             snpData.TestEndOfMonthDates(lnkStartDate.Text, lnkEndDate.Text);
 
         }
+
+        private void btnTestEmail_Click(object sender, EventArgs e)
+        {
+            Mail mail = new Mail();
+            mail.SendMail("Message");
+        }
     }
 }

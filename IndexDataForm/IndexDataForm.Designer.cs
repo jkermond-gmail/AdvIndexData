@@ -51,6 +51,7 @@
             this.lblStartDate = new System.Windows.Forms.Label();
             this.cboVendor = new System.Windows.Forms.ComboBox();
             this.lblVendor = new System.Windows.Forms.Label();
+            this.btnTestEmail = new System.Windows.Forms.Button();
             this.tabUnitTest.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.SuspendLayout();
@@ -90,6 +91,7 @@
             // 
             // tabPage1
             // 
+            this.tabPage1.Controls.Add(this.btnTestEmail);
             this.tabPage1.Controls.Add(this.chkHistoricalAxmlFile);
             this.tabPage1.Controls.Add(this.btnTestEndOfMonthDates);
             this.tabPage1.Controls.Add(this.btnTestAxmlOutput);
@@ -284,6 +286,16 @@
             this.lblVendor.TabIndex = 4;
             this.lblVendor.Text = "Vendor";
             // 
+            // btnTestEmail
+            // 
+            this.btnTestEmail.Location = new System.Drawing.Point(393, 241);
+            this.btnTestEmail.Name = "btnTestEmail";
+            this.btnTestEmail.Size = new System.Drawing.Size(125, 23);
+            this.btnTestEmail.TabIndex = 15;
+            this.btnTestEmail.Text = "Test Email";
+            this.btnTestEmail.UseVisualStyleBackColor = true;
+            this.btnTestEmail.Click += new System.EventHandler(this.btnTestEmail_Click);
+            // 
             // IndexDataForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -328,6 +340,7 @@
         private System.Windows.Forms.Button btnTestAxmlOutput;
         private System.Windows.Forms.Button btnTestEndOfMonthDates;
         private System.Windows.Forms.CheckBox chkHistoricalAxmlFile;
+        private System.Windows.Forms.Button btnTestEmail;
     }
 }
 

@@ -640,27 +640,31 @@ namespace IndexDataEngineLibrary
                     CurrentRowCount += 1;
                     cmd.Parameters["@IndexCode"].Value = IndexCodeParsed;
 
-                    sValue = ParseColumn(dr, "STOCK KEY");    // NUMERIC but stored as String
-                    cmd.Parameters["@StockKey"].Value = sValue;
+                    string sStockKey = ParseColumn(dr, "STOCK KEY");    // NUMERIC but stored as String
+                    cmd.Parameters["@StockKey"].Value = sStockKey;
 
                     string EffectiveDate = ParseColumn(dr, "EFFECTIVE DATE"); // YYYYMMDD
                     DateTime.TryParseExact(EffectiveDate, "yyyyMMdd", mEnUS, DateTimeStyles.None, out oDate);
                     cmd.Parameters["@EffectiveDate"].Value = oDate;
 
-                    sValue = ParseColumn(dr, "CUSIP");   // 9 character
-                    cmd.Parameters["@CUSIP"].Value = sValue;
+                    string sCUSIP = ParseColumn(dr, "CUSIP");   // 9 character
+                    cmd.Parameters["@CUSIP"].Value = sCUSIP;
 
-                    sValue = ParseColumn(dr, "TICKER"); // UPPERCASE
-                    cmd.Parameters["@Ticker"].Value = sValue;
+                    string sTicker = ParseColumn(dr, "TICKER"); // UPPERCASE
+                    cmd.Parameters["@Ticker"].Value = sTicker;
 
-                    sValue = ParseColumn(dr, "GICS CODE");    // NUMERIC(8)
-                    cmd.Parameters["@GicsCode"].Value = sValue;
+                    string sSector = ParseColumn(dr, "GICS CODE");    // NUMERIC(8)
+                    cmd.Parameters["@GicsCode"].Value = sSector;
 
                     sValue = ParseColumn(dr, "INDEX MARKET CAP");
                     cmd.Parameters["@MarketCap"].Value = sValue;
 
                     sValue = ParseColumn(dr, "INDEX WEIGHT");
                     cmd.Parameters["@Weight"].Value = sValue;
+
+                    string sCompanyName = ParseColumn(dr, "COMPANY");
+
+                    sharedData.AddSecurityMasterFull(sStockKey, sTicker, sCUSIP, "S", sCompanyName, sSector, oDate);
 
                     try
                     {
@@ -686,6 +690,8 @@ namespace IndexDataEngineLibrary
                     finally
                     {
                     }
+                    sharedData.AddSecurityMasterFull(sTicker, sCUSIP, "S", sCompanyName, sSector, oDate);
+
                 }
                 //else if (sValue.Equals("LINE COUNT:"))
                 //{

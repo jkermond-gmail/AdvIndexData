@@ -116,7 +116,7 @@ namespace IndexDataEngineLibrary
                 {
                     cmd.CommandText =
                         "update HistoricalSecurityMasterFull  set " +
-                        "StockKey = @StockKey" +
+                        "StockKey = @StockKey, " +
                         "CompanyName = @CompanyName, " +
                         "SectorCode = @SectorCode, " +
                         "EndDate = @EndDate " +

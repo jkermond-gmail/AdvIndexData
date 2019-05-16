@@ -229,6 +229,45 @@ namespace IndexDataEngineLibrary
 
             LogHelper.WriteLine(sMsg + "Started " + DateTime.Now);
 
+            /*
+             * old
+_SP100_ADJ.SPC
+_SP400_ADJ.SPC
+_SP500_ADJ.SPC
+_SP600_ADJ.SPC
+_SPMLP_ADJ.SPC
+_SP100_CLS.SPC
+_SP400_CLS.SPC
+_SP500_CLS.SPC
+_SP600_CLS.SPC
+_SPMLP_CLS.SPC
+_SP400.SPL
+_SP500.SPL
+_SP600.SPL
+_SP1500.SPL
+_SPMLP.SPL
+
+            * new
+
+_SP100_ADJ.SDC
+_SP400_ADJ.SDC
+_SP500_ADJ.SDC
+_SP600_ADJ.SDC
+_SPMLP_ADJ.SDC
+_SP100_CLS.SDC
+_SP400_CLS.SDC
+_SP500_CLS.SDC
+_SP600_CLS.SDC
+_SPMLP_CLS.SDC
+_SP400.SDL
+_SP500.SDL
+_SP600.SDL
+_SP900.SDL
+_SP1000.SDL
+_SP1500.SDL
+_SPMLP.SDL
+
+            */
             try
             {
                 for (oProcessDate = oStartDate
@@ -341,7 +380,7 @@ namespace IndexDataEngineLibrary
                         if (File.Exists(FileName) && (Dataset.Equals("All") || Dataset.Equals("sp500")))
                         {
                             AddSnpClosingData(FileName, oProcessDate);
-                            ProcessStatus.Update(oProcessDate, Vendors.Snp.ToString(), Dataset, "", ProcessStatus.WhichStatus.OpenData, ProcessStatus.StatusValue.Pass);
+                            ProcessStatus.Update(oProcessDate, Vendors.Snp.ToString(), Dataset, "", ProcessStatus.WhichStatus.CloseData, ProcessStatus.StatusValue.Pass);
                         }
 
                         FileName = FilePath + oProcessDate.ToString("yyyyMMdd") + "_SP600_CLS.SDC";
@@ -647,6 +686,7 @@ namespace IndexDataEngineLibrary
                     cmd.Parameters["@EffectiveDate"].Value = oDate;
 
                     string sCUSIP = ParseColumn(dr, "CUSIP");   // 9 character
+                    sCUSIP = sCUSIP.Substring(0, 8);
                     cmd.Parameters["@CUSIP"].Value = sCUSIP;
 
                     string sTicker = ParseColumn(dr, "TICKER"); // UPPERCASE
@@ -801,6 +841,7 @@ namespace IndexDataEngineLibrary
                     cmd.Parameters["@EffectiveDate"].Value = oDate;
 
                     sValue = ParseColumn(dr, "CUSIP");   // 9 character
+                    sValue = sValue.Substring(0, 8);
                     cmd.Parameters["@CUSIP"].Value = sValue;
 
                     sValue = ParseColumn(dr, "TICKER"); // UPPERCASE

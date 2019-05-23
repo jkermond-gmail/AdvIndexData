@@ -30,6 +30,7 @@ namespace IndexDataEngineLibrary
         private string mIndexname;
         private string mCUSIP;
         private string mTicker;
+        private string mCurrentTicker;
         private string mSectorLevel1;
         private string mSectorLevel2;
         private string mSectorLevel3;
@@ -70,6 +71,12 @@ namespace IndexDataEngineLibrary
         internal string Ticker
         {
             get { return mTicker; }
+        }
+
+        internal string CurrentTicker
+        {
+            get { return mCurrentTicker; }
+            set { mCurrentTicker = value.ToLower(); }
         }
 
         internal string CUSIP
@@ -172,6 +179,7 @@ namespace IndexDataEngineLibrary
             mIndexname = sIndexname;
             mCUSIP = sCUSIP;
             mTicker = sTicker;
+            mCurrentTicker = sTicker;
             mSectorLevel1 = sSectorLevel1;
             mSectorLevel2 = sSectorLevel2;
             mSectorLevel3 = sSectorLevel3;

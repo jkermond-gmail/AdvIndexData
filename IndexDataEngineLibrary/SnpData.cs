@@ -45,8 +45,8 @@ namespace IndexDataEngineLibrary
             }
             catch( SqlException ex)
             {
-                Console.WriteLine(sharedData.ConnectionStringIndexData);
-                Console.WriteLine(ex.Message);
+                LogHelper.WriteLine(sharedData.ConnectionStringIndexData);
+                LogHelper.WriteLine(ex.Message);
             }
             finally
             {
@@ -192,7 +192,7 @@ namespace IndexDataEngineLibrary
                     //for (int i = 0; i < fieldCount; i++)
                     //    Console.Write(string.Format("{0} = {1};",
                     //                  headers[i], csv[i]));
-                    //Console.WriteLine();
+                    //LogHelper.WriteLine();
                 }
             }
 
@@ -632,7 +632,7 @@ _SPMLP.SDL
             {
                 if (ex.Number == 2627)
                 {
-                    Console.WriteLine(ex.Message);
+                    LogHelper.WriteLine(ex.Message);
                 }
             }
             finally
@@ -723,14 +723,12 @@ _SPMLP.SDL
                     {
                         if (ex.Number == 2627)
                         {
-                            Console.WriteLine(ex.Message);
+                            LogHelper.WriteLine(ex.Message);
                         }
                     }
                     finally
                     {
                     }
-                    sharedData.AddSecurityMasterFull(sTicker, sCUSIP, "S", sCompanyName, sSector, oDate);
-
                 }
                 //else if (sValue.Equals("LINE COUNT:"))
                 //{
@@ -787,7 +785,7 @@ _SPMLP.SDL
             {
                 if (ex.Number == 2627)
                 {
-                    Console.WriteLine(ex.Message);
+                    LogHelper.WriteLine(ex.Message);
                 }
             }
             finally
@@ -891,7 +889,7 @@ _SPMLP.SDL
                     {
                         if (ex.Number == 2627)
                         {
-                            Console.WriteLine(ex.Message);
+                            LogHelper.WriteLine(ex.Message);
                         }
                     }
                     finally
@@ -1027,7 +1025,7 @@ _SPMLP.SDL
             {
                 if (ex.Number == 2627)
                 {
-                    Console.WriteLine(ex.Message);
+                    LogHelper.WriteLine(ex.Message);
                 }
             }
             finally
@@ -1431,7 +1429,7 @@ _SPMLP.SDL
             {
                 if (ex.Number == 2627)
                 {
-                    Console.WriteLine(ex.Message);
+                    LogHelper.WriteLine(ex.Message);
                 }
             }
             finally
@@ -1617,6 +1615,12 @@ _SPMLP.SDL
                         IndexRow indexRow = new IndexRow(sDate, sIndexName, sCusip, sTicker,
                                                          sSector, sIndustryGroup, sIndustry, sSubIndustry,
                                                          sWeight, sSecurityReturn, IndexRow.VendorFormat.CONSTITUENT);
+                        //bool found = false;
+                        //if ( sTicker.ToLower().Equals("aa"))
+                        //{
+                        //    found = true;
+                        //}
+                        //indexRow.CurrentTicker = sharedData.GetSecurityMasterCurrentTicker( sTicker, sCusip, "S", sDate);
                         indexRowsTickerSort.Add(indexRow);
                         i = i + 1;
                     }
@@ -1977,7 +1981,7 @@ _SPMLP.SDL
                 {
                     if (ex.Number == 2627)
                     {
-                        Console.WriteLine(ex.Message);
+                        LogHelper.WriteLine(ex.Message);
                     }
                 }
                 finally

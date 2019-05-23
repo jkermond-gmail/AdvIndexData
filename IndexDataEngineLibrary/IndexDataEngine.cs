@@ -562,7 +562,7 @@ namespace IndexDataEngineLibrary
             {
                 if (ex.Number == 2627)
                 {
-                    Console.WriteLine(ex.Message);
+                    LogHelper.WriteLine(ex.Message);
                 }
             }
             finally
@@ -593,7 +593,7 @@ namespace IndexDataEngineLibrary
             }
             catch (SqlException ex)
             {
-                Console.WriteLine(ex.Message);
+                LogHelper.WriteLine(ex.Message);
                 //LogHelper.WriteLine(logFuncName + " " + colName + " " + ex.Message);
             }
             finally

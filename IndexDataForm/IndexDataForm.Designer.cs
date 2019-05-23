@@ -34,6 +34,7 @@
             this.timerRunIndexData = new System.Windows.Forms.Timer(this.components);
             this.tabUnitTest = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.btnTestEmail = new System.Windows.Forms.Button();
             this.chkHistoricalAxmlFile = new System.Windows.Forms.CheckBox();
             this.btnTestEndOfMonthDates = new System.Windows.Forms.Button();
             this.btnTestAxmlOutput = new System.Windows.Forms.Button();
@@ -51,7 +52,6 @@
             this.lblStartDate = new System.Windows.Forms.Label();
             this.cboVendor = new System.Windows.Forms.ComboBox();
             this.lblVendor = new System.Windows.Forms.Label();
-            this.btnTestEmail = new System.Windows.Forms.Button();
             this.tabUnitTest.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.SuspendLayout();
@@ -115,6 +115,16 @@
             this.tabPage1.Text = "Russell";
             this.tabPage1.UseVisualStyleBackColor = true;
             this.tabPage1.Click += new System.EventHandler(this.tabPage1_Click);
+            // 
+            // btnTestEmail
+            // 
+            this.btnTestEmail.Location = new System.Drawing.Point(393, 241);
+            this.btnTestEmail.Name = "btnTestEmail";
+            this.btnTestEmail.Size = new System.Drawing.Size(125, 23);
+            this.btnTestEmail.TabIndex = 15;
+            this.btnTestEmail.Text = "Test Email";
+            this.btnTestEmail.UseVisualStyleBackColor = true;
+            this.btnTestEmail.Click += new System.EventHandler(this.btnTestEmail_Click);
             // 
             // chkHistoricalAxmlFile
             // 
@@ -232,7 +242,7 @@
             this.lnkEndDate.Size = new System.Drawing.Size(65, 13);
             this.lnkEndDate.TabIndex = 3;
             this.lnkEndDate.TabStop = true;
-            this.lnkEndDate.Text = "04/15/2019";
+            this.lnkEndDate.Text = "01/07/2014";
             this.lnkEndDate.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.lnkEndDate_LinkClicked);
             // 
             // lnkStartDate
@@ -243,7 +253,7 @@
             this.lnkStartDate.Size = new System.Drawing.Size(65, 13);
             this.lnkStartDate.TabIndex = 2;
             this.lnkStartDate.TabStop = true;
-            this.lnkStartDate.Text = "04/12/2019";
+            this.lnkStartDate.Text = "01/06/2014";
             this.lnkStartDate.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.lnkStartDate_LinkClicked);
             // 
             // lblEndDate
@@ -285,16 +295,6 @@
             this.lblVendor.Size = new System.Drawing.Size(41, 13);
             this.lblVendor.TabIndex = 4;
             this.lblVendor.Text = "Vendor";
-            // 
-            // btnTestEmail
-            // 
-            this.btnTestEmail.Location = new System.Drawing.Point(393, 241);
-            this.btnTestEmail.Name = "btnTestEmail";
-            this.btnTestEmail.Size = new System.Drawing.Size(125, 23);
-            this.btnTestEmail.TabIndex = 15;
-            this.btnTestEmail.Text = "Test Email";
-            this.btnTestEmail.UseVisualStyleBackColor = true;
-            this.btnTestEmail.Click += new System.EventHandler(this.btnTestEmail_Click);
             // 
             // IndexDataForm
             // 

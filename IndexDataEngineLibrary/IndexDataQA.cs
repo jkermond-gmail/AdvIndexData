@@ -379,7 +379,7 @@ namespace IndexDataEngineLibrary
             {
                 if (ex.Number == 2627)
                 {
-                    Console.WriteLine(ex.Message);
+                    LogHelper.WriteLine(ex.Message);
                 }
             }
             finally
@@ -493,7 +493,7 @@ namespace IndexDataEngineLibrary
             {
                 if (ex.Number == 2627)
                 {
-                    Console.WriteLine(ex.Message);
+                    LogHelper.WriteLine(ex.Message);
                 }
             }
             finally

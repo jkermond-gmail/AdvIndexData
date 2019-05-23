@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Data.SqlClient;
 using System.Data;
+using AdventUtilityLibrary;
 
 
 namespace IndexDataEngineLibrary
@@ -88,7 +89,7 @@ namespace IndexDataEngineLibrary
                 {
                     if (ex.Number == 2627)
                     {
-                        Console.WriteLine(ex.Message);
+                        LogHelper.WriteLine(ex.Message);
                     }
                 }
                 finally
@@ -156,7 +157,7 @@ namespace IndexDataEngineLibrary
                 {
                     if (ex.Number == 2627)
                     {
-                        Console.WriteLine(ex.Message);
+                        LogHelper.WriteLine(ex.Message);
                     }
                 }
                 finally
@@ -258,7 +259,7 @@ namespace IndexDataEngineLibrary
                     {
                         if (ex.Number == 2627)
                         {
-                            Console.WriteLine(ex.Message);
+                            LogHelper.WriteLine(ex.Message);
                         }
                     }
                     finally

@@ -9,6 +9,7 @@ using AdventUtilityLibrary;
 using System.Configuration;
 using System.IO;
 using System.Globalization;
+using System.Collections;
 
 
 
@@ -104,8 +105,58 @@ namespace IndexDataEngineLibrary
                 cmd.Parameters["@Vendor"].Value = Vendor;
                 int iCount = (int)cmd.ExecuteScalar();
 
-                if (iCount == 0)
+                if( iCount == 0 )
                 {
+                    // But check if the ticker exists with a different CUSIP
+                    SqlSelect = @"
+                        select count(*) from HistoricalSecurityMasterFull
+                        where Ticker = @Ticker
+                        and Vendor = @Vendor
+                    ";
+                    cmd.CommandText = SqlSelect;
+                    iCount = (int)cmd.ExecuteScalar();
+
+                    // If the ticker exists with a different CUSIP
+                    if (iCount == 1)
+                    {
+                        // see if the ticker exists with a "." extension eq tick.1 or tick.2 and how many
+                        cmd.Parameters["@Ticker"].Value = Ticker + ".%";
+
+                        SqlSelect = @"
+                            select count(*) from HistoricalSecurityMasterFull
+                            where Ticker like @Ticker
+                            and Vendor = @Vendor
+                        ";
+                        cmd.CommandText = SqlSelect;
+                        iCount = (int)cmd.ExecuteScalar();
+                        iCount += 1;
+
+                        // set ticker back to the original ticker value and determine the CUSIP
+                        cmd.Parameters["@Ticker"].Value = Ticker;
+                        SqlSelect = @"
+                            select Cusip from HistoricalSecurityMasterFull
+                            where Ticker = @Ticker
+                            and Vendor = @Vendor
+                        ";
+                        cmd.CommandText = SqlSelect;
+                        SqlDataReader dr = null;
+                        dr = cmd.ExecuteReader();
+                        if (dr.HasRows)
+                        {
+                            if (dr.Read())
+                            {
+                                cmd.Parameters["@Cusip"].Value = dr["CUSIP"].ToString();
+                                dr.Close();
+                                cmd.CommandText =
+                                    "update HistoricalSecurityMasterFull  set " +
+                                    "Ticker = '" + Ticker + "." + iCount.ToString() + "' " +
+                                    "where Ticker = @Ticker and Cusip = @Cusip and Vendor = @Vendor";
+                                cmd.ExecuteNonQuery();
+                            }
+                        }
+                        dr.Close();
+                    }
+                    cmd.Parameters["@Cusip"].Value = Cusip;
                     cmd.Parameters.Add("@BeginDate", SqlDbType.DateTime);
                     cmd.Parameters["@BeginDate"].Value = EndDate;
                     cmd.CommandText =
@@ -136,13 +187,149 @@ namespace IndexDataEngineLibrary
             {
                 if (ex.Number == 2627)
                 {
-                    Console.WriteLine(ex.Message);
+                    LogHelper.WriteLine(ex.Message);
                 }
             }
             finally
             {
             }
         }
+
+        public string GetSecurityMasterCurrentTicker(string Ticker, string Cusip, string Vendor, string sDate  )
+        {
+            string SecurityMasterCurrentTicker = Ticker; 
+            try
+            {
+                if (mSqlConn == null)
+                {
+                    mSqlConn = new SqlConnection(ConnectionStringIndexData);
+                    mSqlConn.Open();
+                }
+
+                //string SqlSelect = @"
+                //    select Ticker from HistoricalSecurityMasterFull
+                //    where Cusip = @Cusip
+                //    and Vendor = @Vendor
+                //    ";
+                string SqlSelect = @"
+                select top 1 ticker from HistoricalSecurityMasterFull where StockKey in 
+                (select StockKey from HistoricalSecurityMasterFull 
+                 where Cusip = @Cusip and Vendor = @Vendor)
+                order by EndDate desc
+                ";
+                SqlCommand cmd = new SqlCommand(SqlSelect, mSqlConn);
+                SqlDataReader dr = null;
+                cmd.Parameters.Add("@Cusip", SqlDbType.VarChar);
+                cmd.Parameters.Add("@Vendor", SqlDbType.VarChar);
+                cmd.Parameters["@Cusip"].Value = Cusip;
+                cmd.Parameters["@Vendor"].Value = Vendor;
+
+                dr = cmd.ExecuteReader();
+                if (dr.HasRows)
+                {
+                    if (dr.Read())
+                    {
+                        SecurityMasterCurrentTicker = dr["Ticker"].ToString();
+                        SecurityMasterCurrentTicker = SecurityMasterCurrentTicker.ToLower();
+                        dr.Close();
+                    }
+                }
+                dr.Close();
+            }
+            catch (SqlException ex)
+            {
+                if (ex.Number == 2627)
+                {
+                    LogHelper.WriteLine(ex.Message);
+                }
+            }
+            finally
+            {
+                if(!Ticker.Equals(SecurityMasterCurrentTicker))
+                {
+                    LogHelper.WriteLine(Ticker + "," + SecurityMasterCurrentTicker + "," + Cusip);
+                }
+            }
+            return (SecurityMasterCurrentTicker);
+
+        }
+
+        public string GetSecurityMasterCurrentTickerInDev(string Ticker, string Cusip, string Vendor, string sDate)
+        {
+            string SecurityMasterCurrentTicker = Ticker;
+            try
+            {
+                if (mSqlConn == null)
+                {
+                    mSqlConn = new SqlConnection(ConnectionStringIndexData);
+                    mSqlConn.Open();
+                }
+
+                string SqlSelect = @"
+                    select StockKey from HistoricalSecurityMasterFull
+                    where Ticker = @Ticker
+                    and Cusip = @Cusip
+                    and Vendor = @Vendor
+                    ";
+                SqlCommand cmd = new SqlCommand(SqlSelect, mSqlConn);
+                SqlDataReader dr = null;
+                string StockKey = "";
+                cmd.Parameters.Add("@Ticker", SqlDbType.VarChar);
+                cmd.Parameters.Add("@Cusip", SqlDbType.VarChar);
+                cmd.Parameters.Add("@Vendor", SqlDbType.VarChar);
+                cmd.Parameters["@Ticker"].Value = Ticker;
+                cmd.Parameters["@Cusip"].Value = Cusip;
+                cmd.Parameters["@Vendor"].Value = Vendor;
+
+                dr = cmd.ExecuteReader();
+                if (dr.HasRows)
+                {
+                    if (dr.Read())
+                    {
+                        StockKey = dr["StockKey"].ToString();
+                        dr.Close();
+                        if (StockKey.Length > 0)
+                        {
+                            cmd.Parameters.Add("@TickerDate", SqlDbType.DateTime);
+                            cmd.Parameters["@TickerDate"].Value = sDate;
+                            cmd.Parameters.Add("@StockKey", SqlDbType.VarChar);
+                            cmd.Parameters["@StockKey"].Value = StockKey;
+
+                            SqlSelect = @"
+                            select Top 1 Ticker from HistoricalSecurityMasterFull
+                            where StockKey = @StockKey
+                            order by EndDate desc
+                            ";
+                            cmd.CommandText = SqlSelect;
+                            dr = cmd.ExecuteReader();
+                            if (dr.HasRows)
+                            {
+                                if (dr.Read())
+                                {
+                                    SecurityMasterCurrentTicker = dr["Ticker"].ToString();
+                                }
+                            }
+                            dr.Close();
+                        }
+                    }
+                }
+                dr.Close();
+            }
+            catch (SqlException ex)
+            {
+                if (ex.Number == 2627)
+                {
+                    LogHelper.WriteLine(ex.Message);
+                }
+            }
+            finally
+            {
+
+            }
+            return (SecurityMasterCurrentTicker);
+
+        }
+
 
         public void AddSymbolChange(string sVendor, DateTime oChangeDate, string sOldSymbol, string sNewSymbol, string sCompanyName)
         {
@@ -193,7 +380,7 @@ namespace IndexDataEngineLibrary
             {
                 if (ex.Number == 2627)
                 {
-                    Console.WriteLine(ex.Message);
+                    LogHelper.WriteLine(ex.Message);
                 }
             }
             finally
@@ -352,7 +539,7 @@ namespace IndexDataEngineLibrary
             {
                 if (ex.Number == 2627)
                 {
-                    Console.WriteLine(ex.Message);
+                    LogHelper.WriteLine(ex.Message);
                 }
             }
             finally
@@ -396,6 +583,19 @@ namespace IndexDataEngineLibrary
             DateTime endofMonthDate = DateHelper.PrevEndOfMonthDay(sBusinessDate);
             string sPrevEndOfMonthDate = endofMonthDate.ToString("yyyyMMdd");
             string sPrevBusinessDate = DateHelper.PrevBusinessDay(sBusinessDate);
+
+            SortedList sortedList = new SortedList();
+
+
+            // fuk  need to deal with duplicates
+            foreach (IndexRow indexRow in indexRowsTickerSort)
+            {
+                if( sortedList.Contains(indexRow.CurrentTicker) == false )
+                    sortedList.Add(indexRow.CurrentTicker, indexRow.Weight.ToString(NumberFormat, mCultureInfo) + "|" + indexRow.RateOfReturn.ToString(NumberFormat, mCultureInfo));
+                else
+                    sortedList.Add(indexRow.CurrentTicker + ".dup", indexRow.Weight.ToString(NumberFormat, mCultureInfo) + "|" + indexRow.RateOfReturn.ToString(NumberFormat, mCultureInfo));
+            }
+
 
             /*
              <?xml version="1.0"?>
@@ -461,10 +661,15 @@ namespace IndexDataEngineLibrary
                 if (addDummyEndOfMonthAXML)
                 {
                     file.WriteLine("<XSXPeriod from=\"" + sPrevBusinessDate + "\" through=\"" + sPrevEndOfMonthDate + "\" indexperfiso=\"usd\">");
-                    foreach (IndexRow indexRow in indexRowsTickerSort)
+                    //foreach (IndexRow indexRow in indexRowsTickerSort)
+                    //{
+                    //    file.WriteLine("<XSXDetail type=\"cs\" iso=\"usd\" symbol=\"" + indexRow.CurrentTicker + "\" weight=\"" + indexRow.Weight.ToString(NumberFormat, mCultureInfo) + "\" irr=\"" + "0" + "\"/>");
+                    //}
+                    foreach (DictionaryEntry pair in sortedList)
                     {
-                        file.WriteLine("<XSXDetail type=\"cs\" iso=\"usd\" symbol=\"" + indexRow.Ticker + "\" weight=\"" + indexRow.Weight.ToString(NumberFormat, mCultureInfo) + "\" irr=\"" + "0" + "\"/>");
+                        file.WriteLine("<XSXDetail type=\"cs\" iso=\"usd\" symbol=\"" + pair.Key + "\" weight=\"" + pair.Value + "\" irr=\"" + "0" + "\"/>");
                     }
+
                     file.WriteLine("</XSXPeriod>");
                     file.WriteLine("<XSXPeriod from=\"" + sPrevEndOfMonthDate + "\" through=\"" + DateHelper.ConvertToYYYYMMDD(sBusinessDate) + "\" indexperfiso=\"usd\">");
                 }
@@ -473,10 +678,18 @@ namespace IndexDataEngineLibrary
                     file.WriteLine("<XSXPeriod from=\"" + DateHelper.PrevBusinessDay(sBusinessDate) + "\" through=\"" + DateHelper.ConvertToYYYYMMDD(sBusinessDate) + "\" indexperfiso=\"usd\">");
                 }
 
-                foreach (IndexRow indexRow in indexRowsTickerSort)
+                //foreach (IndexRow indexRow in indexRowsTickerSort)
+                //{
+                //    file.WriteLine("<XSXDetail type=\"cs\" iso=\"usd\" symbol=\"" + indexRow.CurrentTicker + "\" weight=\"" + indexRow.Weight.ToString(NumberFormat, mCultureInfo) + "\" irr=\"" + indexRow.RateOfReturn.ToString(NumberFormat, mCultureInfo) + "\"/>");
+                //}
+                foreach (DictionaryEntry pair in sortedList)
                 {
-                    file.WriteLine("<XSXDetail type=\"cs\" iso=\"usd\" symbol=\"" + indexRow.Ticker + "\" weight=\"" + indexRow.Weight.ToString(NumberFormat, mCultureInfo) + "\" irr=\"" + indexRow.RateOfReturn.ToString(NumberFormat, mCultureInfo) + "\"/>");
+                    string weight = pair.Value.ToString();
+                    string[] vals = weight.Split('|');
+
+                    file.WriteLine("<XSXDetail type=\"cs\" iso=\"usd\" symbol=\"" + pair.Key + "\" weight=\"" + vals[0].ToString() + "\" irr=\"" + vals[1].ToString() + "\"/>");
                 }
+
 
                 file.WriteLine("</XSXPeriod>");
             }

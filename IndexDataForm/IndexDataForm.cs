@@ -60,10 +60,10 @@ namespace IndexDataForm
             //LogHelper.Info("timerRunIndexData_Tick", "IndexDataForm");
             TimerEnableDisable("Start Working", false);
             // Begin checking if there is any index data work to do
-            Console.WriteLine("Index Data Engine Running");
+            LogHelper.WriteLine("Index Data Engine Running");
             indexDataEngine = new IndexDataEngine();
             indexDataEngine.Run();
-            Console.WriteLine("Index Data Engine Waiting " + timerInterval/1000 + " seconds ");
+            LogHelper.WriteLine("Index Data Engine Waiting " + timerInterval/1000 + " seconds ");
             // End checking if there is any index data work to do
             TimerEnableDisable("Done Working", true);
         }

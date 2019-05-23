@@ -195,7 +195,7 @@ namespace IndexDataEngineLibrary
             {
                 if (ex.Number == 2627)
                 {
-                    Console.WriteLine(ex.Message);
+                    LogHelper.WriteLine(ex.Message);
                 }
             }
             finally
@@ -268,7 +268,7 @@ namespace IndexDataEngineLibrary
             {
                 if (ex.Number == 2627)
                 {
-                    Console.WriteLine(ex.Message);
+                    LogHelper.WriteLine(ex.Message);
                 }
             }
             finally
@@ -988,7 +988,7 @@ RU3000    20170103   CHF   1662.25918   1365.02441   1696.48181   1567.99955    
                         {
                             if (ex.Number == 2627)
                             {
-                                Console.WriteLine(ex.Message);
+                                LogHelper.WriteLine(ex.Message);
                                 LogHelper.WriteLine(FileName + ":" + TextLine);
                             }
                         }
@@ -1218,7 +1218,7 @@ RU3000    20170103   CHF   1662.25918   1365.02441   1696.48181   1567.99955    
             {
                 if (ex.Number == 2627)
                 {
-                    Console.WriteLine(ex.Message);
+                    LogHelper.WriteLine(ex.Message);
                 }
             }
             finally
@@ -1276,7 +1276,7 @@ RU3000    20170103   CHF   1662.25918   1365.02441   1696.48181   1567.99955    
             {
                 if (ex.Number == 2627)
                 {
-                    Console.WriteLine(ex.Message);
+                    LogHelper.WriteLine(ex.Message);
                 }
             }
             finally
@@ -1363,7 +1363,7 @@ RU3000    20170103   CHF   1662.25918   1365.02441   1696.48181   1567.99955    
             {
                 if (ex.Number == 2627)
                 {
-                    Console.WriteLine(ex.Message);
+                    LogHelper.WriteLine(ex.Message);
                 }
             }
             finally
@@ -1480,7 +1480,7 @@ RU3000    20170103   CHF   1662.25918   1365.02441   1696.48181   1567.99955    
             {
                 if (ex.Number == 2627)
                 {
-                    Console.WriteLine(ex.Message);
+                    LogHelper.WriteLine(ex.Message);
                 }
             }
             finally
@@ -1540,7 +1540,7 @@ RU3000    20170103   CHF   1662.25918   1365.02441   1696.48181   1567.99955    
             {
                 if (ex.Number == 2627)
                 {
-                    Console.WriteLine(ex.Message);
+                    LogHelper.WriteLine(ex.Message);
                 }
             }
             finally
@@ -2557,7 +2557,7 @@ RU3000    20170103   CHF   1662.25918   1365.02441   1696.48181   1567.99955    
             {
                 if (ex.Number == 2627)
                 {
-                    Console.WriteLine(ex.Message);
+                    LogHelper.WriteLine(ex.Message);
                 }
             }
             finally
@@ -2603,7 +2603,7 @@ RU3000    20170103   CHF   1662.25918   1365.02441   1696.48181   1567.99955    
             {
                 if (ex.Number == 2627)
                 {
-                    Console.WriteLine(ex.Message);
+                    LogHelper.WriteLine(ex.Message);
                 }
             }
             finally
@@ -2688,7 +2688,7 @@ RU3000    20170103   CHF   1662.25918   1365.02441   1696.48181   1567.99955    
             {
                 if (ex.Number == 2627)
                 {
-                    Console.WriteLine(ex.Message);
+                    LogHelper.WriteLine(ex.Message);
                 }
             }
             finally
@@ -2786,7 +2786,7 @@ RU3000    20170103   CHF   1662.25918   1365.02441   1696.48181   1567.99955    
                 {
                     if (ex.Number == 2627)
                     {
-                        Console.WriteLine(ex.Message);
+                        LogHelper.WriteLine(ex.Message);
                     }
                 }
                 finally
@@ -2868,7 +2868,7 @@ RU3000    20170103   CHF   1662.25918   1365.02441   1696.48181   1567.99955    
                 {
                     if (ex.Number == 2627)
                     {
-                        Console.WriteLine(ex.Message);
+                        LogHelper.WriteLine(ex.Message);
                     }
                 }
                 finally

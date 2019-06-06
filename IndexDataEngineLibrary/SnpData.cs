@@ -1619,7 +1619,7 @@ _SPMLP.SDL
                         //{
                         //    found = true;
                         //}
-                        //indexRow.CurrentTicker = sharedData.GetSecurityMasterCurrentTicker( sTicker, sCusip, "S", sDate);
+                        indexRow.CurrentTicker = sharedData.GetSecurityMasterCurrentTicker( sTicker, sCusip, "S", sDate);
                         indexRowsTickerSort.Add(indexRow);
                         i = i + 1;
                     }

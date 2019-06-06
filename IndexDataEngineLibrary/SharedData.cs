@@ -195,9 +195,59 @@ namespace IndexDataEngineLibrary
             }
         }
 
-        public string GetSecurityMasterCurrentTicker(string Ticker, string Cusip, string Vendor, string sDate  )
+        public string GetSecurityMasterCurrentTickerRussell(string Ticker, string Cusip, string Vendor, string sDate  )
         {
             string SecurityMasterCurrentTicker = Ticker; 
+            try
+            {
+                if (mSqlConn == null)
+                {
+                    mSqlConn = new SqlConnection(ConnectionStringIndexData);
+                    mSqlConn.Open();
+                }
+
+                string SqlSelect = @"
+                    select Ticker from HistoricalSecurityMaster
+                    where Cusip = @Cusip
+                    ";
+                SqlCommand cmd = new SqlCommand(SqlSelect, mSqlConn);
+                SqlDataReader dr = null;
+                cmd.Parameters.Add("@Cusip", SqlDbType.VarChar);
+                cmd.Parameters["@Cusip"].Value = Cusip;
+
+                dr = cmd.ExecuteReader();
+                if (dr.HasRows)
+                {
+                    if (dr.Read())
+                    {
+                        SecurityMasterCurrentTicker = dr["Ticker"].ToString();
+                        SecurityMasterCurrentTicker = SecurityMasterCurrentTicker.ToLower();
+                        dr.Close();
+                    }
+                }
+                dr.Close();
+            }
+            catch (SqlException ex)
+            {
+                if (ex.Number == 2627)
+                {
+                    LogHelper.WriteLine(ex.Message);
+                }
+            }
+            finally
+            {
+                if(!Ticker.Equals(SecurityMasterCurrentTicker))
+                {
+                    LogHelper.WriteLine("GetSecurityMasterCurrentTickerRussell: " + Ticker + "," + SecurityMasterCurrentTicker + "," + Cusip);
+                }
+            }
+            return (SecurityMasterCurrentTicker);
+
+        }
+
+        public string GetSecurityMasterCurrentTicker(string Ticker, string Cusip, string Vendor, string sDate)
+        {
+            string SecurityMasterCurrentTicker = Ticker;
             try
             {
                 if (mSqlConn == null)
@@ -245,14 +295,17 @@ namespace IndexDataEngineLibrary
             }
             finally
             {
-                if(!Ticker.Equals(SecurityMasterCurrentTicker))
+                if (!Ticker.Equals(SecurityMasterCurrentTicker))
                 {
-                    LogHelper.WriteLine(Ticker + "," + SecurityMasterCurrentTicker + "," + Cusip);
+                    LogHelper.WriteLine("GetSecurityMasterCurrentTickerSnp:" + Ticker + ", " + SecurityMasterCurrentTicker + "," + Cusip);
+                    GetSecurityMasterCurrentTickerRussell(Ticker, Cusip, Vendor, sDate);
+                    LogHelper.WriteLine(" ");
                 }
             }
             return (SecurityMasterCurrentTicker);
 
         }
+
 
         public string GetSecurityMasterCurrentTickerInDev(string Ticker, string Cusip, string Vendor, string sDate)
         {

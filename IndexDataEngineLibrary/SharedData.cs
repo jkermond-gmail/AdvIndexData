@@ -242,7 +242,6 @@ namespace IndexDataEngineLibrary
                 }
             }
             return (SecurityMasterCurrentTicker);
-
         }
 
         public string GetSecurityMasterCurrentTicker(string Ticker, string Cusip, string Vendor, string sDate)
@@ -643,10 +642,16 @@ namespace IndexDataEngineLibrary
             // fuk  need to deal with duplicates
             foreach (IndexRow indexRow in indexRowsTickerSort)
             {
-                if( sortedList.Contains(indexRow.CurrentTicker) == false )
-                    sortedList.Add(indexRow.CurrentTicker, indexRow.Weight.ToString(NumberFormat, mCultureInfo) + "|" + indexRow.RateOfReturn.ToString(NumberFormat, mCultureInfo));
+                double rateOfReturn = 0.0;
+                if (vendor.Equals(Vendors.Russell))
+                    rateOfReturn = indexRow.RateOfReturnAdjusted;
+                else if(vendor.Equals(Vendors.Snp))
+                    rateOfReturn = indexRow.RateOfReturn;
+
+                if ( sortedList.Contains(indexRow.CurrentTicker) == false )
+                    sortedList.Add(indexRow.CurrentTicker, indexRow.Weight.ToString(NumberFormat, mCultureInfo) + "|" + rateOfReturn.ToString(NumberFormat, mCultureInfo));
                 else
-                    sortedList.Add(indexRow.CurrentTicker + ".dup", indexRow.Weight.ToString(NumberFormat, mCultureInfo) + "|" + indexRow.RateOfReturn.ToString(NumberFormat, mCultureInfo));
+                    sortedList.Add(indexRow.CurrentTicker + ".dup", indexRow.Weight.ToString(NumberFormat, mCultureInfo) + "|" + rateOfReturn.ToString(NumberFormat, mCultureInfo));
             }
 
 

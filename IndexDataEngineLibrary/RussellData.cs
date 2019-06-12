@@ -2057,7 +2057,7 @@ RU3000    20170103   CHF   1662.25918   1365.02441   1696.48181   1567.99955    
                 {
                     GenerateIndustryReturnsForDate(processDate.ToString("MM/dd/yyyy"), sIndexName);
                     sharedData.GenerateAxmlFileSectors(processDate.ToString("MM/dd/yyyy"), fileDate.ToString("MM/dd/yyyy"),
-                                                       sIndexName, Vendors.Russell, 
+                                                       sIndexName, Vendors.Russell,
                                                        indexRowsSectorLevel1RollUp, indexRowsSectorLevel2RollUp, indexRowsSectorLevel3RollUp,
                                                        isFirstDate, isLastDate);
                 }
@@ -2090,6 +2090,7 @@ RU3000    20170103   CHF   1662.25918   1365.02441   1696.48181   1567.99955    
                         IndexRow indexRow = new IndexRow(sDate, sIndexName, sCusip, sTicker, 
                                                          sSector, sSubSector, sIndustry, "",
                                                          sWeight, sSecurityReturn, IndexRow.VendorFormat.CONSTITUENT);
+                        indexRow.CurrentTicker = sharedData.GetSecurityMasterCurrentTickerRussell(sTicker, sCusip, "R", sDate);
                         indexRowsTickerSort.Add(indexRow);
                     }
                 }

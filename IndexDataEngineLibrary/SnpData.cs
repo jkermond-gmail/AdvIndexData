@@ -24,6 +24,7 @@ namespace IndexDataEngineLibrary
         private int ConstituentCount = 0;
         private const string NumberFormat = "0.#########";
         private CultureInfo mCultureInfo = new CultureInfo("en-US");
+        private bool mUseSnpSecurityMaster = true;
 
         private List<IndexRow> indexRowsTickerSort = new List<IndexRow>();
         private List<IndexRow> indexRowsIndustrySort = new List<IndexRow>();
@@ -52,10 +53,11 @@ namespace IndexDataEngineLibrary
             {
             }
 
-            CultureInfo mEnUS = new CultureInfo("en-US");
+            CultureInfo mEnUS = new CultureInfo("en-US");                    
+            mUseSnpSecurityMaster = AppSettings.Get<bool>("useSnpSecurityMaster");
         }
 
-        private void CloseGlobals()
+    private void CloseGlobals()
         {
             if (mSqlDr != null)
             {
@@ -506,7 +508,6 @@ _SPMLP.SDL
             finally
             {
                 LogHelper.WriteLine(sMsg + "finished " + DateTime.Now);
-                //RussellData_Finish();
             }
         }
 
@@ -1614,12 +1615,11 @@ _SPMLP.SDL
                         IndexRow indexRow = new IndexRow(sDate, sIndexName, sCusip, sTicker,
                                                          sSector, sIndustryGroup, sIndustry, sSubIndustry,
                                                          sWeight, sSecurityReturn, IndexRow.VendorFormat.CONSTITUENT);
-                        //bool found = false;
-                        //if ( sTicker.ToLower().Equals("aa"))
-                        //{
-                        //    found = true;
-                        //}
-                        indexRow.CurrentTicker = sharedData.GetSecurityMasterCurrentTicker( sTicker, sCusip, "S", sDate);
+
+                        if( mUseSnpSecurityMaster.Equals(true))
+                            indexRow.CurrentTicker = sharedData.GetSecurityMasterCurrentTickerSnp( sTicker, sCusip, sDate);
+                        else
+                            indexRow.CurrentTicker = sharedData.GetSecurityMasterCurrentTickerRussell(sTicker, sCusip, sDate);
                         indexRowsTickerSort.Add(indexRow);
                         i = i + 1;
                     }

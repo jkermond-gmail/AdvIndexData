@@ -2090,7 +2090,7 @@ RU3000    20170103   CHF   1662.25918   1365.02441   1696.48181   1567.99955    
                         IndexRow indexRow = new IndexRow(sDate, sIndexName, sCusip, sTicker, 
                                                          sSector, sSubSector, sIndustry, "",
                                                          sWeight, sSecurityReturn, IndexRow.VendorFormat.CONSTITUENT);
-                        indexRow.CurrentTicker = sharedData.GetSecurityMasterCurrentTickerRussell(sTicker, sCusip, "R", sDate);
+                        indexRow.CurrentTicker = sharedData.GetSecurityMasterCurrentTickerRussell(sTicker, sCusip, sDate);
                         indexRowsTickerSort.Add(indexRow);
                     }
                 }

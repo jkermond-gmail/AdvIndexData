@@ -41,13 +41,9 @@ namespace IndexDataEngineLibrary
         //private string mConnectionString = @"server=JKERMOND-NEW\SQLEXPRESS2014;database=IndexData;uid=sa;pwd=M@gichat!";
         private string mConnectionStringAmdVifs = null;
         private string mConnectionStringIndexData = null;
-
         private SqlConnection mSqlConn = null;
-
         private const string NumberFormat = "0.#########";
         private CultureInfo mCultureInfo = new CultureInfo("en-US");
-
-
 
         Vendors mVendor;
 
@@ -195,9 +191,75 @@ namespace IndexDataEngineLibrary
             }
         }
 
-        public string GetSecurityMasterCurrentTickerRussell(string Ticker, string Cusip, string Vendor, string sDate  )
+        public string GetSecurityMasterCurrentCusip(string OriginalCusip, string Vendor, string sDate)
         {
-            string SecurityMasterCurrentTicker = Ticker; 
+            string currentCusip = OriginalCusip;
+            string sChangeDate = sDate;
+
+            try
+            {
+                if (mSqlConn == null)
+                {
+                    mSqlConn = new SqlConnection(ConnectionStringIndexData);
+                    mSqlConn.Open();
+                }
+
+                bool found = false;
+                string SqlSelect = @"
+                    select NewSymbol, ChangeDate from HistoricalSymbolChanges
+                    where OldSymbol = @Cusip and
+                    ChangeDate > @ChangeDate
+                    ";
+                SqlCommand cmd = new SqlCommand(SqlSelect, mSqlConn);
+                SqlDataReader dr = null;
+                cmd.Parameters.Add("@Cusip", SqlDbType.VarChar);
+                cmd.Parameters.Add("@ChangeDate", SqlDbType.DateTime);
+
+                while ( found.Equals(false))
+                {
+                    cmd.Parameters["@Cusip"].Value = currentCusip;
+                    cmd.Parameters["@ChangeDate"].Value = sChangeDate;
+
+                    dr = cmd.ExecuteReader();
+                    if (dr.HasRows)
+                    {
+                        if (dr.Read())
+                        {
+                            currentCusip = dr["NewSymbol"].ToString();
+                            sChangeDate = dr["ChangeDate"].ToString(); 
+                            dr.Close();
+                        }
+                    }
+                    else
+                        found = true;
+                    dr.Close();
+                }
+            }
+            catch (SqlException ex)
+            {
+                if (ex.Number == 2627)
+                {
+                    LogHelper.WriteLine(ex.Message);
+                }
+            }
+            finally
+            {
+                if (!currentCusip.Equals(OriginalCusip))
+                {
+                    LogHelper.WriteLine("GetSecurityMasterCurrentCusipRussell Current, " + currentCusip + ", Original," + OriginalCusip);
+                }
+            }
+
+            return (currentCusip);
+        }
+
+        public string GetSecurityMasterCurrentTickerRussell(string Ticker, string Cusip, string sDate  )
+        {
+            string SecurityMasterCurrentTicker = Ticker;
+            string Vendor = "R";
+
+            string CurrentCusip = GetSecurityMasterCurrentCusip(Cusip, Vendor, sDate);
+
             try
             {
                 if (mSqlConn == null)
@@ -213,7 +275,7 @@ namespace IndexDataEngineLibrary
                 SqlCommand cmd = new SqlCommand(SqlSelect, mSqlConn);
                 SqlDataReader dr = null;
                 cmd.Parameters.Add("@Cusip", SqlDbType.VarChar);
-                cmd.Parameters["@Cusip"].Value = Cusip;
+                cmd.Parameters["@Cusip"].Value = CurrentCusip;
 
                 dr = cmd.ExecuteReader();
                 if (dr.HasRows)
@@ -238,15 +300,16 @@ namespace IndexDataEngineLibrary
             {
                 if(!Ticker.Equals(SecurityMasterCurrentTicker))
                 {
-                    LogHelper.WriteLine("GetSecurityMasterCurrentTickerRussell: " + Ticker + "," + SecurityMasterCurrentTicker + "," + Cusip);
+                    LogHelper.WriteLine("GetSecurityMasterCurrentTickerRussell: " + Ticker + "," + SecurityMasterCurrentTicker + "," + Cusip + "," + CurrentCusip);
                 }
             }
             return (SecurityMasterCurrentTicker);
         }
 
-        public string GetSecurityMasterCurrentTicker(string Ticker, string Cusip, string Vendor, string sDate)
+        public string GetSecurityMasterCurrentTickerSnp(string Ticker, string Cusip, string sDate)
         {
             string SecurityMasterCurrentTicker = Ticker;
+            string Vendor = "S";
             try
             {
                 if (mSqlConn == null)
@@ -297,8 +360,8 @@ namespace IndexDataEngineLibrary
                 if (!Ticker.Equals(SecurityMasterCurrentTicker))
                 {
                     LogHelper.WriteLine("GetSecurityMasterCurrentTickerSnp:" + Ticker + ", " + SecurityMasterCurrentTicker + "," + Cusip);
-                    GetSecurityMasterCurrentTickerRussell(Ticker, Cusip, Vendor, sDate);
-                    LogHelper.WriteLine(" ");
+                    //GetSecurityMasterCurrentTickerRussell(Ticker, Cusip, sDate);
+                    //LogHelper.WriteLine(" ");
                 }
             }
             return (SecurityMasterCurrentTicker);
@@ -306,81 +369,81 @@ namespace IndexDataEngineLibrary
         }
 
 
-        public string GetSecurityMasterCurrentTickerInDev(string Ticker, string Cusip, string Vendor, string sDate)
-        {
-            string SecurityMasterCurrentTicker = Ticker;
-            try
-            {
-                if (mSqlConn == null)
-                {
-                    mSqlConn = new SqlConnection(ConnectionStringIndexData);
-                    mSqlConn.Open();
-                }
+        //public string GetSecurityMasterCurrentTickerInDev(string Ticker, string Cusip, string Vendor, string sDate)
+        //{
+        //    string SecurityMasterCurrentTicker = Ticker;
+        //    try
+        //    {
+        //        if (mSqlConn == null)
+        //        {
+        //            mSqlConn = new SqlConnection(ConnectionStringIndexData);
+        //            mSqlConn.Open();
+        //        }
 
-                string SqlSelect = @"
-                    select StockKey from HistoricalSecurityMasterFull
-                    where Ticker = @Ticker
-                    and Cusip = @Cusip
-                    and Vendor = @Vendor
-                    ";
-                SqlCommand cmd = new SqlCommand(SqlSelect, mSqlConn);
-                SqlDataReader dr = null;
-                string StockKey = "";
-                cmd.Parameters.Add("@Ticker", SqlDbType.VarChar);
-                cmd.Parameters.Add("@Cusip", SqlDbType.VarChar);
-                cmd.Parameters.Add("@Vendor", SqlDbType.VarChar);
-                cmd.Parameters["@Ticker"].Value = Ticker;
-                cmd.Parameters["@Cusip"].Value = Cusip;
-                cmd.Parameters["@Vendor"].Value = Vendor;
+        //        string SqlSelect = @"
+        //            select StockKey from HistoricalSecurityMasterFull
+        //            where Ticker = @Ticker
+        //            and Cusip = @Cusip
+        //            and Vendor = @Vendor
+        //            ";
+        //        SqlCommand cmd = new SqlCommand(SqlSelect, mSqlConn);
+        //        SqlDataReader dr = null;
+        //        string StockKey = "";
+        //        cmd.Parameters.Add("@Ticker", SqlDbType.VarChar);
+        //        cmd.Parameters.Add("@Cusip", SqlDbType.VarChar);
+        //        cmd.Parameters.Add("@Vendor", SqlDbType.VarChar);
+        //        cmd.Parameters["@Ticker"].Value = Ticker;
+        //        cmd.Parameters["@Cusip"].Value = Cusip;
+        //        cmd.Parameters["@Vendor"].Value = Vendor;
 
-                dr = cmd.ExecuteReader();
-                if (dr.HasRows)
-                {
-                    if (dr.Read())
-                    {
-                        StockKey = dr["StockKey"].ToString();
-                        dr.Close();
-                        if (StockKey.Length > 0)
-                        {
-                            cmd.Parameters.Add("@TickerDate", SqlDbType.DateTime);
-                            cmd.Parameters["@TickerDate"].Value = sDate;
-                            cmd.Parameters.Add("@StockKey", SqlDbType.VarChar);
-                            cmd.Parameters["@StockKey"].Value = StockKey;
+        //        dr = cmd.ExecuteReader();
+        //        if (dr.HasRows)
+        //        {
+        //            if (dr.Read())
+        //            {
+        //                StockKey = dr["StockKey"].ToString();
+        //                dr.Close();
+        //                if (StockKey.Length > 0)
+        //                {
+        //                    cmd.Parameters.Add("@TickerDate", SqlDbType.DateTime);
+        //                    cmd.Parameters["@TickerDate"].Value = sDate;
+        //                    cmd.Parameters.Add("@StockKey", SqlDbType.VarChar);
+        //                    cmd.Parameters["@StockKey"].Value = StockKey;
 
-                            SqlSelect = @"
-                            select Top 1 Ticker from HistoricalSecurityMasterFull
-                            where StockKey = @StockKey
-                            order by EndDate desc
-                            ";
-                            cmd.CommandText = SqlSelect;
-                            dr = cmd.ExecuteReader();
-                            if (dr.HasRows)
-                            {
-                                if (dr.Read())
-                                {
-                                    SecurityMasterCurrentTicker = dr["Ticker"].ToString();
-                                }
-                            }
-                            dr.Close();
-                        }
-                    }
-                }
-                dr.Close();
-            }
-            catch (SqlException ex)
-            {
-                if (ex.Number == 2627)
-                {
-                    LogHelper.WriteLine(ex.Message);
-                }
-            }
-            finally
-            {
+        //                    SqlSelect = @"
+        //                    select Top 1 Ticker from HistoricalSecurityMasterFull
+        //                    where StockKey = @StockKey
+        //                    order by EndDate desc
+        //                    ";
+        //                    cmd.CommandText = SqlSelect;
+        //                    dr = cmd.ExecuteReader();
+        //                    if (dr.HasRows)
+        //                    {
+        //                        if (dr.Read())
+        //                        {
+        //                            SecurityMasterCurrentTicker = dr["Ticker"].ToString();
+        //                        }
+        //                    }
+        //                    dr.Close();
+        //                }
+        //            }
+        //        }
+        //        dr.Close();
+        //    }
+        //    catch (SqlException ex)
+        //    {
+        //        if (ex.Number == 2627)
+        //        {
+        //            LogHelper.WriteLine(ex.Message);
+        //        }
+        //    }
+        //    finally
+        //    {
 
-            }
-            return (SecurityMasterCurrentTicker);
+        //    }
+        //    return (SecurityMasterCurrentTicker);
 
-        }
+        //}
 
 
         public void AddSymbolChange(string sVendor, DateTime oChangeDate, string sOldSymbol, string sNewSymbol, string sCompanyName)

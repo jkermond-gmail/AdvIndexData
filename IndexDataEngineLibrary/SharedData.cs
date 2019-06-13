@@ -246,7 +246,7 @@ namespace IndexDataEngineLibrary
             {
                 if (!currentCusip.Equals(OriginalCusip))
                 {
-                    LogHelper.WriteLine("GetSecurityMasterCurrentCusipRussell Current, " + currentCusip + ", Original," + OriginalCusip);
+                 //   LogHelper.WriteLine("GetSecurityMasterCurrentCusipRussell Current, " + currentCusip + ", Original," + OriginalCusip);
                 }
             }
 
@@ -300,7 +300,7 @@ namespace IndexDataEngineLibrary
             {
                 if(!Ticker.Equals(SecurityMasterCurrentTicker))
                 {
-                    LogHelper.WriteLine("GetSecurityMasterCurrentTickerRussell: " + Ticker + "," + SecurityMasterCurrentTicker + "," + Cusip + "," + CurrentCusip);
+                   // LogHelper.WriteLine("GetSecurityMasterCurrentTickerRussell: " + Ticker + "," + SecurityMasterCurrentTicker + "," + Cusip + "," + CurrentCusip);
                 }
             }
             return (SecurityMasterCurrentTicker);
@@ -359,7 +359,7 @@ namespace IndexDataEngineLibrary
             {
                 if (!Ticker.Equals(SecurityMasterCurrentTicker))
                 {
-                    LogHelper.WriteLine("GetSecurityMasterCurrentTickerSnp:" + Ticker + ", " + SecurityMasterCurrentTicker + "," + Cusip);
+                    //LogHelper.WriteLine("GetSecurityMasterCurrentTickerSnp:" + Ticker + ", " + SecurityMasterCurrentTicker + "," + Cusip);
                     //GetSecurityMasterCurrentTickerRussell(Ticker, Cusip, sDate);
                     //LogHelper.WriteLine(" ");
                 }

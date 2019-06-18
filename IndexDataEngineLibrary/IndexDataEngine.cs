@@ -26,7 +26,6 @@ namespace IndexDataEngineLibrary
         private DateTime IndexDataProcessDate;
         private bool testing = false;
 
-
         public IndexDataEngine()
         {
             //LogHelper.Info("IndexDataEngine()", "IndexDataEngineLibrary");
@@ -57,7 +56,10 @@ namespace IndexDataEngineLibrary
                 LogHelper.ArchiveLog(IndexDataProcessDate.Date);
                 InitializeProcessStatus(sVifsProcessDate);
                 setIndexDataProcessDate(sVifsProcessDate);
+                Mail mail = new Mail();
+                mail.SendMail("AdvIndexData: New business day started " + sVifsProcessDate);
             }
+
             ProcessIndexDataWork(sVifsProcessDate);
 
             if (testing)
@@ -149,11 +151,6 @@ namespace IndexDataEngineLibrary
                         if (JobsProcessed < JobsTotal)
                             LogHelper.WriteLine("Vendor | " + vendor + " | Dataset | " + dataset + " | sProcessDate | " + sProcessDate + " | JobsProcessed | "
                                             + JobsProcessed + " | JobsTotal | " + JobsTotal);
-
-                        //if (VendorDatasetFilesGenerated(vendor, dataset, sProcessDate, out FilesTotal, out FilesGenerated))
-                        //{
-
-                        //}
                     }
                     else
                     {

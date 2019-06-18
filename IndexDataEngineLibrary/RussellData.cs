@@ -190,6 +190,8 @@ namespace IndexDataEngineLibrary
                     }
                 }
                 sharedData.VendorDatasetJobsUpdateProcessDate(Vendors.Russell.ToString(), Dataset, sProcessDate);
+                Mail mail = new Mail();
+                mail.SendMail("AdvIndexData: VendorDatasetJobs complete  " + Vendors.Russell.ToString() + " " + Dataset + " " + sProcessDate);
             }
             catch (SqlException ex)
             {

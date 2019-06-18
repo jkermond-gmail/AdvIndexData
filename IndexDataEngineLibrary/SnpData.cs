@@ -102,7 +102,11 @@ namespace IndexDataEngineLibrary
                 ProcessStatus.Update(sProcessDate, Vendors.Snp.ToString(), Dataset, IndexName, ProcessStatus.WhichStatus.AxmlConstituentData, ProcessStatus.StatusValue.Pass);
                 GenerateReturnsForDateRange(sProcessDate, sProcessDate, IndexName, AdventOutputType.Sector, false);
                 ProcessStatus.Update(sProcessDate, Vendors.Snp.ToString(), Dataset, IndexName, ProcessStatus.WhichStatus.AxmlSectorData, ProcessStatus.StatusValue.Pass);
+                // Note: after this is released to production, review the work that would replace StandardAndPoors with Snp to make all tables consistent
                 sharedData.VendorDatasetJobsUpdateProcessDate("StandardAndPoors", Dataset, sProcessDate);
+                Mail mail = new Mail();
+                mail.SendMail("AdvIndexData: VendorDatasetJobs complete  " + Vendors.Snp.ToString() + " " + Dataset + " " + sProcessDate);
+
             }
         }
 

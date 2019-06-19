@@ -1,0 +1,14 @@
+Release Notes:
+
+When we release this to production:
+- Migrate tables:
+. Clients
+. Jobs
+. JobIndexIds
+. States
+. Countries
+
+Make sure 
+. Jobs : ProcessDate gets set to the current date
+. Make sure sp900 jobs (2) get added
+

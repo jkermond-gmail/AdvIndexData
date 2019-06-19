@@ -27,6 +27,8 @@ namespace IndexDataEngineLibrary
 
         public enum StatusValue
         {
+            Unassigned,
+            AssignToPass,
             Pass,
             Fail
         }
@@ -272,6 +274,102 @@ namespace IndexDataEngineLibrary
             }
             return (GenerateReturns);
         }
+
+        public static StatusValue CheckStatus(string sProcessDate, string Vendor, string Dataset, string IndexName, WhichStatus whichStatus)
+        {
+            StatusValue checkStatus = StatusValue.Unassigned;
+            StatusValue checkStatus400 = StatusValue.Unassigned;
+            StatusValue checkStatus500 = StatusValue.Unassigned;
+            StatusValue checkStatus600 = StatusValue.Unassigned;
+
+            try
+            {
+                if (mSqlConn == null)
+                {
+                    OpenSqlConn();
+                }
+
+                string Sql = @"
+                    select * from ProcessStatus
+                    where ProcessDate = @ProcessDate 
+                    and Vendor = @Vendor
+                    and Dataset = @Dataset
+                    and IndexName = @IndexName 
+                    ";
+
+                SqlCommand cmd = new SqlCommand(Sql, mSqlConn);
+                cmd.Parameters.Add("@ProcessDate", SqlDbType.DateTime);
+                cmd.Parameters.Add("@Vendor", SqlDbType.VarChar);
+                cmd.Parameters.Add("@Dataset", SqlDbType.VarChar);
+                cmd.Parameters.Add("@IndexName", SqlDbType.VarChar);
+                cmd.Parameters["@ProcessDate"].Value = sProcessDate;
+                cmd.Parameters["@Vendor"].Value = Vendor;
+                cmd.Parameters["@Dataset"].Value = Dataset;
+                cmd.Parameters["@IndexName"].Value = IndexName;
+                SqlDataReader dr = cmd.ExecuteReader();
+                if (dr.HasRows)
+                {
+                    if (dr.Read())
+                    {
+                        if (whichStatus.Equals(WhichStatus.OpenData))
+                        {
+                            if (dr["OpenData"].ToString().Equals("P"))
+                                checkStatus = StatusValue.Pass;
+                            else if (dr["OpenData"].ToString().Equals(""))
+                                checkStatus = StatusValue.Unassigned;
+                        }
+                        else if (whichStatus.Equals(WhichStatus.CloseData))
+                        {
+                            if (dr["CloseData"].ToString().Equals("P"))
+                                checkStatus = StatusValue.Pass;
+                            else if (dr["CloseData"].ToString().Equals(""))
+                                checkStatus = StatusValue.Unassigned;
+                        }
+                    }
+                }
+                dr.Close();
+            }
+
+            catch (SqlException ex)
+            {
+                if (ex.Number == 2627)
+                {
+                    LogHelper.WriteLine(ex.Message);
+                }
+            }
+            finally
+            {
+            }
+
+            if (checkStatus.Equals(ProcessStatus.StatusValue.Unassigned))
+            {
+                if (Dataset.Equals("sp900"))
+                {
+                    checkStatus400 = CheckStatus(sProcessDate, Vendor, "sp400", "sp400", whichStatus);
+                    checkStatus500 = CheckStatus(sProcessDate, Vendor, "sp500", "sp500", whichStatus);
+                    if (checkStatus400.Equals(StatusValue.Pass) && checkStatus500.Equals(StatusValue.Pass))
+                        checkStatus = StatusValue.AssignToPass;
+                }
+                else if (Dataset.Equals("sp1000"))
+                {
+                    checkStatus400 = CheckStatus(sProcessDate, Vendor, "sp400", "sp400", whichStatus);
+                    checkStatus600 = CheckStatus(sProcessDate, Vendor, "sp600", "sp600", whichStatus);
+                    if (checkStatus400.Equals(StatusValue.Pass) && checkStatus600.Equals(StatusValue.Pass))
+                        checkStatus = StatusValue.AssignToPass;
+                }
+                else if (Dataset.Equals("sp1500"))
+                {
+                    checkStatus400 = CheckStatus(sProcessDate, Vendor, "sp400", "sp400", whichStatus);
+                    checkStatus500 = CheckStatus(sProcessDate, Vendor, "sp500", "sp500", whichStatus);
+                    checkStatus600 = CheckStatus(sProcessDate, Vendor, "sp600", "sp600", whichStatus);
+                    if (checkStatus400.Equals(StatusValue.Pass) && checkStatus500.Equals(StatusValue.Pass) && checkStatus600.Equals(StatusValue.Pass))
+                        checkStatus = StatusValue.AssignToPass;
+                }
+
+            }
+            return (checkStatus);
+        }
+
 
     }
 }

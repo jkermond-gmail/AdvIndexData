@@ -20,42 +20,41 @@ namespace AdventUtilityLibrary
         //    client.Credentials = new NetworkCredential("myemail@gmail.com", "password");
         //    client.Send(Message);
         //}
+        bool mSendMail = false; 
 
-        public void SendMail2(string sMessage)
-        { 
-            SmtpClient client = new SmtpClient();
-            client.Host = "10.128.8.25";
-            client.Timeout = 10000;
-            client.DeliveryMethod = SmtpDeliveryMethod.Network;
-
-            MailMessage mm = new MailMessage("hmd@hubdata.com", "jkermond@gmail.com", "test", "test");
-                    mm.BodyEncoding = UTF8Encoding.UTF8;
-            mm.DeliveryNotificationOptions = DeliveryNotificationOptions.OnFailure;
-
-            client.Send(mm);
+        public Mail()
+        {
+            mSendMail = AppSettings.Get<bool>("sendMail");
         }
 
         public void SendMail(string sMessage)
         {
-            MailMessage mail = new MailMessage();
-            SmtpClient SmtpServer = new SmtpClient();
-            mail.To.Add("jkermond@gmail.com");
-            mail.From = new MailAddress("advindexdata@hubdata.com");
-            mail.Subject = "test subject";
-            mail.IsBodyHtml = false;
-            mail.Body = sMessage;
-            SmtpServer.Host = "10.128.8.25";
-            SmtpServer.Port = 25;
-            SmtpServer.DeliveryMethod = System.Net.Mail.SmtpDeliveryMethod.Network;
-            try
+            string subject = "AdvIndexData Status: " + sMessage;
+            LogHelper.WriteLine("Send mail " + subject);
+
+            if (mSendMail.Equals(true))
             {
-                SmtpServer.Send(mail);
-            }
-            catch (Exception ex)
-            {
-                LogHelper.WriteLine("Mail Exception Message: " + ex.Message);
-                if (ex.InnerException != null)
-                    LogHelper.WriteLine("Mail Exception Inner:   " + ex.InnerException);
+                MailMessage mail = new MailMessage();
+                SmtpClient SmtpServer = new SmtpClient();
+                mail.To.Add("jkermond@advent.com");
+                mail.To.Add("jkermond@gmail.com");
+                mail.From = new MailAddress("advindexdata@hubdata.com");
+                mail.Subject = subject;
+                mail.IsBodyHtml = false;
+                mail.Body = sMessage;
+                SmtpServer.Host = "10.128.8.25";
+                SmtpServer.Port = 25;
+                SmtpServer.DeliveryMethod = System.Net.Mail.SmtpDeliveryMethod.Network;
+                try
+                {
+                    SmtpServer.Send(mail);
+                }
+                catch (Exception ex)
+                {
+                    LogHelper.WriteLine("Mail Exception Message: " + ex.Message);
+                    if (ex.InnerException != null)
+                        LogHelper.WriteLine("Mail Exception Inner:   " + ex.InnerException);
+                }
             }
         }
     }

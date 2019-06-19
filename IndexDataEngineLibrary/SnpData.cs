@@ -232,6 +232,7 @@ namespace IndexDataEngineLibrary
             string FilePath = AppSettings.Get<string>("VifsPath.Snp");
             string FileName = "";
             string sMsg = "ProcessVendorFiles: " + oStartDate.ToShortDateString() + " to " + oEndDate.ToShortDateString() + " " + Dataset;
+            ProcessStatus.StatusValue statusValue = ProcessStatus.StatusValue.Unassigned;
 
             LogHelper.WriteLine(sMsg + "Started " + DateTime.Now);
 
@@ -345,6 +346,13 @@ _SPMLP.SDL
                             AddSnpOpeningData(FileName, oProcessDate);
                             ProcessStatus.Update(oProcessDate, Vendors.Snp.ToString(), Dataset, "", ProcessStatus.WhichStatus.OpenData, ProcessStatus.StatusValue.Pass);
                         }
+
+                        if (Dataset.Equals("sp900") || Dataset.Equals("sp1000") || Dataset.Equals("sp1500"))
+                        {
+                            statusValue = ProcessStatus.CheckStatus(oProcessDate.ToString("MM/dd/yyyy"), Vendors.Snp.ToString(), Dataset, Dataset, ProcessStatus.WhichStatus.OpenData);
+                            if (statusValue.Equals(ProcessStatus.StatusValue.AssignToPass))
+                                ProcessStatus.Update(oProcessDate, Vendors.Snp.ToString(), Dataset, "", ProcessStatus.WhichStatus.OpenData, ProcessStatus.StatusValue.Pass);
+                        }
                     }
 
                     if (bCloseFiles)
@@ -413,6 +421,14 @@ _SPMLP.SDL
                             AddSnpClosingData(FileName, oProcessDate);
                             ProcessStatus.Update(oProcessDate, Vendors.Snp.ToString(), Dataset, "", ProcessStatus.WhichStatus.CloseData, ProcessStatus.StatusValue.Pass);
                         }
+
+                        if (Dataset.Equals("sp900") || Dataset.Equals("sp1000") || Dataset.Equals("sp1500"))
+                        {
+                            statusValue = ProcessStatus.CheckStatus(oProcessDate.ToString("MM/dd/yyyy"), Vendors.Snp.ToString(), Dataset, Dataset, ProcessStatus.WhichStatus.CloseData);
+                            if (statusValue.Equals(ProcessStatus.StatusValue.AssignToPass))
+                                ProcessStatus.Update(oProcessDate, Vendors.Snp.ToString(), Dataset, "", ProcessStatus.WhichStatus.CloseData, ProcessStatus.StatusValue.Pass);
+                        }
+
                     }
 
                     if (bTotalReturnFiles)

@@ -57,15 +57,10 @@ namespace IndexDataForm
 
         private void timerRunIndexData_Tick(object sender, EventArgs e)
         {
-            //LogHelper.Info("timerRunIndexData_Tick", "IndexDataForm");
-            TimerEnableDisable("Start Working", false);
-            // Begin checking if there is any index data work to do
-            LogHelper.WriteLine("Index Data Engine Running");
+            TimerEnableDisable("Index Data Engine Running", false);
             indexDataEngine = new IndexDataEngine();
             indexDataEngine.Run();
-            LogHelper.WriteLine("Index Data Engine Waiting " + timerInterval/1000 + " seconds ");
-            // End checking if there is any index data work to do
-            TimerEnableDisable("Done Working", true);
+            TimerEnableDisable("Index Data Engine Waiting " + timerInterval / 1000 + " seconds ", true);
         }
 
         private void TimerEnableDisable(string message, bool enable)

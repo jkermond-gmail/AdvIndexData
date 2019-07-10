@@ -124,9 +124,33 @@ namespace AdventUtilityLibrary
             return (PrevEndOfMonthDay(date));
         }
 
+        public static DateTime EndOfMonthDay(DateTime date)
+        {
+            DateTime eomDate = DateTime.MinValue;
+
+            if (date.Month < 12)
+                eomDate = new DateTime(date.Year, date.Month + 1, 1);
+            else
+                eomDate = new DateTime(date.Year + 1, 1, 1);
+
+            return (eomDate.AddDays(-1));
+        }
+
+        public static DateTime EndOfMonthDay(string sDate)
+        {
+            DateTime date = DateTime.Parse(sDate);
+            return (EndOfMonthDay(date));
+        }
+
+
         public static bool IsPrevEndofMonthOnWeekend(DateTime Date)
         {
             return(IsPrevEndofMonthOnWeekend(Date.ToString("MM/dd/yyyy")));
+        }
+
+        public static bool IsEndofMonthOnWeekend(DateTime Date)
+        {
+            return (IsEndofMonthOnWeekend(Date.ToString("MM/dd/yyyy")));
         }
 
         public static bool IsPrevEndofMonthOnWeekend(string sDate)
@@ -146,6 +170,21 @@ namespace AdventUtilityLibrary
 
             }
 
+            return (isOnWeekend);
+        }
+
+        public static bool IsEndofMonthOnWeekend(string sDate)
+        {
+            bool isOnWeekend = false;
+
+            DateTime businessDay = DateTime.Parse(sDate);
+            DateTime nextBusinessDay = NextBusinessDay(businessDay);
+            DateTime endOfMonthDay = EndOfMonthDay(sDate);
+
+            if ((endOfMonthDay < nextBusinessDay) && !IsWeekday(endOfMonthDay))
+            {
+                isOnWeekend = true;
+            }
             return (isOnWeekend);
         }
     }

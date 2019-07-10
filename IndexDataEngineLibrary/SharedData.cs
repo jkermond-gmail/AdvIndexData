@@ -664,32 +664,56 @@ namespace IndexDataEngineLibrary
         }
 
         /*
-<?xml version="1.0"?>
-<AdventXML version="3.0">
-<AccountProvider name="Russell" code="rl">
-<XSXList index="r1000v" date="20180402" batch="6">
-<XSXPeriod from="20180329" through="20180331" indexperfiso="usd">
-<XSXDetail type="cs" iso="usd" symbol="a" weight="0.135035463" irr="0"/>
-<XSXDetail type="cs" iso="usd" symbol="aa" weight="0.068634999" irr="0"/>
-.
-.
-<XSXDetail type="cs" iso="usd" symbol="zion" weight="0.085081808" irr="0"/>
-<XSXDetail type="cs" iso="usd" symbol="znga" weight="0.02324712" irr="0"/>
-</XSXPeriod>
-<XSXPeriod from="20180331" through="20180402" indexperfiso="usd">
-<XSXDetail type="cs" iso="usd" symbol="a" weight="0.135035463" irr="-3.469003739"/>
-<XSXDetail type="cs" iso="usd" symbol="aa" weight="0.068634999" irr="-1.379007356"/>
+        Support two cases:
 
-.
-.
-<XSXDetail type="cs" iso="usd" symbol="zion" weight="0.085081808" irr="-2.579005934"/>
-<XSXDetail type="cs" iso="usd" symbol="znga" weight="0.02324712" irr="-3.005021719"/>
-</XSXPeriod>
-</XSXList>
-</AccountProvider>
-</AdventXML>
+            1. last business day on a Friday and last calendar day is over the weekend
+            last business day is Fri 06/28/19
+            last calendar day is Sun 06/30/19
+            Output should be:
+            Filename should have end of month filename
+            ix-20190630-xse-sp500.XSX
+            Followed by returns for the business day from the prev business day
+            <?xml version="1.0"?>
+            <AdventXML version="3.0">
+            <AccountProvider name="StandardAndPoors" code="ix">
+            <XSXList index="sp500" date="20190630" batch="7">
+            <XSXPeriod from="20190627" through="20190628" indexperfiso="usd">
+            <XSXDetail type="cs" iso="usd" symbol="a" weight="0.095238957" irr="2.022134171"/>
+            <XSXDetail type="cs" iso="usd" symbol="aal" weight="0.052414972" irr="1.430793157"/>
+            ...
+            </XSXPeriod>
+            Followed by dummied returns for the period from the last business day to the end of month day
+            <XSXPeriod from="20190628" through="20190630" indexperfiso="usd">
+            <XSXDetail type="cs" iso="usd" symbol="a" weight="0.095238957" irr="0"/>
+            <XSXDetail type="cs" iso="usd" symbol="aal" weight="0.052414972" irr="0"/>
+            <XSXDetail type="cs" iso="usd" symbol="aap" weight="0.044817006" irr="0"/>
+            </XSXPeriod>
+            </XSXList>
+            </AccountProvider>
+            </AdventXML>
+
+            1. business day on a Monday or Tues if Monday is a holiday and last calendar day is over the previous weekend
+            Filename has the business day
+            ix-20190701-xse-sp500.XSX
+            Followed by dummied returns for the period from the last business day to the end of month day
+            <?xml version="1.0"?>
+            <AdventXML version="3.0">
+            <AccountProvider name="StandardAndPoors" code="ix">
+            <XSXList index="sp500" date="20190701" batch="7">
+            <XSXPeriod from="20190628" through="20190630" indexperfiso="usd">
+            <XSXDetail type="cs" iso="usd" symbol="a" weight="0.096560495" irr="0"/>
+            <XSXDetail type="cs" iso="usd" symbol="aal" weight="0.05283426" irr="0"/>
+            ...
+            </XSXPeriod>
+            Followed by return from the end of month day to the business day
+            <XSXPeriod from="20190630" through="20190701" indexperfiso="usd">
+            <XSXDetail type="cs" iso="usd" symbol="a" weight="0.096560495" irr="1.706173832"/>
+            <XSXDetail type="cs" iso="usd" symbol="aal" weight="0.05283426" irr="0.827966881"/>
+            </XSXPeriod>
+            </XSXList>
+            </AccountProvider>
+            </AdventXML>
          */
-
         public void GenerateAxmlFileConstituents(string sBusinessDate, string sFileDate, string sIndexName, Vendors vendor, List<IndexRow> indexRowsTickerSort, bool IsFirstDate, bool IsLastDate)
         {
             string mAxmlFilename = "";
@@ -700,7 +724,6 @@ namespace IndexDataEngineLibrary
             string sPrevBusinessDate = DateHelper.PrevBusinessDay(sBusinessDate);
 
             SortedList sortedList = new SortedList();
-
 
             // fuk  need to deal with duplicates
             foreach (IndexRow indexRow in indexRowsTickerSort)
@@ -717,20 +740,6 @@ namespace IndexDataEngineLibrary
                     sortedList.Add(indexRow.CurrentTicker + ".dup", indexRow.Weight.ToString(NumberFormat, mCultureInfo) + "|" + rateOfReturn.ToString(NumberFormat, mCultureInfo));
             }
 
-
-            /*
-             <?xml version="1.0"?>
-            <AdventXML version="3.0">
-            <AccountProvider name="Russell" code="rl">
-            <XSXList index="r3000" date="20170609" batch="1">
-            <XSXPeriod from="20170608" through="20170609" indexperfiso="usd">
-            <XSXDetail type="cs" iso="usd" symbol="a" weight="0.077572343" irr="-1.56300165"/>
-
-            </XSXPeriod>
-            </XSXList>
-            </AccountProvider>
-            </AdventXML>
-             */
             // https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/file-system/how-to-write-to-a-text-file
             // Example #3: Write only some strings in an array to a file.
             // The using statement automatically flushes AND CLOSES the stream and calls 

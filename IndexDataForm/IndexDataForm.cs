@@ -296,8 +296,11 @@ namespace IndexDataForm
 
         private void btnTestEmail_Click(object sender, EventArgs e)
         {
-            Mail mail = new Mail();
-            mail.SendMail("Message");
+            //Mail mail = new Mail();
+            //mail.SendMail("Message");
+            DateHelper.IsEndofMonthOnWeekend("06/28/2019");
+            DateHelper.IsEndofMonthOnWeekend("06/27/2019");
+
         }
     }
 }

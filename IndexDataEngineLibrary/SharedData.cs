@@ -717,11 +717,14 @@ namespace IndexDataEngineLibrary
         public void GenerateAxmlFileConstituents(string sBusinessDate, string sFileDate, string sIndexName, Vendors vendor, List<IndexRow> indexRowsTickerSort, bool IsFirstDate, bool IsLastDate)
         {
             string mAxmlFilename = "";
-            bool addDummyEndOfMonthAXML = DateHelper.IsPrevEndofMonthOnWeekend(sBusinessDate);
+            bool addDummyEndOfMonthAxmlAfter = false;
+            bool addDummyEndOfMonthAxmlBefore = DateHelper.IsPrevEndofMonthOnWeekend(sBusinessDate);
 
-            DateTime endofMonthDate = DateHelper.PrevEndOfMonthDay(sBusinessDate);
-            string sPrevEndOfMonthDate = endofMonthDate.ToString("yyyyMMdd");
+            DateTime prevEndofMonthDate = DateHelper.PrevEndOfMonthDay(sBusinessDate);
+            string sPrevEndOfMonthDate = prevEndofMonthDate.ToString("yyyyMMdd");
             string sPrevBusinessDate = DateHelper.PrevBusinessDay(sBusinessDate);
+            string sEndOfMonthDate = "";
+
 
             SortedList sortedList = new SortedList();
 
@@ -765,8 +768,19 @@ namespace IndexDataEngineLibrary
                 batch = "batch=\"1\">";
             }
 
-            if( IsFirstDate && IsLastDate)
+            if (IsFirstDate && IsLastDate)
+            {
+                addDummyEndOfMonthAxmlAfter = DateHelper.IsEndofMonthOnWeekend(sBusinessDate);
+
+                if( addDummyEndOfMonthAxmlAfter)
+                {
+                    DateTime dt = DateHelper.EndOfMonthDay(sFileDate);
+                    sFileDate = dt.ToString("MM/dd/yyyy");
+                    sEndOfMonthDate = DateHelper.ConvertToYYYYMMDD(dt);
+                }
+
                 mAxmlFilename = prefix + DateHelper.ConvertToYYYYMMDD(sFileDate) + "-xse-" + sIndexName + ".XSX";
+            }
             else
                 mAxmlFilename = prefix + DateHelper.ConvertToYYYYMMDD(sFileDate) + "-xse-h" + sIndexName + ".XSX";
 
@@ -788,18 +802,13 @@ namespace IndexDataEngineLibrary
             }
             using (StreamWriter file = new StreamWriter(filename, true))
             {
-                if (addDummyEndOfMonthAXML)
+                if (addDummyEndOfMonthAxmlBefore)
                 {
                     file.WriteLine("<XSXPeriod from=\"" + sPrevBusinessDate + "\" through=\"" + sPrevEndOfMonthDate + "\" indexperfiso=\"usd\">");
-                    //foreach (IndexRow indexRow in indexRowsTickerSort)
-                    //{
-                    //    file.WriteLine("<XSXDetail type=\"cs\" iso=\"usd\" symbol=\"" + indexRow.CurrentTicker + "\" weight=\"" + indexRow.Weight.ToString(NumberFormat, mCultureInfo) + "\" irr=\"" + "0" + "\"/>");
-                    //}
                     foreach (DictionaryEntry pair in sortedList)
                     {
                         file.WriteLine("<XSXDetail type=\"cs\" iso=\"usd\" symbol=\"" + pair.Key + "\" weight=\"" + pair.Value + "\" irr=\"" + "0" + "\"/>");
                     }
-
                     file.WriteLine("</XSXPeriod>");
                     file.WriteLine("<XSXPeriod from=\"" + sPrevEndOfMonthDate + "\" through=\"" + DateHelper.ConvertToYYYYMMDD(sBusinessDate) + "\" indexperfiso=\"usd\">");
                 }
@@ -808,10 +817,6 @@ namespace IndexDataEngineLibrary
                     file.WriteLine("<XSXPeriod from=\"" + DateHelper.PrevBusinessDay(sBusinessDate) + "\" through=\"" + DateHelper.ConvertToYYYYMMDD(sBusinessDate) + "\" indexperfiso=\"usd\">");
                 }
 
-                //foreach (IndexRow indexRow in indexRowsTickerSort)
-                //{
-                //    file.WriteLine("<XSXDetail type=\"cs\" iso=\"usd\" symbol=\"" + indexRow.CurrentTicker + "\" weight=\"" + indexRow.Weight.ToString(NumberFormat, mCultureInfo) + "\" irr=\"" + indexRow.RateOfReturn.ToString(NumberFormat, mCultureInfo) + "\"/>");
-                //}
                 foreach (DictionaryEntry pair in sortedList)
                 {
                     string weight = pair.Value.ToString();
@@ -819,12 +824,20 @@ namespace IndexDataEngineLibrary
 
                     file.WriteLine("<XSXDetail type=\"cs\" iso=\"usd\" symbol=\"" + pair.Key + "\" weight=\"" + vals[0].ToString() + "\" irr=\"" + vals[1].ToString() + "\"/>");
                 }
-
-
                 file.WriteLine("</XSXPeriod>");
+
+                if (addDummyEndOfMonthAxmlAfter)
+                {
+                    file.WriteLine("<XSXPeriod from=\"" + DateHelper.ConvertToYYYYMMDD(sBusinessDate) + "\" through=\"" + sEndOfMonthDate + "\" indexperfiso=\"usd\">");
+                    foreach (DictionaryEntry pair in sortedList)
+                    {
+                        file.WriteLine("<XSXDetail type=\"cs\" iso=\"usd\" symbol=\"" + pair.Key + "\" weight=\"" + pair.Value + "\" irr=\"" + "0" + "\"/>");
+                    }
+                    file.WriteLine("</XSXPeriod>");
+                }
             }
 
-            if( IsLastDate )
+            if ( IsLastDate )
             {
                 using (StreamWriter file = new StreamWriter(filename, true))
                 {
@@ -848,12 +861,16 @@ namespace IndexDataEngineLibrary
             List<IndexRow> indexRowsSectorLevel1RollUp, List<IndexRow> indexRowsSectorLevel2RollUp, List<IndexRow> indexRowsSectorLevel3RollUp, List<IndexRow> indexRowsSectorLevel4RollUp,
              bool IsFirstDate, bool IsLastDate)
         {
-            string mAxmlFilename = "";
-            bool addDummyEndOfMonthAXML = DateHelper.IsPrevEndofMonthOnWeekend(sBusinessDate);
 
-            DateTime endofMonthDate = DateHelper.PrevEndOfMonthDay(sBusinessDate);
-            string sPrevEndOfMonthDate = endofMonthDate.ToString("yyyyMMdd");
+            string mAxmlFilename = "";
+            bool addDummyEndOfMonthAxmlAfter = false;
+            bool addDummyEndOfMonthAxmlBefore = DateHelper.IsPrevEndofMonthOnWeekend(sBusinessDate);
+
+            DateTime prevEndofMonthDate = DateHelper.PrevEndOfMonthDay(sBusinessDate);
+            string sPrevEndOfMonthDate = prevEndofMonthDate.ToString("yyyyMMdd");
             string sPrevBusinessDate = DateHelper.PrevBusinessDay(sBusinessDate);
+            string sEndOfMonthDate = "";
+
 
             /*
              filename: ix-20180105-xnf-sp500.XNX
@@ -917,7 +934,18 @@ namespace IndexDataEngineLibrary
             }
 
             if (IsFirstDate && IsLastDate)
+            {
+                addDummyEndOfMonthAxmlAfter = DateHelper.IsEndofMonthOnWeekend(sBusinessDate);
+
+                if (addDummyEndOfMonthAxmlAfter)
+                {
+                    DateTime dt = DateHelper.EndOfMonthDay(sFileDate);
+                    sFileDate = dt.ToString("MM/dd/yyyy");
+                    sEndOfMonthDate = DateHelper.ConvertToYYYYMMDD(dt);
+                }
+
                 mAxmlFilename = prefix + DateHelper.ConvertToYYYYMMDD(sFileDate) + "-xnf-" + sIndexName + ".XNX";
+            }
             else
                 mAxmlFilename = prefix + DateHelper.ConvertToYYYYMMDD(sFileDate) + "-xnf-h" + sIndexName + ".XNX";
 
@@ -941,7 +969,7 @@ namespace IndexDataEngineLibrary
             using (StreamWriter file = new StreamWriter(filename, true))
             {
                 /////////////////////////////////////////// Level 1
-                if (addDummyEndOfMonthAXML)
+                if (addDummyEndOfMonthAxmlBefore)
                 {
                     file.WriteLine("<XSXPeriod from=\"" + sPrevBusinessDate + "\" through=\"" + sPrevEndOfMonthDate + "\" indexperfiso=\"usd\" " + level1Class + "> ");
                     foreach (IndexRow indexRow in indexRowsSectorLevel1RollUp)
@@ -961,9 +989,19 @@ namespace IndexDataEngineLibrary
                     file.WriteLine("<XNXDetail code=\"" + indexRow.SectorLevel1 + "\" weight=\"" + indexRow.Weight.ToString(NumberFormat, mCultureInfo) + "\" irr=\"" + indexRow.RateOfReturn.ToString(NumberFormat, mCultureInfo) + "\"/>");
                 }
                 file.WriteLine("</XNXPeriod>");
-                /////////////////////////////////////////// Level 2
 
-                if (addDummyEndOfMonthAXML)
+                if (addDummyEndOfMonthAxmlAfter)
+                {
+                    file.WriteLine("<XSXPeriod from=\"" + DateHelper.ConvertToYYYYMMDD(sBusinessDate) + "\" through=\"" + sEndOfMonthDate + "\" indexperfiso=\"usd\" " + level1Class + "> ");
+                    foreach (IndexRow indexRow in indexRowsSectorLevel1RollUp)
+                    {
+                        file.WriteLine("<XNXDetail code=\"" + indexRow.SectorLevel1 + "\" weight=\"" + indexRow.Weight.ToString(NumberFormat, mCultureInfo) + "\" irr=\"" + "0" + "\"/>");
+                    }
+                    file.WriteLine("</XSXPeriod>");
+                }
+
+                /////////////////////////////////////////// Level 2
+                if (addDummyEndOfMonthAxmlBefore)
                 {
                     file.WriteLine("<XSXPeriod from=\"" + sPrevBusinessDate + "\" through=\"" + sPrevEndOfMonthDate + "\" indexperfiso=\"usd\" " + level2Class + "> ");
                     foreach (IndexRow indexRow in indexRowsSectorLevel2RollUp)
@@ -983,9 +1021,19 @@ namespace IndexDataEngineLibrary
                     file.WriteLine("<XNXDetail code=\"" + indexRow.SectorLevel2 + "\" weight=\"" + indexRow.Weight.ToString(NumberFormat, mCultureInfo) + "\" irr=\"" + indexRow.RateOfReturn.ToString(NumberFormat, mCultureInfo) + "\"/>");
                 }
                 file.WriteLine("</XNXPeriod>");
-                /////////////////////////////////////////// Level 3
-                
-                if (addDummyEndOfMonthAXML)
+
+                if (addDummyEndOfMonthAxmlAfter)
+                {
+                    file.WriteLine("<XSXPeriod from=\"" + DateHelper.ConvertToYYYYMMDD(sBusinessDate) + "\" through=\"" + sEndOfMonthDate + "\" indexperfiso=\"usd\" " + level2Class + "> ");
+                    foreach (IndexRow indexRow in indexRowsSectorLevel2RollUp)
+                    {
+                        file.WriteLine("<XNXDetail code=\"" + indexRow.SectorLevel2 + "\" weight=\"" + indexRow.Weight.ToString(NumberFormat, mCultureInfo) + "\" irr=\"" + "0" + "\"/>");
+                    }
+                    file.WriteLine("</XSXPeriod>");
+                }
+
+                /////////////////////////////////////////// Level 3               
+                if (addDummyEndOfMonthAxmlBefore)
                 {
                     file.WriteLine("<XSXPeriod from=\"" + sPrevBusinessDate + "\" through=\"" + sPrevEndOfMonthDate + "\" indexperfiso=\"usd\" " + level3Class + "> ");
                     foreach (IndexRow indexRow in indexRowsSectorLevel3RollUp)
@@ -1005,12 +1053,22 @@ namespace IndexDataEngineLibrary
                     file.WriteLine("<XNXDetail code=\"" + indexRow.SectorLevel3 + "\" weight=\"" + indexRow.Weight.ToString(NumberFormat, mCultureInfo) + "\" irr=\"" + indexRow.RateOfReturn.ToString(NumberFormat, mCultureInfo) + "\"/>");
                 }
                 file.WriteLine("</XNXPeriod>");
-                /////////////////////////////////////////// Level 4
 
+                if (addDummyEndOfMonthAxmlAfter)
+                {
+                    file.WriteLine("<XSXPeriod from=\"" + DateHelper.ConvertToYYYYMMDD(sBusinessDate) + "\" through=\"" + sEndOfMonthDate + "\" indexperfiso=\"usd\" " + level3Class + "> ");
+                    foreach (IndexRow indexRow in indexRowsSectorLevel3RollUp)
+                    {
+                        file.WriteLine("<XNXDetail code=\"" + indexRow.SectorLevel3 + "\" weight=\"" + indexRow.Weight.ToString(NumberFormat, mCultureInfo) + "\" irr=\"" + "0" + "\"/>");
+                    }
+                    file.WriteLine("</XSXPeriod>");
+                }
+
+                /////////////////////////////////////////// Level 4
                 if (vendor.Equals(Vendors.Snp))
                 {
 
-                    if (addDummyEndOfMonthAXML)
+                    if (addDummyEndOfMonthAxmlBefore)
                     {
                         file.WriteLine("<XSXPeriod from=\"" + sPrevBusinessDate + "\" through=\"" + sPrevEndOfMonthDate + "\" indexperfiso=\"usd\" " + level4Class + "> ");
                         foreach (IndexRow indexRow in indexRowsSectorLevel4RollUp)
@@ -1030,6 +1088,16 @@ namespace IndexDataEngineLibrary
                         file.WriteLine("<XNXDetail code=\"" + indexRow.SectorLevel4 + "\" weight=\"" + indexRow.Weight.ToString(NumberFormat, mCultureInfo) + "\" irr=\"" + indexRow.RateOfReturn.ToString(NumberFormat, mCultureInfo) + "\"/>");
                     }
                     file.WriteLine("</XNXPeriod>");
+
+                    if (addDummyEndOfMonthAxmlAfter)
+                    {
+                        file.WriteLine("<XSXPeriod from=\"" + DateHelper.ConvertToYYYYMMDD(sBusinessDate) + "\" through=\"" + sEndOfMonthDate + "\" indexperfiso=\"usd\" " + level4Class + "> ");
+                        foreach (IndexRow indexRow in indexRowsSectorLevel4RollUp)
+                        {
+                            file.WriteLine("<XNXDetail code=\"" + indexRow.SectorLevel4 + "\" weight=\"" + indexRow.Weight.ToString(NumberFormat, mCultureInfo) + "\" irr=\"" + "0" + "\"/>");
+                        }
+                        file.WriteLine("</XSXPeriod>");
+                    }
                 }
             }
             if (IsLastDate)

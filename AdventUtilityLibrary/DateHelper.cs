@@ -106,6 +106,11 @@ namespace AdventUtilityLibrary
             return (date.ToString("yyyyMMdd"));
         }
 
+        public static string ConvertToYYYYMMDD(DateTime Date)
+        {
+            return (Date.ToString("yyyyMMdd"));
+        }
+
         public static DateTime PrevEndOfMonthDay(DateTime date)
         {
             DateTime eomDate = DateTime.MinValue;
@@ -141,7 +146,6 @@ namespace AdventUtilityLibrary
             DateTime date = DateTime.Parse(sDate);
             return (EndOfMonthDay(date));
         }
-
 
         public static bool IsPrevEndofMonthOnWeekend(DateTime Date)
         {

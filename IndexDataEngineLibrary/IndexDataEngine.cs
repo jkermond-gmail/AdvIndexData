@@ -8,6 +8,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Globalization;
 using System.Configuration;
+using System.IO;
 using AdventUtilityLibrary;
 
 
@@ -33,12 +34,16 @@ namespace IndexDataEngineLibrary
             //LogHelper.WriteLine("testingIndexDataEngine = " + testing);
         }
 
+        private void InitializeConnectionStrings()
+        {
+            sConnectionIndexData = ConfigurationManager.ConnectionStrings["dbConnectionIndexData"].ConnectionString;
+            sConnectionAmdVifs = ConfigurationManager.ConnectionStrings["dbConnectionAmdVifs"].ConnectionString;
+        }
 
         public void Run()
         {
             //LogHelper.Info("IndexDataEngine.Run", "IndexDataEngineLibrary");
-            sConnectionIndexData = ConfigurationManager.ConnectionStrings["dbConnectionIndexData"].ConnectionString;
-            sConnectionAmdVifs = ConfigurationManager.ConnectionStrings["dbConnectionAmdVifs"].ConnectionString;
+            InitializeConnectionStrings();
             DateHelper.ConnectionString = sConnectionAmdVifs;
             ProcessStatus.ConnectionString = sConnectionIndexData;
 
@@ -630,6 +635,77 @@ namespace IndexDataEngineLibrary
         {
             cnSqlIndexData.Close();
             cnSqlAmdVifs.Close();
+        }
+
+        public void CreateFtpFolders()
+        {
+            InitializeConnectionStrings();
+            BeginSql();
+            string ftpRootDir = AppSettings.Get<string>("ftpRootDir");
+            string dir = "";
+
+            if (!Directory.Exists(ftpRootDir))
+            {
+                Directory.CreateDirectory(ftpRootDir);
+            }
+
+            SqlCommand cmd = null;
+            string clientID = "";
+
+
+            string commandText = @"
+                SELECT distinct ClientID
+                FROM Clients
+                ORDER BY ClientID
+                ";
+            try
+            {
+                cmd = new SqlCommand
+                {
+                    Connection = cnSqlIndexData,
+                    CommandText = commandText
+                };
+
+                SqlDataReader dr = null;
+                dr = cmd.ExecuteReader();
+                int rows = 0;
+                if (dr.HasRows)
+                {
+                    while (dr.Read())
+                    {
+                        rows += 1;
+                        clientID = dr["ClientID"].ToString();
+                        dir = ftpRootDir + "\\" + clientID;
+                        if (!Directory.Exists(dir))
+                        {
+                            Directory.CreateDirectory(dir);
+                        }
+
+                        dir = dir + "\\" + "IndexData";
+                        if (!Directory.Exists(dir))
+                        {
+                            Directory.CreateDirectory(dir);
+                        }
+
+                        dir = dir + "\\" + "Results";
+                        if (!Directory.Exists(dir))
+                        {
+                            Directory.CreateDirectory(dir);
+                        }
+                    }
+                }
+                dr.Close();
+            }
+            catch (SqlException ex)
+            {
+            }
+            finally
+            {
+                //LogHelper.WriteLine(logFuncName + " done " );
+                EndSql();
+            }
+            return;
+
         }
 
 

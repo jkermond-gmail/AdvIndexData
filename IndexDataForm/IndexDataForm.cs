@@ -298,8 +298,13 @@ namespace IndexDataForm
         {
             //Mail mail = new Mail();
             //mail.SendMail("Message");
-            DateHelper.IsEndofMonthOnWeekend("06/28/2019");
-            DateHelper.IsEndofMonthOnWeekend("06/27/2019");
+
+            //DateHelper.IsEndofMonthOnWeekend("06/28/2019");
+            //DateHelper.IsEndofMonthOnWeekend("06/27/2019");
+
+            indexDataEngine = new IndexDataEngine();
+            indexDataEngine.CreateFtpFolders();
+
 
         }
     }

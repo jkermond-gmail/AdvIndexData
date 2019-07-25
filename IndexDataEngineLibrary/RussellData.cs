@@ -327,6 +327,8 @@ namespace IndexDataEngineLibrary
                             {
                                 AddRussellOpeningData(VendorFileFormats.H_OPEN_RGS, FileName, oProcessDate);
                                 ProcessStatus.Update(oProcessDate, Vendors.Russell.ToString(), Dataset, "", ProcessStatus.WhichStatus.OpenData, ProcessStatus.StatusValue.Pass);
+                                ProcessStatus.Update(oProcessDate, Vendors.Russell.ToString(), Dataset, "", ProcessStatus.WhichStatus.SecurityMasterData, ProcessStatus.StatusValue.Pass);
+
                             }
                             if (bSymbolChanges)
                             {

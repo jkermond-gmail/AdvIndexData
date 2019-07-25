@@ -302,10 +302,9 @@ namespace IndexDataForm
             //DateHelper.IsEndofMonthOnWeekend("06/28/2019");
             //DateHelper.IsEndofMonthOnWeekend("06/27/2019");
 
-            indexDataEngine = new IndexDataEngine();
-            indexDataEngine.CreateFtpFolders();
-
-
+            //indexDataEngine = new IndexDataEngine();
+            //indexDataEngine.CreateFtpFolders();
+            snpData.TestFileCopy();
         }
     }
 }

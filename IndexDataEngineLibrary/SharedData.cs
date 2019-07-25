@@ -11,8 +11,6 @@ using System.IO;
 using System.Globalization;
 using System.Collections;
 
-
-
 namespace IndexDataEngineLibrary
 {
     public enum Vendors
@@ -1110,6 +1108,60 @@ namespace IndexDataEngineLibrary
                 }
             }
         }
+
+        public void CopyFileToFtpFolder(string clientId, string sFileDate, Vendors vendor, string sIndexName, AdventOutputType outputType)
+        {
+            try
+            {
+                string ftpRootDir = AppSettings.Get<string>("ftpRootDir");
+                string sourceDir = AppSettings.Get<string>("AxmlOutputPath");
+                string destDir = ftpRootDir + "\\" + clientId + "\\IndexData\\Results\\";
+
+                if (Directory.Exists(sourceDir) && Directory.Exists(destDir))
+                {
+                    bool bEndOfMonthOnWeekend = DateHelper.IsEndofMonthOnWeekend(sFileDate);
+
+                    if (bEndOfMonthOnWeekend)
+                    {
+                        DateTime dt = DateHelper.EndOfMonthDay(sFileDate);
+                        sFileDate = dt.ToString("MM/dd/yyyy");
+                    }
+
+                    string prefix = "";
+                    string sourceFilename = "";
+
+                    if (vendor.Equals(Vendors.Snp))
+                    {
+                        prefix = "ix-";
+                    }
+                    else if (vendor.Equals(Vendors.Russell))
+                    {
+                        prefix = "rl-";
+                    }
+                    if (outputType.Equals(AdventOutputType.Constituent))
+                    {
+                        sourceFilename = sourceDir + prefix + DateHelper.ConvertToYYYYMMDD(sFileDate) + "-xse-" + sIndexName + ".XSX";
+                    }
+                    else if (outputType.Equals(AdventOutputType.Sector))
+                    {
+                        sourceFilename = sourceDir + prefix + DateHelper.ConvertToYYYYMMDD(sFileDate) + "-xnf-" + sIndexName + ".XNX";
+                    }
+                    if (File.Exists(sourceFilename))
+                    {
+                        File.Copy(sourceFilename, destDir + Path.GetFileName(sourceFilename), true);
+                    }
+                }
+            }
+            catch
+            {
+
+            }
+            finally
+            {
+
+            }
+        }
+
 
         public void VendorDatasetJobsUpdateProcessDate(string Vendor, string Dataset, string sProcessDate)
         {

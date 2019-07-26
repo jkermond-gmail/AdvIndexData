@@ -800,12 +800,16 @@ namespace IndexDataEngineLibrary
             }
             using (StreamWriter file = new StreamWriter(filename, true))
             {
+                string weightAndIrr = "";
+                string[] vals = null;
                 if (addDummyEndOfMonthAxmlBefore)
                 {
                     file.WriteLine("<XSXPeriod from=\"" + sPrevBusinessDate + "\" through=\"" + sPrevEndOfMonthDate + "\" indexperfiso=\"usd\">");
                     foreach (DictionaryEntry pair in sortedList)
                     {
-                        file.WriteLine("<XSXDetail type=\"cs\" iso=\"usd\" symbol=\"" + pair.Key + "\" weight=\"" + pair.Value + "\" irr=\"" + "0" + "\"/>");
+                        weightAndIrr = pair.Value.ToString();
+                        vals = weightAndIrr.Split('|');
+                        file.WriteLine("<XSXDetail type=\"cs\" iso=\"usd\" symbol=\"" + pair.Key + "\" weight=\"" + vals[0].ToString() + "\" irr=\"" + "0" + "\"/>");
                     }
                     file.WriteLine("</XSXPeriod>");
                     file.WriteLine("<XSXPeriod from=\"" + sPrevEndOfMonthDate + "\" through=\"" + DateHelper.ConvertToYYYYMMDD(sBusinessDate) + "\" indexperfiso=\"usd\">");
@@ -817,9 +821,8 @@ namespace IndexDataEngineLibrary
 
                 foreach (DictionaryEntry pair in sortedList)
                 {
-                    string weight = pair.Value.ToString();
-                    string[] vals = weight.Split('|');
-
+                    weightAndIrr = pair.Value.ToString();
+                    vals = weightAndIrr.Split('|');
                     file.WriteLine("<XSXDetail type=\"cs\" iso=\"usd\" symbol=\"" + pair.Key + "\" weight=\"" + vals[0].ToString() + "\" irr=\"" + vals[1].ToString() + "\"/>");
                 }
                 file.WriteLine("</XSXPeriod>");
@@ -829,7 +832,9 @@ namespace IndexDataEngineLibrary
                     file.WriteLine("<XSXPeriod from=\"" + DateHelper.ConvertToYYYYMMDD(sBusinessDate) + "\" through=\"" + sEndOfMonthDate + "\" indexperfiso=\"usd\">");
                     foreach (DictionaryEntry pair in sortedList)
                     {
-                        file.WriteLine("<XSXDetail type=\"cs\" iso=\"usd\" symbol=\"" + pair.Key + "\" weight=\"" + pair.Value + "\" irr=\"" + "0" + "\"/>");
+                        weightAndIrr = pair.Value.ToString();
+                        vals = weightAndIrr.Split('|');
+                        file.WriteLine("<XSXDetail type=\"cs\" iso=\"usd\" symbol=\"" + pair.Key + "\" weight=\"" + vals[0].ToString() + "\" irr=\"" + "0" + "\"/>");
                     }
                     file.WriteLine("</XSXPeriod>");
                 }
@@ -1108,6 +1113,12 @@ namespace IndexDataEngineLibrary
                 }
             }
         }
+
+        public void CopyFilesToFtpFolder(string sFileDate, Vendors vendor, string sIndexName, AdventOutputType outputType)
+        {
+
+        }
+
 
         public void CopyFileToFtpFolder(string clientId, string sFileDate, Vendors vendor, string sIndexName, AdventOutputType outputType)
         {

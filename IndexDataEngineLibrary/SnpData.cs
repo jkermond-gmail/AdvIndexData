@@ -104,8 +104,8 @@ namespace IndexDataEngineLibrary
                 ProcessStatus.Update(sProcessDate, Vendors.Snp.ToString(), Dataset, IndexName, ProcessStatus.WhichStatus.AxmlSectorData, ProcessStatus.StatusValue.Pass);
                 // Note: after this is released to production, review the work that would replace StandardAndPoors with Snp to make all tables consistent
                 sharedData.VendorDatasetJobsUpdateProcessDate("StandardAndPoors", Dataset, sProcessDate);
-                //sharedData.CopyFileToFtpFolder(clientId, sFileDate, vendor, sIndexName, outputType);
-                sharedData.CopyFilesToFtpFolder(sProcessDate, Vendors.Snp.ToString(), Dataset, IndexName, ProcessStatus.WhichStatus.AxmlConstituentData );
+                sharedData.CopyFilesToFtpFolder(sProcessDate, Vendors.Snp, Dataset, IndexName, AdventOutputType.Constituent);
+                sharedData.CopyFilesToFtpFolder(sProcessDate, Vendors.Snp, Dataset, IndexName, AdventOutputType.Sector);
                 Mail mail = new Mail();
                 mail.SendMail("AdvIndexData: VendorDatasetJobs complete  " + Vendors.Snp.ToString() + " " + Dataset + " " + sProcessDate);
 
@@ -2117,8 +2117,42 @@ _SPMLP.SDL
             sIndexName = "sp500";
             outputType = AdventOutputType.Sector;
             sharedData.CopyFileToFtpFolder(clientId, sFileDate, vendor, sIndexName, outputType);
+        }
 
+        public void TestFilesCopy()
+        {
+            string sFileDate = "07/01/2019";
+            Vendors vendor = Vendors.Russell;
+            string sIndexName = "r3000";
+            AdventOutputType outputType = AdventOutputType.Sector;
+            sharedData.CopyFilesToFtpFolder(sFileDate, vendor, "RGS", sIndexName, outputType);
+            sFileDate = "06/28/2019";
+            vendor = Vendors.Russell;
+            sIndexName = "r3000";
+            outputType = AdventOutputType.Sector;
+            sharedData.CopyFilesToFtpFolder(sFileDate, vendor, "RGS", sIndexName, outputType);
+            sFileDate = "06/28/2019";
+            vendor = Vendors.Snp;
+            sIndexName = "sp500";
+            outputType = AdventOutputType.Sector;
+            sharedData.CopyFilesToFtpFolder(sFileDate, vendor, "sp500", sIndexName, outputType);
+            sFileDate = "07/01/2019";
+            vendor = Vendors.Snp;
+            sIndexName = "sp500";
+            outputType = AdventOutputType.Sector;
+            sharedData.CopyFilesToFtpFolder(sFileDate, vendor, "sp500", sIndexName, outputType);
+            sFileDate = "06/28/2019";
+            vendor = Vendors.Snp;
+            sIndexName = "sp500";
+            outputType = AdventOutputType.Constituent;
+            sharedData.CopyFilesToFtpFolder(sFileDate, vendor, "sp500", sIndexName, outputType);
+            sFileDate = "07/01/2019";
+            vendor = Vendors.Snp;
+            sIndexName = "sp500";
+            outputType = AdventOutputType.Constituent;
+            sharedData.CopyFilesToFtpFolder(sFileDate, vendor, "sp500", sIndexName, outputType);
 
         }
+
     }
 }

@@ -1114,14 +1114,103 @@ namespace IndexDataEngineLibrary
             }
         }
 
-        public void CopyFilesToFtpFolder(string sFileDate, Vendors vendor, string sIndexName, AdventOutputType outputType)
+        public void CopyFilesToFtpFolder(string sFileDate, Vendors vendor, string dataSet, string sIndexName, AdventOutputType outputType)
         {
+            string jobInputFormat = "";
+            string jobVendor = "";
+            string clientID = "";
+            string AxmlConstituentFile = "";
+            string AxmlSectorFile = "";
+
+            switch (vendor)
+            {
+                case Vendors.Russell:
+                    jobVendor = Vendors.Russell.ToString();
+                    switch (outputType)
+                    {
+                        case AdventOutputType.Constituent:
+                            jobInputFormat = "RussellSecurity";
+                            break;
+                        case AdventOutputType.Sector:
+                            jobInputFormat = "RussellRGS";
+                            break;
+                    }
+                    break;
+                case Vendors.Snp:
+                    jobVendor = "StandardAndPoors";
+                    switch (outputType)
+                    {
+                        case AdventOutputType.Constituent:
+                            jobInputFormat = "StandardPoorsSecurity";
+                            break;
+                        case AdventOutputType.Sector:
+                            jobInputFormat = "StandardPoorsGICS";
+                            break;
+                    }
+                    break;
+
+            }
+
+            try
+            {
+                if (mSqlConn == null)
+                {
+                    mSqlConn = new SqlConnection(ConnectionStringIndexData);
+                    mSqlConn.Open();
+                }
+
+                string SqlSelect = @"
+                 select j.ClientID, j.JobName, j.LastProcessDate, i.IndexName, v.AdventIndexName, v.AxmlConstituentFile, v.AxmlSectorFile
+                 from jobs j
+                 inner join JobIndexIds i on(i.JobName = j.JobName and i.ClientID = j.ClientID and i.Vendor = j.Vendor)
+                 inner join VendorIndexMap v on v.VendorIndexName = i.IndexName
+                 where j.DataSet = @DataSet and j.InputFormat = @InputFormat
+                 and j.Active = 'Yes' and j.JobType = 'Client'  and j.Vendor = @Vendor and v.AdventIndexName = @AdventIndexName
+                 order by j.ClientID
+                ";
+                SqlCommand cmd = new SqlCommand(SqlSelect, mSqlConn);
+                SqlDataReader dr = null;
+                cmd.Parameters.Add("@DataSet", SqlDbType.VarChar);
+                cmd.Parameters.Add("@InputFormat", SqlDbType.VarChar);
+                cmd.Parameters.Add("@Vendor", SqlDbType.VarChar);
+                cmd.Parameters.Add("@AdventIndexName", SqlDbType.VarChar);
+                cmd.Parameters["@DataSet"].Value = dataSet;
+                cmd.Parameters["@InputFormat"].Value = jobInputFormat;
+                cmd.Parameters["@Vendor"].Value = jobVendor;
+                cmd.Parameters["@AdventIndexName"].Value = sIndexName;
+
+                dr = cmd.ExecuteReader();
+                if (dr.HasRows)
+                {
+                    while (dr.Read())
+                    {
+                        clientID = dr["ClientID"].ToString();
+                        AxmlConstituentFile = dr["AxmlConstituentFile"].ToString();
+                        AxmlSectorFile = dr["AxmlSectorFile"].ToString();
+                        CopyFileToFtpFolder(clientID, sFileDate, vendor, sIndexName, outputType);
+                    }
+                }
+                dr.Close();
+            }
+            catch (SqlException ex)
+            {
+                if (ex.Number == 2627)
+                {
+                    LogHelper.WriteLine(ex.Message);
+                }
+            }
+            finally
+            {
+            }
+            return;
 
         }
 
 
         public void CopyFileToFtpFolder(string clientId, string sFileDate, Vendors vendor, string sIndexName, AdventOutputType outputType)
         {
+            string destFilename = "";
+
             try
             {
                 string ftpRootDir = AppSettings.Get<string>("ftpRootDir");
@@ -1159,13 +1248,19 @@ namespace IndexDataEngineLibrary
                     }
                     if (File.Exists(sourceFilename))
                     {
-                        File.Copy(sourceFilename, destDir + Path.GetFileName(sourceFilename), true);
+                        destFilename = destDir + Path.GetFileName(sourceFilename);
+                        File.Copy(sourceFilename, destFilename, true);
+                        LogHelper.WriteLine("Successful copy " + destFilename);
+                    }
+                    else
+                    {
+                        LogHelper.WriteLine("Missing sourcefile" + sourceFilename);
                     }
                 }
             }
             catch
             {
-
+                LogHelper.WriteLine("Unsuccessful copy to" + destFilename);
             }
             finally
             {

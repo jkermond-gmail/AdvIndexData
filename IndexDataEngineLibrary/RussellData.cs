@@ -187,6 +187,8 @@ namespace IndexDataEngineLibrary
                         ProcessStatus.Update(sProcessDate, Vendors.Russell.ToString(), Dataset, IndexName, ProcessStatus.WhichStatus.AxmlConstituentData, ProcessStatus.StatusValue.Pass);
                         GenerateReturnsForDateRange(sProcessDate, sProcessDate, IndexName, AdventOutputType.Sector, false);
                         ProcessStatus.Update(sProcessDate, Vendors.Russell.ToString(), Dataset, IndexName, ProcessStatus.WhichStatus.AxmlSectorData, ProcessStatus.StatusValue.Pass);
+                        sharedData.CopyFilesToFtpFolder(sProcessDate, Vendors.Russell, Dataset, IndexName, AdventOutputType.Constituent);
+                        sharedData.CopyFilesToFtpFolder(sProcessDate, Vendors.Russell, Dataset, IndexName, AdventOutputType.Sector);
                     }
                 }
                 sharedData.VendorDatasetJobsUpdateProcessDate(Vendors.Russell.ToString(), Dataset, sProcessDate);

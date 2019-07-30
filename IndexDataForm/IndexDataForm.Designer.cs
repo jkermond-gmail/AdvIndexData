@@ -52,6 +52,7 @@
             this.lblStartDate = new System.Windows.Forms.Label();
             this.cboVendor = new System.Windows.Forms.ComboBox();
             this.lblVendor = new System.Windows.Forms.Label();
+            this.btnTestFtp = new System.Windows.Forms.Button();
             this.tabUnitTest.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.SuspendLayout();
@@ -91,6 +92,7 @@
             // 
             // tabPage1
             // 
+            this.tabPage1.Controls.Add(this.btnTestFtp);
             this.tabPage1.Controls.Add(this.btnTestEmail);
             this.tabPage1.Controls.Add(this.chkHistoricalAxmlFile);
             this.tabPage1.Controls.Add(this.btnTestEndOfMonthDates);
@@ -138,7 +140,7 @@
             // 
             // btnTestEndOfMonthDates
             // 
-            this.btnTestEndOfMonthDates.Location = new System.Drawing.Point(348, 329);
+            this.btnTestEndOfMonthDates.Location = new System.Drawing.Point(393, 329);
             this.btnTestEndOfMonthDates.Name = "btnTestEndOfMonthDates";
             this.btnTestEndOfMonthDates.Size = new System.Drawing.Size(121, 23);
             this.btnTestEndOfMonthDates.TabIndex = 13;
@@ -148,7 +150,7 @@
             // 
             // btnTestAxmlOutput
             // 
-            this.btnTestAxmlOutput.Location = new System.Drawing.Point(348, 287);
+            this.btnTestAxmlOutput.Location = new System.Drawing.Point(393, 299);
             this.btnTestAxmlOutput.Name = "btnTestAxmlOutput";
             this.btnTestAxmlOutput.Size = new System.Drawing.Size(121, 23);
             this.btnTestAxmlOutput.TabIndex = 12;
@@ -296,6 +298,16 @@
             this.lblVendor.TabIndex = 4;
             this.lblVendor.Text = "Vendor";
             // 
+            // btnTestFtp
+            // 
+            this.btnTestFtp.Location = new System.Drawing.Point(389, 270);
+            this.btnTestFtp.Name = "btnTestFtp";
+            this.btnTestFtp.Size = new System.Drawing.Size(125, 23);
+            this.btnTestFtp.TabIndex = 16;
+            this.btnTestFtp.Text = "Test FTP";
+            this.btnTestFtp.UseVisualStyleBackColor = true;
+            this.btnTestFtp.Click += new System.EventHandler(this.btnTestFtp_Click);
+            // 
             // IndexDataForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -341,6 +353,7 @@
         private System.Windows.Forms.Button btnTestEndOfMonthDates;
         private System.Windows.Forms.CheckBox chkHistoricalAxmlFile;
         private System.Windows.Forms.Button btnTestEmail;
+        private System.Windows.Forms.Button btnTestFtp;
     }
 }
 

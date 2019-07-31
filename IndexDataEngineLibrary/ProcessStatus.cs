@@ -21,8 +21,10 @@ namespace IndexDataEngineLibrary
             SymbolChangeData,
             AxmlConstituentData,
             AxmlSectorData,
-            ExpectedClientFiles,
-            ActualClientFiles
+            ExpectedConstituentClientFiles,
+            ActualConstituentClientFiles,
+            ExpectedSectorClientFiles,
+            ActualSectorClientFiles
         }
 
         public enum StatusValue
@@ -30,13 +32,20 @@ namespace IndexDataEngineLibrary
             Unassigned,
             AssignToPass,
             Pass,
-            Fail
+            Fail,
+            IgnoreArgument
         }
 
 
         public static string ConnectionString { get; set; }
 
         public static bool UseProcessStatus { get; set; }
+
+        public static int ExpectedConstituentClientFiles { get; set; }
+        public static int ActualConstituentClientFiles { get; set; }
+        public static int ExpectedSectorClientFiles { get; set; }
+        public static int ActualSectorClientFiles { get; set; }
+
 
         private static SqlConnection mSqlConn = null;
 
@@ -100,6 +109,50 @@ namespace IndexDataEngineLibrary
             }
         }
 
+        public static void DeleteOldEntries(string sProcessDate)
+        {
+            int daysOfHistory = 0;
+            try
+            {
+                    
+                var v = AppSettings.Get<int>("processStatusDaysOfHistory");
+                if (v.Equals(0))
+                    daysOfHistory = 30;
+                else
+                    daysOfHistory = v;
+
+                daysOfHistory *= -1;
+
+                DateTime date = DateTime.Parse(sProcessDate);
+                date = date.AddDays(daysOfHistory);
+
+                if (mSqlConn == null)
+                {
+                    OpenSqlConn();
+                }
+                string Sql = @"
+                delete from ProcessStatus
+                where ProcessDate < @ProcessDate 
+                ";
+                SqlCommand cmd = new SqlCommand(Sql, mSqlConn);
+                cmd.Parameters.Add("@ProcessDate", SqlDbType.DateTime);
+                cmd.Parameters["@ProcessDate"].Value = date;
+                cmd.ExecuteNonQuery();
+            }
+            catch (SqlException ex)
+            {
+                if (ex.Number == 2627)
+                {
+                    LogHelper.WriteLine(ex.Message);
+                }
+            }
+            finally
+            {
+                LogHelper.WriteLine( "deleted " + daysOfHistory + " from ProcessStatus table" );
+            }
+        }
+
+
         public static void Update(DateTime ProcessDate, string Vendor, string Dataset, string IndexName, WhichStatus whichStatus, StatusValue statusValue)
         {
             Update(ProcessDate.ToString("MM/dd/yyy"), Vendor, Dataset, IndexName, whichStatus, statusValue);
@@ -119,8 +172,27 @@ namespace IndexDataEngineLibrary
                     string columnValue = "";
 
                     column = whichStatus.ToString();
-                    columnValue = statusValue.ToString();
-                    columnValue = columnValue.Substring(0, 1);
+                    if (whichStatus.Equals(WhichStatus.ExpectedConstituentClientFiles))
+                    {
+                        columnValue = ExpectedConstituentClientFiles.ToString();
+                    }
+                    else if (whichStatus.Equals(WhichStatus.ActualConstituentClientFiles))
+                    {
+                        columnValue = ActualConstituentClientFiles.ToString();
+                    }
+                    else if (whichStatus.Equals(WhichStatus.ExpectedSectorClientFiles))
+                    {
+                        columnValue = ExpectedSectorClientFiles.ToString();
+                    }
+                    else if (whichStatus.Equals(WhichStatus.ActualSectorClientFiles))
+                    {
+                        columnValue = ActualSectorClientFiles.ToString();
+                    }
+                    else
+                    {
+                        columnValue = statusValue.ToString();
+                        columnValue = columnValue.Substring(0, 1);
+                    }
 
                     string Sql = "update ProcessStatus set " + column + "='" + columnValue + "' ";
                     string SqlWhere = "";
@@ -369,7 +441,5 @@ namespace IndexDataEngineLibrary
             }
             return (checkStatus);
         }
-
-
     }
 }

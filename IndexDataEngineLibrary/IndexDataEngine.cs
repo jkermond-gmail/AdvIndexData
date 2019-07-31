@@ -46,8 +46,6 @@ namespace IndexDataEngineLibrary
             InitializeConnectionStrings();
             DateHelper.ConnectionString = sConnectionAmdVifs;
             ProcessStatus.ConnectionString = sConnectionIndexData;
-
-
             BeginSql();
 
             sVifsProcessDate = getVIFsProcessDate();
@@ -93,6 +91,7 @@ namespace IndexDataEngineLibrary
             LogHelper.WriteLine("InitializeProcessStatus: " + sProcessDate.ToString());
 
             ProcessStatus.Initialize();
+            ProcessStatus.DeleteOldEntries(sProcessDate);
             List<KeyValuePair<string, string>> listVendorDatasets = null;
 
             getVendorDatasets(out listVendorDatasets);

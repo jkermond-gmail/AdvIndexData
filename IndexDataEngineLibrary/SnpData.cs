@@ -7,6 +7,7 @@ using System.Globalization;
 using System.IO;
 using System.Data.SqlClient;
 using System.Data;
+using System.Configuration;
 
 using AdventUtilityLibrary;
 using LumenWorks.Framework.IO.Csv;
@@ -2125,6 +2126,9 @@ _SPMLP.SDL
             Vendors vendor = Vendors.Russell;
             string sIndexName = "r3000";
             AdventOutputType outputType = AdventOutputType.Sector;
+            ProcessStatus.UseProcessStatus = true;
+            string sConnectionIndexData = ConfigurationManager.ConnectionStrings["dbConnectionIndexData"].ConnectionString;
+            ProcessStatus.ConnectionString = sConnectionIndexData;
             sharedData.CopyFilesToFtpFolder(sFileDate, vendor, "RGS", sIndexName, outputType);
             sFileDate = "06/28/2019";
             vendor = Vendors.Russell;

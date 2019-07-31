@@ -1121,6 +1121,7 @@ namespace IndexDataEngineLibrary
             string clientID = "";
             string AxmlConstituentFile = "";
             string AxmlSectorFile = "";
+            int count = 0;
 
             switch (vendor)
             {
@@ -1166,9 +1167,11 @@ namespace IndexDataEngineLibrary
                  inner join VendorIndexMap v on v.VendorIndexName = i.IndexName
                  where j.DataSet = @DataSet and j.InputFormat = @InputFormat
                  and j.Active = 'Yes' and j.JobType = 'Client'  and j.Vendor = @Vendor and v.AdventIndexName = @AdventIndexName
-                 order by j.ClientID
                 ";
-                SqlCommand cmd = new SqlCommand(SqlSelect, mSqlConn);
+                string SqlOrderBy = " order by j.ClientID";
+
+                string SqlSelect2 = "select count(*) from (" + SqlSelect + ") ct";
+                SqlCommand cmd = new SqlCommand(SqlSelect2, mSqlConn);
                 SqlDataReader dr = null;
                 cmd.Parameters.Add("@DataSet", SqlDbType.VarChar);
                 cmd.Parameters.Add("@InputFormat", SqlDbType.VarChar);
@@ -1182,12 +1185,45 @@ namespace IndexDataEngineLibrary
                 dr = cmd.ExecuteReader();
                 if (dr.HasRows)
                 {
+                    dr.Read();
+                    string val = dr[0].ToString();
+                    count = Convert.ToInt32(val);
+                    if (outputType.Equals(AdventOutputType.Constituent))
+                    {
+                        ProcessStatus.ExpectedConstituentClientFiles = count;
+                        ProcessStatus.Update(sFileDate, vendor.ToString(), dataSet, sIndexName, ProcessStatus.WhichStatus.ExpectedConstituentClientFiles, ProcessStatus.StatusValue.IgnoreArgument);
+                    }
+                    else if (outputType.Equals(AdventOutputType.Sector))
+                    {
+                        ProcessStatus.ExpectedSectorClientFiles = count;
+                        ProcessStatus.Update(sFileDate, vendor.ToString(), dataSet, sIndexName, ProcessStatus.WhichStatus.ExpectedSectorClientFiles, ProcessStatus.StatusValue.IgnoreArgument);
+                    }
+                }
+                dr.Close();
+
+                cmd.CommandText = SqlSelect + SqlOrderBy;
+                dr = cmd.ExecuteReader();
+                if (dr.HasRows)
+                {
+                    count = 0;
                     while (dr.Read())
                     {
                         clientID = dr["ClientID"].ToString();
                         AxmlConstituentFile = dr["AxmlConstituentFile"].ToString();
                         AxmlSectorFile = dr["AxmlSectorFile"].ToString();
                         CopyFileToFtpFolder(clientID, sFileDate, vendor, sIndexName, outputType);
+                        count += 1;
+                    }
+
+                    if (outputType.Equals(AdventOutputType.Constituent))
+                    {
+                        ProcessStatus.ActualConstituentClientFiles = count;
+                        ProcessStatus.Update(sFileDate, vendor.ToString(), dataSet, sIndexName, ProcessStatus.WhichStatus.ActualConstituentClientFiles, ProcessStatus.StatusValue.IgnoreArgument);
+                    }
+                    else if (outputType.Equals(AdventOutputType.Sector))
+                    {
+                        ProcessStatus.ActualSectorClientFiles = count;
+                        ProcessStatus.Update(sFileDate, vendor.ToString(), dataSet, sIndexName, ProcessStatus.WhichStatus.ActualSectorClientFiles, ProcessStatus.StatusValue.IgnoreArgument);
                     }
                 }
                 dr.Close();

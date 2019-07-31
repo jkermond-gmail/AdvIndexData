@@ -305,7 +305,7 @@ namespace IndexDataForm
             //indexDataEngine = new IndexDataEngine();
             //indexDataEngine.CreateFtpFolders();
             //snpData.TestFileCopy();
-            //snpData.TestFilesCopy();
+            //snpData.TestFilesCopy();            
         }
 
         private void btnTestFtp_Click(object sender, EventArgs e)

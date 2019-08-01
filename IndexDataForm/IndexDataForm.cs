@@ -305,7 +305,35 @@ namespace IndexDataForm
             //indexDataEngine = new IndexDataEngine();
             //indexDataEngine.CreateFtpFolders();
             //snpData.TestFileCopy();
-            //snpData.TestFilesCopy();            
+            //snpData.TestFilesCopy();    
+
+            // JK: I added this code to see how the new version compared to the old version in terms of code lines
+            // old version has 173,234 lines of *.cs code
+            // new version has 18,308   lines of *.cs code
+            //string directory = @"C:\A_Development\visual studio 2017\Projects\Advent_ApxIndexData";
+            //string directory = @"C:\A_Development\visual studio 2017\Projects\AdvIndexData";
+
+            //string searchPattern = "*.cs";
+
+            //if (directory == null || !System.IO.Directory.Exists(directory))
+            //{
+            //}
+            //else
+            //{ 
+            //    var filesResults = System.IO.Directory.EnumerateFiles(directory, searchPattern, System.IO.SearchOption.AllDirectories)
+            //                                .Select(file => new
+            //                                {
+            //                                    FilePath = file,
+            //                                    TotalLines = System.IO.File.ReadLines(file).Count()
+            //                                }).ToList();
+            //    int totalLines = 0;
+            //    foreach (var result in filesResults)
+            //    {
+            //        totalLines += result.TotalLines;
+            //    }
+
+            //    LogHelper.WriteLine("totalLines " + totalLines);
+            //}
         }
 
         private void btnTestFtp_Click(object sender, EventArgs e)

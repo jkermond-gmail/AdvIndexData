@@ -51,7 +51,25 @@ namespace IndexDataEngineLibrary
             sVifsProcessDate = getVIFsProcessDate();
             VifsProcessDate = DateTime.ParseExact(sVifsProcessDate, "MM/dd/yyyy", CultureInfo.InvariantCulture);
             sIndexDataProcessDate = getIndexDataProcessDate();
+
+            //int filesTotal = 0;
+            //int filesDownloaded = 0;
+            //bool downloaded = VendorFilesDownloaded(sIndexDataProcessDate, out filesTotal, out filesDownloaded);
+            //if(!downloaded)
+            //{
+            //    List<string> files = VendorFilesNotDownloaded(sIndexDataProcessDate);
+            //    string sYYYYMMDD = DateHelper.ConvertToYYYYMMDD(sIndexDataProcessDate);
+            //    foreach (string file in files)
+            //    {
+            //        string file2 = file.Replace("YYYYMMDD", sYYYYMMDD);
+            //        LogHelper.WriteLine("Missing file " + file2);
+            //    }
+
+            //}
             IndexDataProcessDate = DateTime.ParseExact(sIndexDataProcessDate, "MM/dd/yyyy", CultureInfo.InvariantCulture);
+
+            GenerateStatusReportIfNeeded(sVifsProcessDate);
+
 
             if (VifsProcessDate.Date > IndexDataProcessDate.Date)
             {
@@ -63,11 +81,11 @@ namespace IndexDataEngineLibrary
                 mail.SendMail("AdvIndexData: New business day started " + sVifsProcessDate);
             }
 
-            ProcessIndexDataWork(sVifsProcessDate);
+            ProcessIndexDataDatasets(sVifsProcessDate);
 
             if (testing)
-            {                
-                ProcessIndexDataWork(sVifsProcessDate); // A second call will make sure the sp 900, 1000, and 1500 are complete
+            {
+                ProcessIndexDataDatasets(sVifsProcessDate); // A second call will make sure the sp 900, 1000, and 1500 are complete
                 string sToday = DateTime.Now.ToString("MM/dd/yyyy");
                 if (sVifsProcessDate.Equals(sToday)) // JK to do change
                 {
@@ -119,7 +137,7 @@ namespace IndexDataEngineLibrary
             }
         }
 
-        private void ProcessIndexDataWork(string sProcessDate)
+        private void ProcessIndexDataDatasets(string sProcessDate)
         {
             //LogHelper.WriteLine("ProcessIndexDataWork: " + sProcessDate.ToString());
 
@@ -161,9 +179,7 @@ namespace IndexDataEngineLibrary
                         ProcessVendorDatasetJobs(vendor, dataset, sProcessDate, out JobsTotal, out JobsProcessed);
                     }
                 }
-
             }
-
         }
 
         private bool VendorDatasetFilesGenerated(string Vendor, string Dataset, string sProcessDate, out int FilesTotal, out int FilesGenerated)
@@ -277,6 +293,138 @@ namespace IndexDataEngineLibrary
 
             return (isDownloaded);
         }
+
+        public bool VendorFilesDownloaded(string sProcessDate, out int FilesTotal, out int FilesDownloaded)
+        {
+            FilesTotal = 0;
+            FilesDownloaded = 0;
+            bool isDownloaded = false;
+            SqlCommand cmd = null;
+            string logFuncName = "VendorFilesDownloaded: ";
+
+
+            string commandText = @"
+                select count(*) as FilesTotal from VIFs
+                where [Application] = 'IDX' and Active = 'Yes'
+                ";
+            try
+            {
+                cmd = new SqlCommand
+                {
+                    Connection = cnSqlAmdVifs,
+                    CommandText = commandText
+                };
+
+                SqlDataReader dr = null;
+                dr = cmd.ExecuteReader();
+                if (dr.HasRows)
+                {
+                    dr.Read();
+                    string val = dr["FilesTotal"].ToString();
+                    FilesTotal = Convert.ToInt32(val);
+                }
+                dr.Close();
+
+                if (FilesTotal > 0)
+                {
+                    cmd.Parameters.Add("@ProcessDate", SqlDbType.Date);
+                    cmd.Parameters["@ProcessDate"].Value = sProcessDate;
+                    cmd.CommandText = @"
+                        select count(*) as FilesDownloaded from VIFs
+                        where LastProcessDate = @ProcessDate 
+                        and [Application] = 'IDX' and Active = 'Yes'
+                        ";
+                    dr = cmd.ExecuteReader();
+                    if (dr.HasRows)
+                    {
+                        dr.Read();
+                        string val = dr["FilesDownloaded"].ToString();
+                        FilesDownloaded = Convert.ToInt32(val);
+                        isDownloaded = (FilesTotal.Equals(FilesDownloaded) == true);
+                    }
+                    dr.Close();
+                }
+            }
+            catch (SqlException ex)
+            {
+                LogHelper.WriteLine(logFuncName + " " + ex.Message);
+            }
+            finally
+            {
+                //LogHelper.WriteLine(logFuncName + " done " );
+            }
+
+            return (isDownloaded);
+        }
+
+
+        public List<string> VendorFilesNotDownloaded(string sProcessDate)
+        {
+            SqlCommand cmd = null;
+            var VendorFiles = new List<string>();
+            string logFuncName = "VendorFilesNotDownloaded: ";
+
+
+            string commandText = @"
+                select * from VIFs
+                where LastProcessDate < @ProcessDate 
+                and [Application] = 'IDX' and Active = 'Yes'
+                ";
+            try
+            {
+                cmd = new SqlCommand
+                {
+                    Connection = cnSqlAmdVifs,
+                    CommandText = commandText
+                };
+
+                cmd.Parameters.Add("@ProcessDate", SqlDbType.Date);
+                cmd.Parameters["@ProcessDate"].Value = sProcessDate;
+                SqlDataReader dr = null;
+                dr = cmd.ExecuteReader();
+                if (dr.HasRows)
+                {
+                    while (dr.Read())
+                    {
+                        VendorFiles.Add(dr["InternetFilename"].ToString());
+                    }
+                }
+                dr.Close();
+            }
+            catch (SqlException ex)
+            {
+                LogHelper.WriteLine(logFuncName + " " + ex.Message);
+            }
+            finally
+            {
+                //LogHelper.WriteLine(logFuncName + " done " );
+            }
+
+            return (VendorFiles);
+        }
+
+        private void GenerateStatusReportIfNeeded(string sVifsProcessDate)
+        {
+            string sReportDate = getSystemSettingValue("StatusReportDate", cnSqlIndexData);
+            DateTime reportDate = DateTime.ParseExact(sReportDate, "MM/dd/yyyy", CultureInfo.InvariantCulture);
+            if( reportDate < IndexDataProcessDate)
+            {
+                DateTime now = DateTime.Now;
+                if (now.Hour <= 20)
+                {
+                    TimeSpan timeOfDay = DateTime.Now.TimeOfDay;
+                    TimeSpan start = new TimeSpan(16, 0, 0);    // 9:00PM
+                    TimeSpan end = new TimeSpan(16, 5, 0);      // 9:03PM
+
+                    if ((timeOfDay >= start) && (timeOfDay <= end))
+                    {
+
+                    }
+                }
+            }
+
+        }
+
 
         private void VendorDatasetFilesUpdateLastProcessDate(string Vendor, string Dataset, string sProcessDate)
         {

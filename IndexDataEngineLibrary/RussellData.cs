@@ -1979,43 +1979,6 @@ RU3000    20170103   CHF   1662.25918   1365.02441   1696.48181   1567.99955    
         }
 
 
-#if COMMENTED
-        #region 3. Now consolidate each dictionary into one indexRow and put it in new IndexRows.
-
-                List<IndexRow> newIndexRows = new List<IndexRow>();
-
-                int indRowCounter = 0;
-                int indRowMissing = 0;
-
-                foreach (KeyValuePair<string, List<IndexRow>> consolidatedIndexRow in consolidatedIndexRows)
-                {
-                    if (1 < consolidatedIndexRow.Value.Count)
-                    {
-                        double weight = 0;
-                        double rateOfReturn = 0;
-
-                        foreach (IndexRow indexRow in consolidatedIndexRow.Value)
-                            weight += indexRow.Weight;
-
-                        foreach (IndexRow indexRow in consolidatedIndexRow.Value)
-                            rateOfReturn += weight == 0 ? 0 : indexRow.RateOfReturn * indexRow.Weight / weight;
-
-                        consolidatedIndexRow.Value[0].Weight = weight;
-                        consolidatedIndexRow.Value[0].RateOfReturn = rateOfReturn;
-                    }
-
-                    if (consolidatedIndexRow.Value.Count > 0)
-                        newIndexRows.Add(consolidatedIndexRow.Value[0]);
-                    else
-                        ConsoleWriter.cWriteError("consolidatedIndexRow.Value = null!!! for key:[ " +
-                            (indRowMissing++).ToString() + " of " + indRowCounter.ToString() + "] " +
-                             consolidatedIndexRow.Key.Replace('\a', ' '));
-
-                    indRowCounter++;
-
-        #endregion
-#endif
-
         public void GenerateReturnsForDateRange(string sStartDate, string sEndDate, string sIndexName, AdventOutputType adventOutputType, bool isHistoricalAxmlFile)
         {
             DateTime startDate = Convert.ToDateTime(sStartDate);

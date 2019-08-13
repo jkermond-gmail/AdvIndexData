@@ -40,6 +40,47 @@ namespace IndexDataEngineLibrary
             sConnectionAmdVifs = ConfigurationManager.ConnectionStrings["dbConnectionAmdVifs"].ConnectionString;
         }
 
+        //public void TestGetStatusSummary(string sProcessDate)
+        //{
+        //    DateTime date = DateTime.Parse(sProcessDate);
+        //    InitializeConnectionStrings();
+        //    DateHelper.ConnectionString = sConnectionAmdVifs;
+        //    ProcessStatus.ConnectionString = sConnectionIndexData;
+        //    BeginSql();
+
+        //    int TotalProcessStatusRows = 0;
+        //    int CountAxmlConstituentData = 0;
+        //    int CountAxmlSectorData = 0;
+        //    int ExpectedConstituentClientFiles = 0;
+        //    int ActualConstituentClientFiles = 0;
+        //    int ExpectedSectorClientFiles = 0;
+        //    int ActualSectorClientFiles = 0;
+
+        //    ProcessStatus.GetStatusSummary("07/10/2019", out TotalProcessStatusRows, out CountAxmlConstituentData, out CountAxmlSectorData,
+        //                                    out ExpectedConstituentClientFiles, out ActualConstituentClientFiles, out ExpectedSectorClientFiles, out ActualSectorClientFiles);
+
+
+
+        //    EndSql();
+        //}
+
+        public void TestGenerateStatusReportIfNeeded(string sProcessDate)
+        {
+            DateTime date = DateTime.Parse(sProcessDate);
+            InitializeConnectionStrings();
+            DateHelper.ConnectionString = sConnectionAmdVifs;
+            ProcessStatus.ConnectionString = sConnectionIndexData;
+            BeginSql();
+
+            IndexDataProcessDate = date;
+
+
+            GenerateStatusReportIfNeeded(sProcessDate);
+            EndSql();
+        }
+
+
+
         public void Run(string sVifsProcessDate)
         {
             DateTime date = DateTime.Parse(sVifsProcessDate);
@@ -429,13 +470,64 @@ namespace IndexDataEngineLibrary
             return (VendorFiles);
         }
 
-        private void GenerateStatusReport(string sVifsProcessDate)
+        private void GenerateStatusReport(string sProcessDate)
         {
+            int FilesTotal = 0;
+            int FilesDownloaded = 0;
+            var report = new List<string>();
 
+            report.Add("Advent Index Data status report for " + sVifsProcessDate);
+            report.Add("------------------------------------------------");
+
+            bool bFilesDownloaded = VendorFilesDownloaded(sProcessDate, out FilesTotal, out FilesDownloaded);
+
+            if (!bFilesDownloaded)
+            {
+                report.Add("Missing Vendor Files not downloaded:");
+
+                List<string> files = VendorFilesNotDownloaded(sProcessDate);
+                string sYYYYMMDD = DateHelper.ConvertToYYYYMMDD(sProcessDate);
+                foreach (string file in files)
+                {
+                    string file2 = file.Replace("YYYYMMDD", sYYYYMMDD);
+                    report.Add("   " + file2);
+                }
+            }
+            else
+            {
+                report.Add(FilesDownloaded + " of " + FilesTotal + " Vendor Files downloaded");
+            }
+            report.Add("   ");
+
+            int TotalProcessStatusRows = 0;
+            int CountAxmlConstituentData = 0;
+            int CountAxmlSectorData = 0;
+            int ExpectedConstituentClientFiles = 0;
+            int ActualConstituentClientFiles = 0;
+            int ExpectedSectorClientFiles = 0;
+            int ActualSectorClientFiles = 0;
+
+            ProcessStatus.GetStatusSummary(sProcessDate, out TotalProcessStatusRows, out CountAxmlConstituentData, out CountAxmlSectorData,
+                                            out ExpectedConstituentClientFiles, out ActualConstituentClientFiles, out ExpectedSectorClientFiles, out ActualSectorClientFiles);
+
+            report.Add(CountAxmlConstituentData + " out of  " + TotalProcessStatusRows + " System Job AXML Constituent files successfully generated");
+            report.Add(CountAxmlSectorData + " out of  " + TotalProcessStatusRows + " System Job AXML Sector files successfully generated");
+            report.Add(ActualConstituentClientFiles + " out of  " + ExpectedConstituentClientFiles + " Client Constituent files successfully copied to ftp folders");
+            report.Add(ActualSectorClientFiles + " out of  " + ExpectedSectorClientFiles + " Client Sector files successfully copied to ftp folders");
+
+            string mailMsg = "";
+            foreach (string reportRow in report)
+            {
+                LogHelper.WriteLine(reportRow);
+                mailMsg += reportRow + "\r\n";
+            }
+
+            Mail mail = new Mail();
+            mail.SendMail(mailMsg);
         }
 
 
-            private void GenerateStatusReportIfNeeded(string sVifsProcessDate)
+        private void GenerateStatusReportIfNeeded(string sProcessDate)
         {
             string sReportDate = getSystemSettingValue("StatusReportDate", cnSqlIndexData);
             DateTime reportDate = DateTime.ParseExact(sReportDate, "MM/dd/yyyy", CultureInfo.InvariantCulture);
@@ -450,7 +542,7 @@ namespace IndexDataEngineLibrary
 
                     if ((timeOfDay >= start) && (timeOfDay <= end))
                     {
-
+                        GenerateStatusReport(sProcessDate);
                     }
                 }
             }

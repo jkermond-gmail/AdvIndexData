@@ -474,5 +474,143 @@ namespace IndexDataEngineLibrary
             }
             return (checkStatus);
         }
+
+        public static void GetStatusSummary(
+            string sProcessDate, out int TotalProcessStatusRows, out int CountAxmlConstituentData, out int CountAxmlSectorData,
+            out int ExpectedConstituentClientFiles, out int ActualConstituentClientFiles, out int ExpectedSectorClientFiles, out int ActualSectorClientFiles)
+        {
+            TotalProcessStatusRows = 0;
+            CountAxmlConstituentData = 0;
+            CountAxmlSectorData = 0;
+            ExpectedConstituentClientFiles = 0;
+            ActualConstituentClientFiles = 0;
+            ExpectedSectorClientFiles = 0;
+            ActualSectorClientFiles = 0;
+
+            DateTime date = DateTime.Parse(sProcessDate);
+            sProcessDate = date.ToString("MM/dd/yyyy");
+
+            try
+            {
+                if (mSqlConn == null)
+                {
+                    OpenSqlConn();
+                }
+
+                string Sql = @"
+                    select count(*) as TotalProcessStatusRows from ProcessStatus
+                    where ProcessDate = @ProcessDate 
+                    ";
+
+                SqlCommand cmd = new SqlCommand(Sql, mSqlConn);
+                cmd.Parameters.Add("@ProcessDate", SqlDbType.DateTime);
+                cmd.Parameters["@ProcessDate"].Value = sProcessDate;
+                SqlDataReader dr = cmd.ExecuteReader();
+                if (dr.HasRows)
+                {
+                    dr.Read();
+                    string val = dr["TotalProcessStatusRows"].ToString();
+                    TotalProcessStatusRows = Convert.ToInt32(val);
+                }
+                dr.Close();
+
+                Sql = @"
+                    select count(*) as CountAxmlConstituentData from ProcessStatus
+                    where ProcessDate = @ProcessDate and AxmlConstituentData = 'P' 
+                    ";
+                cmd.CommandText = Sql;
+                dr = cmd.ExecuteReader();
+                if (dr.HasRows)
+                {
+                    dr.Read();
+                    string val = dr["CountAxmlConstituentData"].ToString();
+                    CountAxmlConstituentData = Convert.ToInt32(val);
+                }
+                dr.Close();
+
+                Sql = @"
+                    select count(*) as CountAxmlSectorData from ProcessStatus
+                    where ProcessDate = @ProcessDate and AxmlSectorData = 'P' 
+                    ";
+                cmd.CommandText = Sql;
+                dr = cmd.ExecuteReader();
+                if (dr.HasRows)
+                {
+                    dr.Read();
+                    string val = dr["CountAxmlSectorData"].ToString();
+                    CountAxmlSectorData = Convert.ToInt32(val);
+                }
+                dr.Close();
+
+                Sql = @"
+                    select sum(ExpectedConstituentClientFiles) as ExpectedConstituentClientFiles from ProcessStatus
+                    where ProcessDate = @ProcessDate 
+                    ";
+                cmd.CommandText = Sql;
+                dr = cmd.ExecuteReader();
+                if (dr.HasRows)
+                {
+                    dr.Read();
+                    string val = dr["ExpectedConstituentClientFiles"].ToString();
+                    ExpectedConstituentClientFiles = Convert.ToInt32(val);
+                }
+                dr.Close();
+
+                Sql = @"
+                    select sum(ActualConstituentClientFiles) as ActualConstituentClientFiles from ProcessStatus
+                    where ProcessDate = @ProcessDate 
+                    ";
+                cmd.CommandText = Sql;
+                dr = cmd.ExecuteReader();
+                if (dr.HasRows)
+                {
+                    dr.Read();
+                    string val = dr["ActualConstituentClientFiles"].ToString();
+                    ActualConstituentClientFiles = Convert.ToInt32(val);
+                }
+                dr.Close();
+
+                Sql = @"
+                    select sum(ExpectedSectorClientFiles) as ExpectedSectorClientFiles from ProcessStatus
+                    where ProcessDate = @ProcessDate 
+                    ";
+                cmd.CommandText = Sql;
+                dr = cmd.ExecuteReader();
+                if (dr.HasRows)
+                {
+                    dr.Read();
+                    string val = dr["ExpectedSectorClientFiles"].ToString();
+                    ExpectedSectorClientFiles = Convert.ToInt32(val);
+                }
+                dr.Close();
+
+                Sql = @"
+                    select sum(ActualSectorClientFiles) as ActualSectorClientFiles from ProcessStatus
+                    where ProcessDate = @ProcessDate 
+                    ";
+                cmd.CommandText = Sql;
+                dr = cmd.ExecuteReader();
+                if (dr.HasRows)
+                {
+                    dr.Read();
+                    string val = dr["ActualSectorClientFiles"].ToString();
+                    ActualSectorClientFiles = Convert.ToInt32(val);
+                }
+                dr.Close();
+            }
+
+            catch (SqlException ex)
+            {
+                if (ex.Number == 2627)
+                {
+                    LogHelper.WriteLine(ex.Message);
+                }
+            }
+            finally
+            {
+            }
+        }
+
+
     }
 }

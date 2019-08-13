@@ -263,6 +263,8 @@ namespace IndexDataForm
         {
             string[] Indices = null;
 
+            cbRussellIndices.Items.Clear();
+
             if (cboVendor.SelectedItem.Equals("Russell"))
             {
                 Indices = russellData.GetIndices();
@@ -342,6 +344,12 @@ namespace IndexDataForm
             indexDataEngine.CreateFtpFolders();
             snpData.TestFileCopy();
             snpData.TestFilesCopy();
+        }
+
+        private void btnProcessAllForDate_Click(object sender, EventArgs e)
+        {
+            IndexDataEngine indexDataEngine = new IndexDataEngine();
+            indexDataEngine.Run(lnkStartDate.Text);
         }
     }
 }

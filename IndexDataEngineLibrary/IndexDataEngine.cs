@@ -40,6 +40,23 @@ namespace IndexDataEngineLibrary
             sConnectionAmdVifs = ConfigurationManager.ConnectionStrings["dbConnectionAmdVifs"].ConnectionString;
         }
 
+        public void Run(string sVifsProcessDate)
+        {
+            DateTime date = DateTime.Parse(sVifsProcessDate);
+            sVifsProcessDate = date.ToString("MM/dd/yyyy");
+            InitializeConnectionStrings();
+            DateHelper.ConnectionString = sConnectionAmdVifs;
+            ProcessStatus.ConnectionString = sConnectionIndexData;
+            BeginSql();
+            VifsProcessDate = DateTime.ParseExact(sVifsProcessDate, "MM/dd/yyyy", CultureInfo.InvariantCulture);
+            InitializeProcessStatus(sVifsProcessDate);
+            testing = true;
+            ProcessIndexDataDatasets(sVifsProcessDate, false);
+            ProcessIndexDataDatasets(sVifsProcessDate, false); // A second call will make sure the sp 900, 1000, and 1500 are complete
+            EndSql();
+        }
+
+
         public void Run()
         {
             //LogHelper.Info("IndexDataEngine.Run", "IndexDataEngineLibrary");
@@ -81,11 +98,11 @@ namespace IndexDataEngineLibrary
                 mail.SendMail("AdvIndexData: New business day started " + sVifsProcessDate);
             }
 
-            ProcessIndexDataDatasets(sVifsProcessDate);
+            ProcessIndexDataDatasets(sVifsProcessDate, true);
 
             if (testing)
             {
-                ProcessIndexDataDatasets(sVifsProcessDate); // A second call will make sure the sp 900, 1000, and 1500 are complete
+                ProcessIndexDataDatasets(sVifsProcessDate, true); // A second call will make sure the sp 900, 1000, and 1500 are complete
                 string sToday = DateTime.Now.ToString("MM/dd/yyyy");
                 if (sVifsProcessDate.Equals(sToday)) // JK to do change
                 {
@@ -110,6 +127,8 @@ namespace IndexDataEngineLibrary
 
             ProcessStatus.Initialize();
             ProcessStatus.DeleteOldEntries(sProcessDate);
+            ProcessStatus.DeleteEntries(sProcessDate);
+
             List<KeyValuePair<string, string>> listVendorDatasets = null;
 
             getVendorDatasets(out listVendorDatasets);
@@ -137,7 +156,7 @@ namespace IndexDataEngineLibrary
             }
         }
 
-        private void ProcessIndexDataDatasets(string sProcessDate)
+        private void ProcessIndexDataDatasets(string sProcessDate, bool normalProcessing)
         {
             //LogHelper.WriteLine("ProcessIndexDataWork: " + sProcessDate.ToString());
 
@@ -159,25 +178,32 @@ namespace IndexDataEngineLibrary
                 vendor = element.Key.ToString();
                 dataset = element.Value.ToString();
 
-                if (testing)
-                    VendorDatasetFilesUpdateLastProcessDate(vendor, dataset, sProcessDate);
-
-                if (VendorDatasetFilesDownloaded(vendor, dataset, sProcessDate, out FilesTotal, out FilesDownloaded))
+                if (normalProcessing.Equals(true))
                 {
-                    if (FilesDownloaded < FilesTotal)
-                        LogHelper.WriteLine("Vendor | " + vendor + " | Dataset | " + dataset + " | sProcessDate | " + sProcessDate + " | FilesDownloaded | "
-                                            + FilesDownloaded + " | FilesTotal | " + FilesTotal);
+                    if (testing)
+                        VendorDatasetFilesUpdateLastProcessDate(vendor, dataset, sProcessDate);
 
-                    if (VendorDatasetJobsProcessed(vendor, dataset, sProcessDate, out JobsTotal, out JobsProcessed))
+                    if (VendorDatasetFilesDownloaded(vendor, dataset, sProcessDate, out FilesTotal, out FilesDownloaded))
                     {
-                        if (JobsProcessed < JobsTotal)
-                            LogHelper.WriteLine("Vendor | " + vendor + " | Dataset | " + dataset + " | sProcessDate | " + sProcessDate + " | JobsProcessed | "
-                                            + JobsProcessed + " | JobsTotal | " + JobsTotal);
+                        if (FilesDownloaded < FilesTotal)
+                            LogHelper.WriteLine("Vendor | " + vendor + " | Dataset | " + dataset + " | sProcessDate | " + sProcessDate + " | FilesDownloaded | "
+                                                + FilesDownloaded + " | FilesTotal | " + FilesTotal);
+
+                        if (VendorDatasetJobsProcessed(vendor, dataset, sProcessDate, out JobsTotal, out JobsProcessed))
+                        {
+                            if (JobsProcessed < JobsTotal)
+                                LogHelper.WriteLine("Vendor | " + vendor + " | Dataset | " + dataset + " | sProcessDate | " + sProcessDate + " | JobsProcessed | "
+                                                + JobsProcessed + " | JobsTotal | " + JobsTotal);
+                        }
+                        else
+                        {
+                            ProcessVendorDatasetJobs(vendor, dataset, sProcessDate, out JobsTotal, out JobsProcessed);
+                        }
                     }
-                    else
-                    {
-                        ProcessVendorDatasetJobs(vendor, dataset, sProcessDate, out JobsTotal, out JobsProcessed);
-                    }
+                }
+                else
+                {
+                    ProcessVendorDatasetJobs(vendor, dataset, sProcessDate, out JobsTotal, out JobsProcessed);
                 }
             }
         }
@@ -403,7 +429,13 @@ namespace IndexDataEngineLibrary
             return (VendorFiles);
         }
 
-        private void GenerateStatusReportIfNeeded(string sVifsProcessDate)
+        private void GenerateStatusReport(string sVifsProcessDate)
+        {
+
+        }
+
+
+            private void GenerateStatusReportIfNeeded(string sVifsProcessDate)
         {
             string sReportDate = getSystemSettingValue("StatusReportDate", cnSqlIndexData);
             DateTime reportDate = DateTime.ParseExact(sReportDate, "MM/dd/yyyy", CultureInfo.InvariantCulture);

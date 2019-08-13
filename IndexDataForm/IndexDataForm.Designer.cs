@@ -34,6 +34,8 @@
             this.timerRunIndexData = new System.Windows.Forms.Timer(this.components);
             this.tabUnitTest = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.btnProcessAllForDate = new System.Windows.Forms.Button();
+            this.btnTestFtp = new System.Windows.Forms.Button();
             this.btnTestEmail = new System.Windows.Forms.Button();
             this.chkHistoricalAxmlFile = new System.Windows.Forms.CheckBox();
             this.btnTestEndOfMonthDates = new System.Windows.Forms.Button();
@@ -52,7 +54,6 @@
             this.lblStartDate = new System.Windows.Forms.Label();
             this.cboVendor = new System.Windows.Forms.ComboBox();
             this.lblVendor = new System.Windows.Forms.Label();
-            this.btnTestFtp = new System.Windows.Forms.Button();
             this.tabUnitTest.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.SuspendLayout();
@@ -87,11 +88,12 @@
             this.tabUnitTest.Location = new System.Drawing.Point(13, 72);
             this.tabUnitTest.Name = "tabUnitTest";
             this.tabUnitTest.SelectedIndex = 0;
-            this.tabUnitTest.Size = new System.Drawing.Size(604, 408);
+            this.tabUnitTest.Size = new System.Drawing.Size(604, 482);
             this.tabUnitTest.TabIndex = 2;
             // 
             // tabPage1
             // 
+            this.tabPage1.Controls.Add(this.btnProcessAllForDate);
             this.tabPage1.Controls.Add(this.btnTestFtp);
             this.tabPage1.Controls.Add(this.btnTestEmail);
             this.tabPage1.Controls.Add(this.chkHistoricalAxmlFile);
@@ -112,11 +114,31 @@
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(596, 382);
+            this.tabPage1.Size = new System.Drawing.Size(596, 456);
             this.tabPage1.TabIndex = 0;
-            this.tabPage1.Text = "Russell";
+            this.tabPage1.Text = "Index Data";
             this.tabPage1.UseVisualStyleBackColor = true;
             this.tabPage1.Click += new System.EventHandler(this.tabPage1_Click);
+            // 
+            // btnProcessAllForDate
+            // 
+            this.btnProcessAllForDate.Location = new System.Drawing.Point(39, 368);
+            this.btnProcessAllForDate.Name = "btnProcessAllForDate";
+            this.btnProcessAllForDate.Size = new System.Drawing.Size(163, 23);
+            this.btnProcessAllForDate.TabIndex = 17;
+            this.btnProcessAllForDate.Text = "Process All for Date";
+            this.btnProcessAllForDate.UseVisualStyleBackColor = true;
+            this.btnProcessAllForDate.Click += new System.EventHandler(this.btnProcessAllForDate_Click);
+            // 
+            // btnTestFtp
+            // 
+            this.btnTestFtp.Location = new System.Drawing.Point(389, 270);
+            this.btnTestFtp.Name = "btnTestFtp";
+            this.btnTestFtp.Size = new System.Drawing.Size(125, 23);
+            this.btnTestFtp.TabIndex = 16;
+            this.btnTestFtp.Text = "Test FTP";
+            this.btnTestFtp.UseVisualStyleBackColor = true;
+            this.btnTestFtp.Click += new System.EventHandler(this.btnTestFtp_Click);
             // 
             // btnTestEmail
             // 
@@ -244,7 +266,7 @@
             this.lnkEndDate.Size = new System.Drawing.Size(65, 13);
             this.lnkEndDate.TabIndex = 3;
             this.lnkEndDate.TabStop = true;
-            this.lnkEndDate.Text = "01/06/2014";
+            this.lnkEndDate.Text = "07/10/2019";
             this.lnkEndDate.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.lnkEndDate_LinkClicked);
             // 
             // lnkStartDate
@@ -255,7 +277,7 @@
             this.lnkStartDate.Size = new System.Drawing.Size(65, 13);
             this.lnkStartDate.TabIndex = 2;
             this.lnkStartDate.TabStop = true;
-            this.lnkStartDate.Text = "01/06/2014";
+            this.lnkStartDate.Text = "07/10/2019";
             this.lnkStartDate.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.lnkStartDate_LinkClicked);
             // 
             // lblEndDate
@@ -298,21 +320,11 @@
             this.lblVendor.TabIndex = 4;
             this.lblVendor.Text = "Vendor";
             // 
-            // btnTestFtp
-            // 
-            this.btnTestFtp.Location = new System.Drawing.Point(389, 270);
-            this.btnTestFtp.Name = "btnTestFtp";
-            this.btnTestFtp.Size = new System.Drawing.Size(125, 23);
-            this.btnTestFtp.TabIndex = 16;
-            this.btnTestFtp.Text = "Test FTP";
-            this.btnTestFtp.UseVisualStyleBackColor = true;
-            this.btnTestFtp.Click += new System.EventHandler(this.btnTestFtp_Click);
-            // 
             // IndexDataForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(640, 492);
+            this.ClientSize = new System.Drawing.Size(640, 566);
             this.Controls.Add(this.lblVendor);
             this.Controls.Add(this.cboVendor);
             this.Controls.Add(this.tabUnitTest);
@@ -354,6 +366,7 @@
         private System.Windows.Forms.CheckBox chkHistoricalAxmlFile;
         private System.Windows.Forms.Button btnTestEmail;
         private System.Windows.Forms.Button btnTestFtp;
+        private System.Windows.Forms.Button btnProcessAllForDate;
     }
 }
 

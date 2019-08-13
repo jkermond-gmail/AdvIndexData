@@ -152,6 +152,39 @@ namespace IndexDataEngineLibrary
             }
         }
 
+        public static void DeleteEntries(string sProcessDate)
+        {
+            try
+            {
+                DateTime date = DateTime.Parse(sProcessDate);
+
+                if (mSqlConn == null)
+                {
+                    OpenSqlConn();
+                }
+                string Sql = @"
+                delete from ProcessStatus
+                where ProcessDate = @ProcessDate 
+                ";
+                SqlCommand cmd = new SqlCommand(Sql, mSqlConn);
+                cmd.Parameters.Add("@ProcessDate", SqlDbType.DateTime);
+                cmd.Parameters["@ProcessDate"].Value = date;
+                cmd.ExecuteNonQuery();
+            }
+            catch (SqlException ex)
+            {
+                if (ex.Number == 2627)
+                {
+                    LogHelper.WriteLine(ex.Message);
+                }
+            }
+            finally
+            {
+                LogHelper.WriteLine("deleted " + sProcessDate + " from ProcessStatus table");
+            }
+        }
+
+
 
         public static void Update(DateTime ProcessDate, string Vendor, string Dataset, string IndexName, WhichStatus whichStatus, StatusValue statusValue)
         {

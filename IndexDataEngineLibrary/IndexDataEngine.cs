@@ -64,18 +64,16 @@ namespace IndexDataEngineLibrary
         //    EndSql();
         //}
 
-        public void TestGenerateStatusReportIfNeeded(string sProcessDate)
+        public void TestGenerateStatusReport(string sProcessDate)
         {
             DateTime date = DateTime.Parse(sProcessDate);
+            sProcessDate = date.ToString("MM/dd/yyyy");
             InitializeConnectionStrings();
             DateHelper.ConnectionString = sConnectionAmdVifs;
             ProcessStatus.ConnectionString = sConnectionIndexData;
             BeginSql();
-
             IndexDataProcessDate = date;
-
-
-            GenerateStatusReportIfNeeded(sProcessDate);
+            GenerateStatusReport(sProcessDate);
             EndSql();
         }
 

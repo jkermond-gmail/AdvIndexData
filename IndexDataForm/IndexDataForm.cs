@@ -340,7 +340,7 @@ namespace IndexDataForm
 
             indexDataEngine = new IndexDataEngine();
             //indexDataEngine.TestGetStatusSummary(lnkStartDate.Text);
-            indexDataEngine.TestGenerateStatusReportIfNeeded("07/10/2019"); 
+            indexDataEngine.TestGenerateStatusReport(lnkStartDate.Text); 
         }
 
         private void btnTestFtp_Click(object sender, EventArgs e)

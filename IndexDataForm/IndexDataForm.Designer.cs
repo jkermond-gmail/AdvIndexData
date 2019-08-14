@@ -146,7 +146,7 @@
             this.btnTestEmail.Name = "btnTestEmail";
             this.btnTestEmail.Size = new System.Drawing.Size(125, 23);
             this.btnTestEmail.TabIndex = 15;
-            this.btnTestEmail.Text = "Test Email";
+            this.btnTestEmail.Text = "Generate Status Report";
             this.btnTestEmail.UseVisualStyleBackColor = true;
             this.btnTestEmail.Click += new System.EventHandler(this.btnTestEmail_Click);
             // 

@@ -29,8 +29,9 @@ namespace AdventUtilityLibrary
 
         public void SendMail(string sMessage)
         {
-            string subject = "AdvIndexData Status: " + sMessage;
+            string subject = "AdvIndexData Status";
             LogHelper.WriteLine("Send mail " + subject);
+            LogHelper.WriteLine("Send mail " + sMessage);
 
             if (mSendMail.Equals(true))
             {

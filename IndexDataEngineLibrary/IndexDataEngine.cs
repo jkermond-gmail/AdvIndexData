@@ -534,19 +534,19 @@ namespace IndexDataEngineLibrary
             if( reportDate < IndexDataProcessDate)
             {
                 DateTime now = DateTime.Now;
-                if (now.Hour <= 20)
+                if (now.Hour <= 21)
                 {
                     TimeSpan timeOfDay = DateTime.Now.TimeOfDay;
-                    TimeSpan start = new TimeSpan(16, 0, 0);    // 9:00PM
-                    TimeSpan end = new TimeSpan(16, 5, 0);      // 9:03PM
+                    TimeSpan start = new TimeSpan(21, 0, 0);    // 9:00PM
+                    TimeSpan end = new TimeSpan(21, 5, 0);      // 9:05PM
 
                     if ((timeOfDay >= start) && (timeOfDay <= end))
                     {
                         GenerateStatusReport(sProcessDate);
+                        setSystemSettingValue("StatusReportDate", sProcessDate, cnSqlIndexData);
                     }
                 }
             }
-
         }
 
 

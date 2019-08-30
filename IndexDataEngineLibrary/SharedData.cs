@@ -1304,7 +1304,6 @@ namespace IndexDataEngineLibrary
             }
         }
 
-
         public void VendorDatasetJobsUpdateProcessDate(string Vendor, string Dataset, string sProcessDate)
         {
             SqlCommand cmd = null;

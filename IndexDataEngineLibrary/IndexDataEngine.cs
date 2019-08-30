@@ -133,6 +133,7 @@ namespace IndexDataEngineLibrary
                 LogHelper.ArchiveLog(IndexDataProcessDate.Date);
                 InitializeProcessStatus(sVifsProcessDate);
                 setIndexDataProcessDate(sVifsProcessDate);
+                DeleteFilesInFtpFolders();
                 Mail mail = new Mail();
                 mail.SendMail("AdvIndexData: New business day started " + sVifsProcessDate);
             }
@@ -474,7 +475,7 @@ namespace IndexDataEngineLibrary
             int FilesDownloaded = 0;
             var report = new List<string>();
 
-            report.Add("Advent Index Data status report for " + sVifsProcessDate);
+            report.Add("Advent Index Data status report for " + sProcessDate);
             report.Add("------------------------------------------------");
 
             bool bFilesDownloaded = VendorFilesDownloaded(sProcessDate, out FilesTotal, out FilesDownloaded);
@@ -495,7 +496,6 @@ namespace IndexDataEngineLibrary
             {
                 report.Add(FilesDownloaded + " of " + FilesTotal + " Vendor Files downloaded");
             }
-            report.Add("   ");
 
             int TotalProcessStatusRows = 0;
             int CountAxmlConstituentData = 0;
@@ -976,6 +976,77 @@ namespace IndexDataEngineLibrary
             return;
 
         }
+
+        public void DeleteFilesInFtpFolders()
+        {
+            string ftpRootDir = AppSettings.Get<string>("ftpRootDir");
+            string dir = "";
+            string filename = "";
+            SqlCommand cmd = null;
+            string clientID = "";
+
+            bool deleteFilesInFtpFolders = AppSettings.Get<bool>("deleteFilesInFtpFolders");
+
+            if (deleteFilesInFtpFolders)
+            {
+                string commandText = @"
+                SELECT distinct ClientID
+                FROM Clients
+                ORDER BY ClientID
+                ";
+                try
+                {
+                    cmd = new SqlCommand
+                    {
+                        Connection = cnSqlIndexData,
+                        CommandText = commandText
+                    };
+
+                    SqlDataReader dr = null;
+                    dr = cmd.ExecuteReader();
+                    int rows = 0;
+                    if (dr.HasRows)
+                    {
+                        while (dr.Read())
+                        {
+                            rows += 1;
+                            clientID = dr["ClientID"].ToString();
+                            dir = ftpRootDir + "\\" + clientID;
+                            if (Directory.Exists(dir))
+                            {
+                                dir = dir + "\\" + "IndexData";
+                                if (Directory.Exists(dir))
+                                {
+                                    dir = dir + "\\" + "Results";
+                                    if (Directory.Exists(dir))
+                                    {
+                                        DirectoryInfo di = new DirectoryInfo(dir);
+
+                                        foreach (FileInfo file in di.GetFiles())
+                                        {
+                                            filename = file.FullName;
+                                            file.Delete();
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    dr.Close();
+                }
+                catch (SqlException ex)
+                {
+                    LogHelper.WriteLine("Unsuccessful delete " + filename);
+                }
+                finally
+                {
+                    //LogHelper.WriteLine(logFuncName + " done " );
+                }
+            }
+            return;
+        }
+
+
 
 
     }

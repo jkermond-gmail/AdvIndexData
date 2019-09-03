@@ -346,6 +346,8 @@ namespace IndexDataForm
         private void btnTestFtp_Click(object sender, EventArgs e)
         {
             indexDataEngine = new IndexDataEngine();
+            //indexDataEngine.InitializeHistoricalSecurityMasterCopy();
+
             indexDataEngine.CreateFtpFolders();
             snpData.TestFileCopy();
             snpData.TestFilesCopy();

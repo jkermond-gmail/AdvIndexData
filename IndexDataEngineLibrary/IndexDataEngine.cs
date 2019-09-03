@@ -134,6 +134,7 @@ namespace IndexDataEngineLibrary
                 InitializeProcessStatus(sVifsProcessDate);
                 setIndexDataProcessDate(sVifsProcessDate);
                 DeleteFilesInFtpFolders();
+                InitializeHistoricalSecurityMasterCopy();
                 Mail mail = new Mail();
                 mail.SendMail("AdvIndexData: New business day started " + sVifsProcessDate);
             }
@@ -1044,6 +1045,51 @@ namespace IndexDataEngineLibrary
                 }
             }
             return;
+        }
+
+        public void InitializeHistoricalSecurityMasterCopy()
+        {
+            bool endSql = false;
+            try
+            {
+                if (String.IsNullOrEmpty(sConnectionIndexData))
+                {
+                    InitializeConnectionStrings();
+                    BeginSql();
+                    endSql = true;
+                }
+
+                string sqlDelete = "DELETE FROM HistoricalSecurityMasterFullCopy";
+
+                SqlCommand cmd = new SqlCommand
+                {
+                    Connection = cnSqlIndexData,
+                    CommandText = sqlDelete
+                };
+                cmd.ExecuteNonQuery();
+                cmd.CommandText = @"
+                    INSERT INTO HistoricalSecurityMasterFullCopy (
+	                Ticker, Cusip, Vendor, StockKey, CompanyName, SectorCode, BeginDate, EndDate)
+	                SELECT Ticker, Cusip, Vendor, StockKey, CompanyName, SectorCode, BeginDate, EndDate
+	                FROM HistoricalSecurityMasterFull ORDER BY id
+                ";
+                cmd.ExecuteNonQuery();
+            }
+            catch (SqlException ex)
+            {
+                if (ex.Number == 2627)
+                {
+                    LogHelper.WriteLine(ex.Message);
+                }
+            }
+            finally
+            {
+                if (endSql)
+                    EndSql();
+            }
+            
+        return;
+
         }
 
 

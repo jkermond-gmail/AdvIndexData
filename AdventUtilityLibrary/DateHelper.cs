@@ -100,6 +100,14 @@ namespace AdventUtilityLibrary
             return (date.ToString("yyyyMMdd"));
         }
 
+        public static string PrevBusinessDayMMDDYYYY_Slash(string sDate)
+        {
+            DateTime date = DateTime.Parse(sDate);
+            date = PrevBusinessDay(date);
+            return (date.ToString("MM/dd/yyyy"));
+        }
+
+
         public static string ConvertToYYYYMMDD(string sDate)
         {
             DateTime date = DateTime.Parse(sDate);

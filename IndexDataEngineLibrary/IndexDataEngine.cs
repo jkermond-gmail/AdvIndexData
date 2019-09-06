@@ -73,6 +73,7 @@ namespace IndexDataEngineLibrary
             ProcessStatus.ConnectionString = sConnectionIndexData;
             BeginSql();
             IndexDataProcessDate = date;
+            //GenerateSecurityMasterChangesData(sProcessDate);
             GenerateStatusReport(sProcessDate);
             EndSql();
         }
@@ -130,7 +131,7 @@ namespace IndexDataEngineLibrary
             if (VifsProcessDate.Date > IndexDataProcessDate.Date)
             {
                 // Initialize everything cuz its a new day
-                LogHelper.ArchiveLog(IndexDataProcessDate.Date);
+               LogHelper.ArchiveLog(IndexDataProcessDate.Date);
                 InitializeProcessStatus(sVifsProcessDate);
                 setIndexDataProcessDate(sVifsProcessDate);
                 DeleteFilesInFtpFolders();
@@ -1052,8 +1053,11 @@ namespace IndexDataEngineLibrary
             bool endSql = false;
             try
             {
+                LogHelper.WriteLine("InitializeHistoricalSecurityMasterCopy");
                 if (String.IsNullOrEmpty(sConnectionIndexData))
                 {
+                    LogHelper.WriteLine("sConnectionIndexData is null");
+
                     InitializeConnectionStrings();
                     BeginSql();
                     endSql = true;
@@ -1067,16 +1071,22 @@ namespace IndexDataEngineLibrary
                     CommandText = sqlDelete
                 };
                 cmd.ExecuteNonQuery();
+                LogHelper.WriteLine("Delete is done");
+
                 cmd.CommandText = @"
                     INSERT INTO HistoricalSecurityMasterFullCopy (
-	                Ticker, Cusip, Vendor, StockKey, CompanyName, SectorCode, BeginDate, EndDate)
-	                SELECT Ticker, Cusip, Vendor, StockKey, CompanyName, SectorCode, BeginDate, EndDate
+	                id, Ticker, Cusip, Vendor, StockKey, CompanyName, SectorCode, BeginDate, EndDate)
+	                SELECT id, Ticker, Cusip, Vendor, StockKey, CompanyName, SectorCode, BeginDate, EndDate
 	                FROM HistoricalSecurityMasterFull ORDER BY id
                 ";
                 cmd.ExecuteNonQuery();
+                LogHelper.WriteLine("Insert is done");
+
             }
             catch (SqlException ex)
             {
+                LogHelper.WriteLine("InitializeHistoricalSecurityMasterCopy Sql Exception " + ex.Message);
+
                 if (ex.Number == 2627)
                 {
                     LogHelper.WriteLine(ex.Message);
@@ -1091,6 +1101,164 @@ namespace IndexDataEngineLibrary
         return;
 
         }
+
+        public void GenerateSecurityMasterChangesData(string sProcessDate)
+        {
+            SqlCommand cmd = null;
+            SqlCommand cmd2 = null;
+            SqlConnection cnSql2 = null ;
+            // First Get the new adds
+            string selectText = @"
+                select id from HistoricalSecurityMasterFull where id not in 
+                (select id from HistoricalSecurityMasterFullCopy)
+            ";
+            string insertText = @"
+                insert into HistoricalSecurityMasterFullChanges
+                (id, ProcessDate, ChangeType, CusipNew, TickerNew, CompanyNameNew, SectorCodeNew)
+                select id, BeginDate, 'Add', Cusip, Ticker, CompanyName, SectorCode from HistoricalSecurityMasterFull where id = @id
+            ";
+            try
+            {
+                cnSql2 = new SqlConnection(sConnectionIndexData);
+                cnSql2.Open();
+
+                cmd = new SqlCommand
+                {
+                    Connection = cnSqlIndexData,
+                    CommandText = selectText
+                };
+
+                cmd2 = new SqlCommand
+                {
+                    Connection = cnSql2,
+                    CommandText = insertText
+                };
+                cmd2.Parameters.Add("@id", SqlDbType.Int);
+
+                SqlDataReader dr = null;
+                dr = cmd.ExecuteReader();
+                if (dr.HasRows)
+                {
+                    while (dr.Read())
+                    {
+                        string val = dr["id"].ToString();
+                        int id = Convert.ToInt32(val);
+                        cmd2.Parameters["@id"].Value = id;
+                        cmd2.ExecuteNonQuery();
+                        LogHelper.WriteLine("Insert Add is done");
+                    }
+                }
+                dr.Close();
+
+                // Next get deletes
+                string sPrevProcessDate = DateHelper.PrevBusinessDayMMDDYYYY_Slash(sProcessDate);
+                selectText = @"
+                    select id from HistoricalSecurityMasterFullCopy where EndDate = @PrevProcessDate and id in
+                    (select id from HistoricalSecurityMasterFull where EndDate = @PrevProcessDate)
+                ";
+                cmd.CommandText = selectText;
+                cmd.Parameters.Add("@PrevProcessDate", SqlDbType.Date);
+                cmd.Parameters["@PrevProcessDate"].Value = sPrevProcessDate;
+
+                insertText = @"
+                    insert into HistoricalSecurityMasterFullChanges
+                    (id, ProcessDate, ChangeType, Cusip, Ticker, CompanyName, SectorCode)
+                    select id, EndDate, 'Delete', Cusip, Ticker, CompanyName, SectorCode from HistoricalSecurityMasterFull where id = @id
+                ";
+                cmd2.CommandText = insertText;
+
+                dr = cmd.ExecuteReader();
+                if (dr.HasRows)
+                {
+                    while (dr.Read())
+                    {
+                        string val = dr["id"].ToString();
+                        int id = Convert.ToInt32(val);
+                        cmd2.Parameters["@id"].Value = id;
+                        cmd2.ExecuteNonQuery();
+                        LogHelper.WriteLine("Insert Delete are done");
+                    }
+                }
+                dr.Close();
+
+                // Lastly, get updates
+                selectText = @"
+                    select h.id from HistoricalSecurityMasterFull h
+                    inner join HistoricalSecurityMasterFullCopy hprev on h.id = hprev.id
+                    where h.EndDate = @ProcessDate and hprev.EndDate = @PrevProcessDate
+                    and h.Vendor = 'R' and hprev.Vendor = 'R' 
+                    and (h.Ticker<> hprev.Ticker OR h.Cusip<> hprev.Cusip or h.CompanyName<> hprev.CompanyName or h.SectorCode<> hprev.SectorCode)
+                ";
+                cmd.CommandText = selectText;
+                cmd.Parameters.Add("@ProcessDate", SqlDbType.Date);
+                cmd.Parameters["@ProcessDate"].Value = sProcessDate;
+
+                insertText = @"
+                    insert into HistoricalSecurityMasterFullChanges
+                    (id, ProcessDate, ChangeType, Cusip, CusipNew, Ticker, TickerNew, CompanyName, CompanyNameNew, SectorCode, SectorCodeNew)
+                    select h.id, h.EndDate, 'Update', hprev.Cusip, h.Cusip, hprev.Ticker, h.Ticker, hprev.CompanyName, h.CompanyName, hprev.SectorCode, h.SectorCode
+	                from HistoricalSecurityMasterFull h
+                    inner join HistoricalSecurityMasterFullCopy hprev on h.id = hprev.id
+                    where h.id = @id and hprev.id = @id
+                ";
+                cmd2.CommandText = insertText;
+
+                dr = cmd.ExecuteReader();
+                if (dr.HasRows)
+                {
+                    while (dr.Read())
+                    {
+                        string val = dr["id"].ToString();
+                        int id = Convert.ToInt32(val);
+                        cmd2.Parameters["@id"].Value = id;
+                        cmd2.ExecuteNonQuery();
+                        LogHelper.WriteLine("Insert Updates are done");
+                    }
+                }
+            }
+            catch (SqlException ex)
+            {
+                //LogHelper.WriteLine("");
+            }
+            finally
+            {
+                if (cnSql2 != null)
+                    cnSql2.Close();
+                //LogHelper.WriteLine(logFuncName + " done " );
+            }
+
+
+            return;
+        }
+
+
+        ///* Get new adds */
+        //select id, Ticker, Cusip, CompanyName, SectorCode from HistoricalSecurityMasterFull where id not in 
+        //(select id from HistoricalSecurityMasterFullCopy)
+
+        ///* Get deletes */
+        //select id, Ticker, Cusip, CompanyName, SectorCode from HistoricalSecurityMasterFullCopy where EndDate = '09/03/2019' and id in
+        //(select id from HistoricalSecurityMasterFull where EndDate = '09/03/2019')
+
+        ///* Get updates */
+        //select h.id, h.Ticker, h.Cusip, h.CompanyName, h.SectorCode, hprev.Ticker as TickerOld, hprev.Cusip as CusipOld, hprev.CompanyName as CompanyNameOld, hprev.SectorCode as SectorCodeOld from HistoricalSecurityMasterFull h
+        //inner join HistoricalSecurityMasterFullCopy hprev on h.id = hprev.id
+        //where h.EndDate = '09/04/2019' and hprev.EndDate = '09/03/2019'
+        //and h.Vendor = 'R' and hprev.Vendor = 'R' and (h.Ticker<> hprev.Ticker OR h.Cusip<> hprev.Cusip or h.CompanyName<> hprev.CompanyName or h.SectorCode<> hprev.SectorCode)
+
+        //CREATE TABLE[dbo].[HistoricalSecurityMasterFullChanges]
+        //(      
+        //[id][int] NOT NULL,     
+        //[ProcessDate] [smalldatetime] NULL,
+        //[ChangeType] [varchar] (6) NOT NULL,
+        //[Cusip] [varchar] (8) NOT NULL,
+        //[CusipNew] [varchar] (8) NOT NULL,
+        //[Ticker] [varchar] (10) NOT NULL,
+        //[TickerNew] [varchar] (10) NOT NULL,
+        //[CompanyName] [varchar] (100) NULL,
+        //[CompanyNameNew] [varchar] (100) NULL,
+        //[SectorCode] [varchar] (8) NULL,
+        //[SectorCodeNew] [varchar] (8) NULL,
 
 
 

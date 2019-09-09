@@ -54,6 +54,8 @@
             this.lblStartDate = new System.Windows.Forms.Label();
             this.cboVendor = new System.Windows.Forms.ComboBox();
             this.lblVendor = new System.Windows.Forms.Label();
+            this.btnTestSecMaster = new System.Windows.Forms.Button();
+            this.btnTestSecMasterReport = new System.Windows.Forms.Button();
             this.tabUnitTest.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.SuspendLayout();
@@ -93,6 +95,8 @@
             // 
             // tabPage1
             // 
+            this.tabPage1.Controls.Add(this.btnTestSecMasterReport);
+            this.tabPage1.Controls.Add(this.btnTestSecMaster);
             this.tabPage1.Controls.Add(this.btnProcessAllForDate);
             this.tabPage1.Controls.Add(this.btnTestFtp);
             this.tabPage1.Controls.Add(this.btnTestEmail);
@@ -134,9 +138,9 @@
             // 
             this.btnTestFtp.Location = new System.Drawing.Point(389, 270);
             this.btnTestFtp.Name = "btnTestFtp";
-            this.btnTestFtp.Size = new System.Drawing.Size(125, 23);
+            this.btnTestFtp.Size = new System.Drawing.Size(139, 23);
             this.btnTestFtp.TabIndex = 16;
-            this.btnTestFtp.Text = "Test FTP";
+            this.btnTestFtp.Text = "Test Sec Master Init";
             this.btnTestFtp.UseVisualStyleBackColor = true;
             this.btnTestFtp.Click += new System.EventHandler(this.btnTestFtp_Click);
             // 
@@ -162,7 +166,7 @@
             // 
             // btnTestEndOfMonthDates
             // 
-            this.btnTestEndOfMonthDates.Location = new System.Drawing.Point(393, 329);
+            this.btnTestEndOfMonthDates.Location = new System.Drawing.Point(389, 387);
             this.btnTestEndOfMonthDates.Name = "btnTestEndOfMonthDates";
             this.btnTestEndOfMonthDates.Size = new System.Drawing.Size(121, 23);
             this.btnTestEndOfMonthDates.TabIndex = 13;
@@ -172,7 +176,7 @@
             // 
             // btnTestAxmlOutput
             // 
-            this.btnTestAxmlOutput.Location = new System.Drawing.Point(393, 299);
+            this.btnTestAxmlOutput.Location = new System.Drawing.Point(389, 358);
             this.btnTestAxmlOutput.Name = "btnTestAxmlOutput";
             this.btnTestAxmlOutput.Size = new System.Drawing.Size(121, 23);
             this.btnTestAxmlOutput.TabIndex = 12;
@@ -320,6 +324,26 @@
             this.lblVendor.TabIndex = 4;
             this.lblVendor.Text = "Vendor";
             // 
+            // btnTestSecMaster
+            // 
+            this.btnTestSecMaster.Location = new System.Drawing.Point(389, 301);
+            this.btnTestSecMaster.Name = "btnTestSecMaster";
+            this.btnTestSecMaster.Size = new System.Drawing.Size(139, 23);
+            this.btnTestSecMaster.TabIndex = 18;
+            this.btnTestSecMaster.Text = "Test Sec Master Changes";
+            this.btnTestSecMaster.UseVisualStyleBackColor = true;
+            this.btnTestSecMaster.Click += new System.EventHandler(this.btnTestSecMaster_Click);
+            // 
+            // btnTestSecMasterReport
+            // 
+            this.btnTestSecMasterReport.Location = new System.Drawing.Point(389, 329);
+            this.btnTestSecMasterReport.Name = "btnTestSecMasterReport";
+            this.btnTestSecMasterReport.Size = new System.Drawing.Size(139, 23);
+            this.btnTestSecMasterReport.TabIndex = 19;
+            this.btnTestSecMasterReport.Text = "Test Sec Master Report";
+            this.btnTestSecMasterReport.UseVisualStyleBackColor = true;
+            this.btnTestSecMasterReport.Click += new System.EventHandler(this.btnTestSecMasterReport_Click);
+            // 
             // IndexDataForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -367,6 +391,8 @@
         private System.Windows.Forms.Button btnTestEmail;
         private System.Windows.Forms.Button btnTestFtp;
         private System.Windows.Forms.Button btnProcessAllForDate;
+        private System.Windows.Forms.Button btnTestSecMaster;
+        private System.Windows.Forms.Button btnTestSecMasterReport;
     }
 }
 

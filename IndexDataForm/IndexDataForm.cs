@@ -346,11 +346,23 @@ namespace IndexDataForm
         private void btnTestFtp_Click(object sender, EventArgs e)
         {
             indexDataEngine = new IndexDataEngine();
-            //indexDataEngine.InitializeHistoricalSecurityMasterCopy();
+            indexDataEngine.InitializeHistoricalSecurityMasterCopy();
 
-            indexDataEngine.CreateFtpFolders();
-            snpData.TestFileCopy();
-            snpData.TestFilesCopy();
+            //indexDataEngine.CreateFtpFolders();
+            //snpData.TestFileCopy();
+            //snpData.TestFilesCopy();
+        }
+
+        private void btnTestSecMaster_Click(object sender, EventArgs e)
+        {
+            indexDataEngine = new IndexDataEngine();
+            indexDataEngine.ProcessSecurityMasterChanges(lnkStartDate.Text);
+        }
+
+        private void btnTestSecMasterReport_Click(object sender, EventArgs e)
+        {
+            indexDataEngine = new IndexDataEngine();
+            indexDataEngine.ProcessSecurityMasterReport(lnkStartDate.Text);
         }
 
         private void btnProcessAllForDate_Click(object sender, EventArgs e)

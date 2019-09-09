@@ -73,11 +73,49 @@ namespace IndexDataEngineLibrary
             ProcessStatus.ConnectionString = sConnectionIndexData;
             BeginSql();
             IndexDataProcessDate = date;
-            //GenerateSecurityMasterChangesData(sProcessDate);
             GenerateStatusReport(sProcessDate);
             EndSql();
         }
 
+        public void ProcessSecurityMasterChanges(string sProcessDate)
+        {
+            DateTime date = DateTime.Parse(sProcessDate);
+            sProcessDate = date.ToString("MM/dd/yyyy");
+            InitializeConnectionStrings();
+            DateHelper.ConnectionString = sConnectionAmdVifs;
+            ProcessStatus.ConnectionString = sConnectionIndexData;
+            BeginSql();
+            IndexDataProcessDate = date;
+            GenerateSecurityMasterChangesData(sProcessDate);
+            EndSql();
+        }
+
+        public void ProcessSecurityMasterReport(string sProcessDate)
+        {
+            DateTime date = DateTime.Parse(sProcessDate);
+            sProcessDate = date.ToString("MM/dd/yyyy");
+            InitializeConnectionStrings();
+            DateHelper.ConnectionString = sConnectionAmdVifs;
+            ProcessStatus.ConnectionString = sConnectionIndexData;
+            BeginSql();
+            IndexDataProcessDate = date;
+            GenerateSecurityMasterChangesReport(sProcessDate);
+            EndSql();
+        }
+
+        public void GenerateSecurityMasterChangesDataAndReport(string sProcessDate)
+        {
+            DateTime date = DateTime.Parse(sProcessDate);
+            sProcessDate = date.ToString("MM/dd/yyyy");
+            InitializeConnectionStrings();
+            DateHelper.ConnectionString = sConnectionAmdVifs;
+            ProcessStatus.ConnectionString = sConnectionIndexData;
+            BeginSql();
+            IndexDataProcessDate = date;
+            GenerateSecurityMasterChangesData(sProcessDate);
+            GenerateSecurityMasterChangesReport(sProcessDate);
+            EndSql();
+        }
 
 
         public void Run(string sVifsProcessDate)
@@ -109,24 +147,9 @@ namespace IndexDataEngineLibrary
             VifsProcessDate = DateTime.ParseExact(sVifsProcessDate, "MM/dd/yyyy", CultureInfo.InvariantCulture);
             sIndexDataProcessDate = getIndexDataProcessDate();
 
-            //int filesTotal = 0;
-            //int filesDownloaded = 0;
-            //bool downloaded = VendorFilesDownloaded(sIndexDataProcessDate, out filesTotal, out filesDownloaded);
-            //if(!downloaded)
-            //{
-            //    List<string> files = VendorFilesNotDownloaded(sIndexDataProcessDate);
-            //    string sYYYYMMDD = DateHelper.ConvertToYYYYMMDD(sIndexDataProcessDate);
-            //    foreach (string file in files)
-            //    {
-            //        string file2 = file.Replace("YYYYMMDD", sYYYYMMDD);
-            //        LogHelper.WriteLine("Missing file " + file2);
-            //    }
-
-            //}
             IndexDataProcessDate = DateTime.ParseExact(sIndexDataProcessDate, "MM/dd/yyyy", CultureInfo.InvariantCulture);
 
             GenerateStatusReportIfNeeded(sVifsProcessDate);
-
 
             if (VifsProcessDate.Date > IndexDataProcessDate.Date)
             {
@@ -1232,36 +1255,117 @@ namespace IndexDataEngineLibrary
         }
 
 
-        ///* Get new adds */
-        //select id, Ticker, Cusip, CompanyName, SectorCode from HistoricalSecurityMasterFull where id not in 
-        //(select id from HistoricalSecurityMasterFullCopy)
+        /*
+         * old report from old production version
+        Date     Action Cusip     New Cusip  Ticker     New Ticker Exchange     New Exchange 1 2 5 M T S 3 MICRO 1 2 5 M T S 3 MICRO Name                      New Name                  ES     New ES SubS     New SubS IND      New IND
+        -------- ------ --------- ---------- ---------- ---------- ------------ ------------ - - - - - - - ----- - - - - - - - ----- ------------------------- ------------------------- ------ ------ -------- -------- -------- --------
+        20190520 Delete 45685L100            HIFR                  NYSE                      N Y Y N N Y Y N                         INFRAREIT INC                                       10            1060              1060914           
+        20190520 Delete 577767106            MXWL                  NASDAQ                    N Y Y N N Y Y Y                         MAXWELL TECHNOLOGIES INC                            08            0820              0820734           
+        20190520 Delete 58409L306            MRT                   NYSE                      N Y Y N N Y Y Y                         MEDEQUITIES REALTY TRUST                            10            1060              1060910           
+        20190520 Update 90539J109  04911A107 UBSH       AUB        NASDAQ                    N Y Y N N Y Y N                         UNION BANKSHARES CORP      ATLANTIC UNION BANKSHARE 10            1010              1010400           
+        20190520 Update 91914N202  91914N301 VLRX                  NASDAQ                    N N N N N N N Y                         VALERITAS HOLDINGS INC                              02            0220              0220471           
 
-        ///* Get deletes */
-        //select id, Ticker, Cusip, CompanyName, SectorCode from HistoricalSecurityMasterFullCopy where EndDate = '09/03/2019' and id in
-        //(select id from HistoricalSecurityMasterFull where EndDate = '09/03/2019')
+            new report from new production version Nov 2019
 
-        ///* Get updates */
-        //select h.id, h.Ticker, h.Cusip, h.CompanyName, h.SectorCode, hprev.Ticker as TickerOld, hprev.Cusip as CusipOld, hprev.CompanyName as CompanyNameOld, hprev.SectorCode as SectorCodeOld from HistoricalSecurityMasterFull h
-        //inner join HistoricalSecurityMasterFullCopy hprev on h.id = hprev.id
-        //where h.EndDate = '09/04/2019' and hprev.EndDate = '09/03/2019'
-        //and h.Vendor = 'R' and hprev.Vendor = 'R' and (h.Ticker<> hprev.Ticker OR h.Cusip<> hprev.Cusip or h.CompanyName<> hprev.CompanyName or h.SectorCode<> hprev.SectorCode)
+        Date     Action Cusip     New Cusip  Ticker     New Ticker Name                      New Name                  Sector  New Sector
+        -------- ------ --------- ---------- ---------- ---------- ------------------------- ------------------------- ------- ----------
+        20190904 Add              01234567              ATest                                Atest Co                          1234567 
+        20190904 Update 12345678  1234567x   DUMMY      DUMMY      NA                        NA                        1234567 1234567 
+        20190904 Update 52603A20  52603A20   LC         LC         LENDINGCLUB CORPORATION   LENDINGCLUB CORPORATIONx  1020489 1020489 
+        20190904 Update 69320M10  69320M10   PCB        PCB        PCB BANCORP               PCB BANCORP               1010400 101040x 
 
-        //CREATE TABLE[dbo].[HistoricalSecurityMasterFullChanges]
-        //(      
-        //[id][int] NOT NULL,     
-        //[ProcessDate] [smalldatetime] NULL,
-        //[ChangeType] [varchar] (6) NOT NULL,
-        //[Cusip] [varchar] (8) NOT NULL,
-        //[CusipNew] [varchar] (8) NOT NULL,
-        //[Ticker] [varchar] (10) NOT NULL,
-        //[TickerNew] [varchar] (10) NOT NULL,
-        //[CompanyName] [varchar] (100) NULL,
-        //[CompanyNameNew] [varchar] (100) NULL,
-        //[SectorCode] [varchar] (8) NULL,
-        //[SectorCodeNew] [varchar] (8) NULL,
+         */
 
+        public void GenerateSecurityMasterChangesReport(string sProcessDate)
+        {
+            string sAxmlOutputPath = AppSettings.Get<string>("AxmlOutputPath");
+            string filename = sAxmlOutputPath + "rl_" + DateHelper.ConvertToYYYYMMDD(sProcessDate) + "_RefData.txt";
 
+            if (File.Exists(filename))
+                File.Delete(filename);
 
+            using (StreamWriter file = new StreamWriter(filename))
+            {
+                file.WriteLine("Date     Action Cusip     New Cusip  Ticker     New Ticker Name                      New Name                  Sector  New Sector");
+                file.WriteLine("-------- ------ --------- ---------- ---------- ---------- ------------------------- ------------------------- ------- ----------");
+            }
+
+            SqlCommand cmd = null;
+            string selectText = @"
+                select * from HistoricalSecurityMasterFullChanges where ProcessDate = @ProcessDate
+                order by ChangeType, Cusip
+            ";
+            try
+            {
+                cmd = new SqlCommand
+                {
+                    Connection = cnSqlIndexData,
+                    CommandText = selectText
+                };
+                cmd.Parameters.Add("@ProcessDate", SqlDbType.Date);
+                cmd.Parameters["@ProcessDate"].Value = sProcessDate;
+
+                SqlDataReader dr = null;
+                dr = cmd.ExecuteReader();
+                using (StreamWriter file = new StreamWriter(filename, true))
+                {
+                    if (dr.HasRows)
+                    {
+                        while (dr.Read())
+                        {
+                            string ProcessDate = GetColString(dr, "ProcessDate");
+                            if (ProcessDate.Length > 0)
+                                ProcessDate = DateHelper.ConvertToYYYYMMDD(ProcessDate);
+                            ProcessDate = ProcessDate.PadRight(8 + 1);
+                            string ChangeType = GetColString(dr, "ChangeType");
+                            ChangeType = ChangeType.PadRight(6 + 1);
+                            string Cusip = GetColString(dr, "Cusip");
+                            Cusip = Cusip.PadRight(9 + 1);
+                            string CusipNew = GetColString(dr, "CusipNew");
+                            CusipNew = CusipNew.PadRight(9 + 2);
+                            string Ticker = GetColString(dr, "Ticker");
+                            Ticker = Ticker.PadRight(10 + 1);
+                            string TickerNew = GetColString(dr, "TickerNew");
+                            TickerNew = TickerNew.PadRight(10 + 1);
+                            string CompanyName = GetColString(dr, "CompanyName");
+                            CompanyName = CompanyName.PadRight(25 + 1);
+                            string CompanyNameNew = GetColString(dr, "CompanyNameNew");
+                            CompanyNameNew = CompanyNameNew.PadRight(25 + 1);
+                            string SectorCode = GetColString(dr, "SectorCode");
+                            SectorCode = SectorCode.PadRight(7 + 1);
+                            string SectorCodeNew = GetColString(dr, "SectorCodeNew");
+                            SectorCodeNew = SectorCodeNew.PadRight(7 + 1);
+
+                            file.WriteLine(ProcessDate + ChangeType + Cusip + CusipNew + Ticker + TickerNew + CompanyName + CompanyNameNew + SectorCode + SectorCodeNew);
+                        }
+                    }
+                    else
+                    {
+                        file.WriteLine(DateHelper.ConvertToYYYYMMDD(sProcessDate) + "No Changes");
+                    }
+                }
+                dr.Close();
+            }
+            catch (SqlException ex)
+            {
+                //LogHelper.WriteLine("");
+            }
+            finally
+            {
+            }
+
+            return;
+        }
+
+        public static string GetColString(SqlDataReader dr, string colName)
+        {
+            string colString = "";
+            if (!dr.IsDBNull(dr.GetOrdinal(colName)))
+            {
+                colString = dr[colName].ToString();
+            }
+            return (colString);
+        }
 
     }
 }

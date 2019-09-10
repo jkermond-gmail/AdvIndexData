@@ -1127,6 +1127,7 @@ namespace IndexDataEngineLibrary
 
         public void GenerateSecurityMasterChangesData(string sProcessDate)
         {
+            LogHelper.WriteLine("GenerateSecurityMasterChangesData " + sProcessDate);
             SqlCommand cmd = null;
             SqlCommand cmd2 = null;
             SqlConnection cnSql2 = null ;
@@ -1186,9 +1187,12 @@ namespace IndexDataEngineLibrary
                 insertText = @"
                     insert into HistoricalSecurityMasterFullChanges
                     (id, ProcessDate, ChangeType, Cusip, Ticker, CompanyName, SectorCode)
-                    select id, EndDate, 'Delete', Cusip, Ticker, CompanyName, SectorCode from HistoricalSecurityMasterFull where id = @id
+                    select id, @ProcessDate, 'Delete', Cusip, Ticker, CompanyName, SectorCode from HistoricalSecurityMasterFull where id = @id
                 ";
                 cmd2.CommandText = insertText;
+                cmd2.Parameters.Add("@ProcessDate", SqlDbType.Date);
+                cmd2.Parameters["@ProcessDate"].Value = sProcessDate;
+
 
                 dr = cmd.ExecuteReader();
                 if (dr.HasRows)
@@ -1238,16 +1242,17 @@ namespace IndexDataEngineLibrary
                         LogHelper.WriteLine("Insert Updates are done");
                     }
                 }
+                dr.Close();
             }
             catch (SqlException ex)
             {
-                //LogHelper.WriteLine("");
+                LogHelper.WriteLine(ex.Message);
             }
             finally
             {
                 if (cnSql2 != null)
                     cnSql2.Close();
-                //LogHelper.WriteLine(logFuncName + " done " );
+                LogHelper.WriteLine("GenerateSecurityMasterChangesData Done");
             }
 
 
@@ -1278,6 +1283,7 @@ namespace IndexDataEngineLibrary
 
         public void GenerateSecurityMasterChangesReport(string sProcessDate)
         {
+            LogHelper.WriteLine("GenerateSecurityMasterChangesReport " + sProcessDate);
             string sAxmlOutputPath = AppSettings.Get<string>("AxmlOutputPath");
             string filename = sAxmlOutputPath + "rl_" + DateHelper.ConvertToYYYYMMDD(sProcessDate) + "_RefData.txt";
 
@@ -1348,10 +1354,11 @@ namespace IndexDataEngineLibrary
             }
             catch (SqlException ex)
             {
-                //LogHelper.WriteLine("");
+                LogHelper.WriteLine(ex.Message);
             }
             finally
             {
+                LogHelper.WriteLine("GenerateSecurityMasterChangesReport done");
             }
 
             return;

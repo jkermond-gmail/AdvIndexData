@@ -100,6 +100,7 @@ namespace IndexDataEngineLibrary
             BeginSql();
             IndexDataProcessDate = date;
             GenerateSecurityMasterChangesReport(sProcessDate);
+            CopySecurityMasterChangesToFtpFolders(sProcessDate);
             EndSql();
         }
 
@@ -114,6 +115,7 @@ namespace IndexDataEngineLibrary
             IndexDataProcessDate = date;
             GenerateSecurityMasterChangesData(sProcessDate);
             GenerateSecurityMasterChangesReport(sProcessDate);
+            CopySecurityMasterChangesToFtpFolders(sProcessDate);
             EndSql();
         }
 
@@ -992,6 +994,7 @@ namespace IndexDataEngineLibrary
             }
             catch (SqlException ex)
             {
+                LogHelper.WriteLine(ex.Message );
             }
             finally
             {
@@ -1061,6 +1064,7 @@ namespace IndexDataEngineLibrary
                 }
                 catch (SqlException ex)
                 {
+                    LogHelper.WriteLine(ex.Message);
                     LogHelper.WriteLine("Unsuccessful delete " + filename);
                 }
                 finally
@@ -1374,5 +1378,70 @@ namespace IndexDataEngineLibrary
             return (colString);
         }
 
+        public void CopySecurityMasterChangesToFtpFolders(string sFileDate)
+        {
+            SqlCommand cmd = null;
+            SqlDataReader dr = null;
+            try
+            {
+                string SqlSelect = @"
+                    select distinct ClientID
+                    from Jobs
+                    where RefReport = 'txt,html' and Active = 'Yes' and ClientID <> 'SystemClient'
+                    order by ClientID
+                ";
+
+                cmd = new SqlCommand
+                {
+                    Connection = cnSqlIndexData,
+                    CommandText = SqlSelect
+                };
+
+                dr = cmd.ExecuteReader();
+                if (dr.HasRows)
+                {
+                    string ftpRootDir = AppSettings.Get<string>("ftpRootDir");
+                    string sourceDir = AppSettings.Get<string>("AxmlOutputPath");
+                    string clientID = null;
+                    string destFilename = null;
+
+                    while (dr.Read())
+                    {
+                        clientID = dr["ClientID"].ToString();
+
+                        string destDir = ftpRootDir + "\\" + clientID + "\\IndexData\\Results\\";
+
+                        if (Directory.Exists(sourceDir) && Directory.Exists(destDir))
+                        {
+                            string sourceFilename = "";
+
+                            sourceFilename = sourceDir + "rl_" + DateHelper.ConvertToYYYYMMDD(sFileDate) + "_RefData.txt";
+
+                            if (File.Exists(sourceFilename))
+                            {
+                                destFilename = destDir + Path.GetFileName(sourceFilename);
+                                File.Copy(sourceFilename, destFilename, true);
+                                LogHelper.WriteLine("Successful copy " + destFilename);
+                            }
+                            else
+                            {
+                                LogHelper.WriteLine("Missing sourcefile" + sourceFilename);
+                            }
+                        }
+                    }
+                    dr.Close();
+                }
+            }
+            catch (SqlException ex)
+            {
+                if (ex.Number == 2627)
+                {
+                    LogHelper.WriteLine(ex.Message);
+                }
+            }
+            finally
+            {
+            }
+        }
     }
 }

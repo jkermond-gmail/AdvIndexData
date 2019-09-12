@@ -29,9 +29,7 @@ namespace IndexDataEngineLibrary
 
         public IndexDataEngine()
         {
-            //LogHelper.Info("IndexDataEngine()", "IndexDataEngineLibrary");
             testing = AppSettings.Get<bool>("testingIndexDataEngine");
-            //LogHelper.WriteLine("testingIndexDataEngine = " + testing);
         }
 
         private void InitializeConnectionStrings()

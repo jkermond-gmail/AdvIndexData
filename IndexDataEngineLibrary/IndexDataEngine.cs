@@ -1351,7 +1351,7 @@ namespace IndexDataEngineLibrary
                     }
                     else
                     {
-                        file.WriteLine(DateHelper.ConvertToYYYYMMDD(sProcessDate) + "No Changes");
+                        file.WriteLine(DateHelper.ConvertToYYYYMMDD(sProcessDate) + " No Changes");
                     }
                 }
                 dr.Close();

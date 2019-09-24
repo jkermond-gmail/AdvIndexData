@@ -1575,15 +1575,18 @@ RU3000    20170103   CHF   1662.25918   1365.02441   1696.48181   1567.99955    
 
             try
             {
-                string SqlSelect = "select AdventIndexName from VendorIndexMap ";
-                string SqlWhere = "where Vendor = 'Russell' and Supported = 'Yes' and VendorIndexName ='" + VendorIndex + "'";
+                //string SqlSelect = "select AdventIndexName from VendorIndexMap ";
+                string SqlSelect = "select IndexClientName from VendorIndexMap ";
+                string SqlWhere = "where Vendor = 'Russell' and Supported = 'Yes' and IndexName ='" + VendorIndex + "'";
+//                string SqlWhere = "where Vendor = 'Russell' and Supported = 'Yes' and VendorIndexName ='" + VendorIndex + "'";
                 conn.Open();
                 SqlCommand cmd = new SqlCommand(SqlSelect + SqlWhere, conn);
                 dr = cmd.ExecuteReader();
                 if (dr.HasRows)
                 {
                     dr.Read();
-                    AdventIndex = dr["AdventIndexName"].ToString();
+                    //AdventIndex = dr["AdventIndexName"].ToString();
+                    AdventIndex = dr["IndexClientName"].ToString();
                 }
             }
             catch (SqlException ex)
@@ -1614,10 +1617,13 @@ RU3000    20170103   CHF   1662.25918   1365.02441   1696.48181   1567.99955    
 
             try
             {
-                string SqlSelectCount = "select count(VendorIndexName) from VendorIndexMap ";
-                string SqlSelect = "select VendorIndexName from VendorIndexMap ";
+                //string SqlSelectCount = "select count(VendorIndexName) from VendorIndexMap ";
+                string SqlSelectCount = "select count(IndexName) from VendorIndexMap ";
+                //string SqlSelect = "select VendorIndexName from VendorIndexMap ";
+                string SqlSelect = "select IndexName from VendorIndexMap ";
                 string SqlWhere = "where Vendor = 'Russell' and Supported = 'Yes' ";
-                string SqlOrderBy = "order by VendorIndexName";
+                //string SqlOrderBy = "order by VendorIndexName";
+                string SqlOrderBy = "order by IndexName";
 
                 conn.Open();
                 SqlCommand cmd = new SqlCommand(SqlSelectCount + SqlWhere, conn);
@@ -1630,7 +1636,8 @@ RU3000    20170103   CHF   1662.25918   1365.02441   1696.48181   1567.99955    
                     int i = 0;
                     while (dr.Read())
                     {
-                        Indices[i] = dr["VendorIndexName"].ToString();
+                        //Indices[i] = dr["VendorIndexName"].ToString();
+                        Indices[i] = dr["IndexName"].ToString();
                         i += 1;
                     }
                 }

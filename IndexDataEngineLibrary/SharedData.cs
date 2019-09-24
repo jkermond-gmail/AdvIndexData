@@ -511,14 +511,17 @@ namespace IndexDataEngineLibrary
 
             try
             {
-                string SqlSelectCount = "select count(AdventIndexName) from VendorIndexMap ";
-                string SqlSelect = "select AdventIndexName from VendorIndexMap ";
+                //string SqlSelectCount = "select count(AdventIndexName) from VendorIndexMap ";
+                //string SqlSelect = "select AdventIndexName from VendorIndexMap ";
+                string SqlSelectCount = "select count(IndexClientName) from VendorIndexMap ";
+                string SqlSelect = "select IndexClientName from VendorIndexMap ";
                 string SqlWhere = "";
                 if (mVendor.Equals(Vendors.Russell))
                     SqlWhere = "where Vendor = 'Russell' and Supported = 'Yes' ";
                 else if (mVendor.Equals(Vendors.Snp))
                     SqlWhere = "where Vendor = 'StandardAndPoors' and Supported = 'Yes' ";
-                string SqlOrderBy = "order by AdventIndexName";
+                //string SqlOrderBy = "order by AdventIndexName";
+                string SqlOrderBy = "order by IndexClientName";
 
                 conn.Open();
                 SqlCommand cmd = new SqlCommand(SqlSelectCount + SqlWhere, conn);
@@ -531,7 +534,8 @@ namespace IndexDataEngineLibrary
                     int i = 0;
                     while (dr.Read())
                     {
-                        Indices[i] = dr["AdventIndexName"].ToString();
+                        //Indices[i] = dr["AdventIndexName"].ToString();
+                        Indices[i] = dr["IndexClientName"].ToString();
                         i += 1;
                     }
                 }
@@ -558,14 +562,17 @@ namespace IndexDataEngineLibrary
 
             try
             {
-                string SqlSelectCount = "select count(AdventIndexName) from VendorIndexMap ";
-                string SqlSelect = "select AdventIndexName from VendorIndexMap ";
+                //string SqlSelectCount = "select count(AdventIndexName) from VendorIndexMap ";
+                //string SqlSelect = "select AdventIndexName from VendorIndexMap ";
+                string SqlSelectCount = "select count(IndexClientName) from VendorIndexMap ";
+                string SqlSelect = "select IndexClientName from VendorIndexMap ";
                 string SqlWhere = "";
                 if (mVendor.Equals(Vendors.Russell))
                     SqlWhere = "where Vendor = 'Russell' and Supported = 'Yes' ";
                 else if (mVendor.Equals(Vendors.Snp))
                     SqlWhere = "where Vendor = 'StandardAndPoors' and Supported = 'Yes' ";
-                string SqlOrderBy = "order by AdventIndexName";
+                //string SqlOrderBy = "order by AdventIndexName";
+                string SqlOrderBy = "order by IndexClientName";
 
                 conn.Open();
                 SqlCommand cmd = new SqlCommand(SqlSelectCount + SqlWhere, conn);
@@ -578,7 +585,8 @@ namespace IndexDataEngineLibrary
                     int i = 0;
                     while (dr.Read())
                     {
-                        Indices[i] = dr["AdventIndexName"].ToString();
+                        //Indices[i] = dr["AdventIndexName"].ToString();
+                        Indices[i] = dr["IndexClientName"].ToString();
                         i += 1;
                     }
                 }
@@ -1159,14 +1167,17 @@ namespace IndexDataEngineLibrary
                     mSqlConn = new SqlConnection(ConnectionStringIndexData);
                     mSqlConn.Open();
                 }
+                //                select j.ClientID, j.JobName, j.LastProcessDate, i.IndexName, v.AdventIndexName, v.AxmlConstituentFile, v.AxmlSectorFile
+                //                inner join VendorIndexMap v on v.VendorIndexName = i.VendorIndexName
+                //                  and j.Active = 'Yes' and j.JobType = 'Client'  and j.Vendor = @Vendor and v.AdventIndexName = @AdventIndexName
 
                 string SqlSelect = @"
-                 select j.ClientID, j.JobName, j.LastProcessDate, i.IndexName, v.AdventIndexName, v.AxmlConstituentFile, v.AxmlSectorFile
+                 select j.ClientID, j.JobName, j.LastProcessDate, i.IndexName, v.IndexClientName, v.AxmlConstituentFile, v.AxmlSectorFile
                  from jobs j
                  inner join JobIndexIds i on(i.JobName = j.JobName and i.ClientID = j.ClientID and i.Vendor = j.Vendor)
-                 inner join VendorIndexMap v on v.VendorIndexName = i.IndexName
+                 inner join VendorIndexMap v on v.IndexName = i.IndexName
                  where j.DataSet = @DataSet and j.InputFormat = @InputFormat
-                 and j.Active = 'Yes' and j.JobType = 'Client'  and j.Vendor = @Vendor and v.AdventIndexName = @AdventIndexName
+                 and j.Active = 'Yes' and j.JobType = 'Client'  and j.Vendor = @Vendor and v.IndexClientName = @AdventIndexName
                 ";
                 string SqlOrderBy = " order by j.ClientID";
 

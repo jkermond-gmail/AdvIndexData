@@ -696,6 +696,12 @@ _SPMLP.SDL
             foreach (DataRow dr in dt.Rows)
             {
                 i += 1;
+                //LogHelper.WriteLine("Processing line: " + i);
+
+                //if( i.Equals(320))
+                //    LogHelper.WriteLine("Debugiing line: " + i);
+
+
                 if (isOldFormat.Equals(false))
                 {
                     IndexnameParsed = ParseColumn(dr, "INDEX NAME");
@@ -705,7 +711,6 @@ _SPMLP.SDL
                         IndexCodeParsed = IndexCodeParsed.ToLower();
                     else
                         IndexCodeParsed = "sp" + IndexCodeParsed;
-
                 }
 
                 if (IndexnameParsed.StartsWith("S&P ") && IndexCodeParsed.Equals(IndexCode))
@@ -721,7 +726,10 @@ _SPMLP.SDL
                     cmd.Parameters["@EffectiveDate"].Value = oDate;
 
                     string sCUSIP = ParseColumn(dr, "CUSIP");   // 9 character
-                    sCUSIP = sCUSIP.Substring(0, 8);
+                    if (sCUSIP.Length >= 8)
+                        sCUSIP = sCUSIP.Substring(0, 8);
+                    else
+                        LogHelper.WriteLine("Error Bad Vendor Data line: " + CurrentRowCount + " IndexCode: " + IndexCodeParsed + " Stock Key: " + sStockKey + " Short or No Cusip: " + sCUSIP);
                     cmd.Parameters["@CUSIP"].Value = sCUSIP;
 
                     string sTicker = ParseColumn(dr, "TICKER"); // UPPERCASE
@@ -866,16 +874,19 @@ _SPMLP.SDL
                     CurrentRowCount += 1;
                     cmd.Parameters["@IndexCode"].Value = IndexCodeParsed;
 
-                    sValue = ParseColumn(dr, "STOCK KEY");    // NUMERIC but stored as String
-                    cmd.Parameters["@StockKey"].Value = sValue;
+                    string sStockKey = ParseColumn(dr, "STOCK KEY");    // NUMERIC but stored as String
+                    cmd.Parameters["@StockKey"].Value = sStockKey;
 
                     string EffectiveDate = ParseColumn(dr, "EFFECTIVE DATE"); // YYYYMMDD
                     DateTime.TryParseExact(EffectiveDate, "yyyyMMdd", mEnUS, DateTimeStyles.None, out oDate);
                     cmd.Parameters["@EffectiveDate"].Value = oDate;
 
-                    sValue = ParseColumn(dr, "CUSIP");   // 9 character
-                    sValue = sValue.Substring(0, 8);
-                    cmd.Parameters["@CUSIP"].Value = sValue;
+                    string sCUSIP = ParseColumn(dr, "CUSIP");   // 9 character
+                    if (sCUSIP.Length >= 8)
+                        sCUSIP = sCUSIP.Substring(0, 8);
+                    else
+                        LogHelper.WriteLine("Error Bad Vendor Data line: " + CurrentRowCount + " IndexCode: " + IndexCodeParsed + " Stock Key: " + sStockKey + " Short or No Cusip: " + sCUSIP);
+                    cmd.Parameters["@CUSIP"].Value = sCUSIP;
 
                     sValue = ParseColumn(dr, "TICKER"); // UPPERCASE
                     cmd.Parameters["@Ticker"].Value = sValue;

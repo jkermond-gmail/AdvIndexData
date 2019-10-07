@@ -34,6 +34,8 @@
             this.timerRunIndexData = new System.Windows.Forms.Timer(this.components);
             this.tabUnitTest = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.btnTestSecMasterReport = new System.Windows.Forms.Button();
+            this.btnTestSecMaster = new System.Windows.Forms.Button();
             this.btnProcessAllForDate = new System.Windows.Forms.Button();
             this.btnTestFtp = new System.Windows.Forms.Button();
             this.btnTestEmail = new System.Windows.Forms.Button();
@@ -54,8 +56,6 @@
             this.lblStartDate = new System.Windows.Forms.Label();
             this.cboVendor = new System.Windows.Forms.ComboBox();
             this.lblVendor = new System.Windows.Forms.Label();
-            this.btnTestSecMaster = new System.Windows.Forms.Button();
-            this.btnTestSecMasterReport = new System.Windows.Forms.Button();
             this.tabUnitTest.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.SuspendLayout();
@@ -123,6 +123,26 @@
             this.tabPage1.Text = "Index Data";
             this.tabPage1.UseVisualStyleBackColor = true;
             this.tabPage1.Click += new System.EventHandler(this.tabPage1_Click);
+            // 
+            // btnTestSecMasterReport
+            // 
+            this.btnTestSecMasterReport.Location = new System.Drawing.Point(389, 329);
+            this.btnTestSecMasterReport.Name = "btnTestSecMasterReport";
+            this.btnTestSecMasterReport.Size = new System.Drawing.Size(139, 23);
+            this.btnTestSecMasterReport.TabIndex = 19;
+            this.btnTestSecMasterReport.Text = "Test Sec Master Report";
+            this.btnTestSecMasterReport.UseVisualStyleBackColor = true;
+            this.btnTestSecMasterReport.Click += new System.EventHandler(this.btnTestSecMasterReport_Click);
+            // 
+            // btnTestSecMaster
+            // 
+            this.btnTestSecMaster.Location = new System.Drawing.Point(389, 301);
+            this.btnTestSecMaster.Name = "btnTestSecMaster";
+            this.btnTestSecMaster.Size = new System.Drawing.Size(139, 23);
+            this.btnTestSecMaster.TabIndex = 18;
+            this.btnTestSecMaster.Text = "Test Sec Master Changes";
+            this.btnTestSecMaster.UseVisualStyleBackColor = true;
+            this.btnTestSecMaster.Click += new System.EventHandler(this.btnTestSecMaster_Click);
             // 
             // btnProcessAllForDate
             // 
@@ -270,7 +290,7 @@
             this.lnkEndDate.Size = new System.Drawing.Size(65, 13);
             this.lnkEndDate.TabIndex = 3;
             this.lnkEndDate.TabStop = true;
-            this.lnkEndDate.Text = "09/04/2019";
+            this.lnkEndDate.Text = "10/04/2019";
             this.lnkEndDate.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.lnkEndDate_LinkClicked);
             // 
             // lnkStartDate
@@ -281,7 +301,7 @@
             this.lnkStartDate.Size = new System.Drawing.Size(65, 13);
             this.lnkStartDate.TabIndex = 2;
             this.lnkStartDate.TabStop = true;
-            this.lnkStartDate.Text = "09/04/2019";
+            this.lnkStartDate.Text = "10/04/2019";
             this.lnkStartDate.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.lnkStartDate_LinkClicked);
             // 
             // lblEndDate
@@ -323,26 +343,6 @@
             this.lblVendor.Size = new System.Drawing.Size(41, 13);
             this.lblVendor.TabIndex = 4;
             this.lblVendor.Text = "Vendor";
-            // 
-            // btnTestSecMaster
-            // 
-            this.btnTestSecMaster.Location = new System.Drawing.Point(389, 301);
-            this.btnTestSecMaster.Name = "btnTestSecMaster";
-            this.btnTestSecMaster.Size = new System.Drawing.Size(139, 23);
-            this.btnTestSecMaster.TabIndex = 18;
-            this.btnTestSecMaster.Text = "Test Sec Master Changes";
-            this.btnTestSecMaster.UseVisualStyleBackColor = true;
-            this.btnTestSecMaster.Click += new System.EventHandler(this.btnTestSecMaster_Click);
-            // 
-            // btnTestSecMasterReport
-            // 
-            this.btnTestSecMasterReport.Location = new System.Drawing.Point(389, 329);
-            this.btnTestSecMasterReport.Name = "btnTestSecMasterReport";
-            this.btnTestSecMasterReport.Size = new System.Drawing.Size(139, 23);
-            this.btnTestSecMasterReport.TabIndex = 19;
-            this.btnTestSecMasterReport.Text = "Test Sec Master Report";
-            this.btnTestSecMasterReport.UseVisualStyleBackColor = true;
-            this.btnTestSecMasterReport.Click += new System.EventHandler(this.btnTestSecMasterReport_Click);
             // 
             // IndexDataForm
             // 

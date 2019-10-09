@@ -15,8 +15,6 @@ namespace IndexDataEngineLibrary
 {
     public sealed class RussellData
     {
-        //private DateHelper dateHelper;
-
         #region privates, enums, constants
         private StreamWriter swLogFile = null;
         private string LogFileName;
@@ -73,6 +71,7 @@ namespace IndexDataEngineLibrary
         //};
 
         private const string TOTAL_COUNT = "Total Count:";
+        private bool logReturnData = false;
 
         #endregion End privates, enums, constants
 
@@ -1751,10 +1750,24 @@ RU3000    20170103   CHF   1662.25918   1365.02441   1696.48181   1567.99955    
             return;
         }
 
+        public bool LogReturnData
+        {
+            get { return logReturnData; }
+            set { logReturnData = value; }
+        }
+
+
         private void AdjustReturnsToMatchPublishedTotalReturns(List<IndexRow> indexRows, string sDate, string sIndexName, string sVendorFormat)
         {
+            if (logReturnData)
+            {
+                LogHelper.WriteLine("----------------------------------------------------------------------------------------------");
+                LogHelper.WriteLine("AdjustReturnsToMatchPublishedTotalReturns " + sDate + " " + sIndexName + " " + sVendorFormat);
+            }
+
             int totalReturnPrecision = 9;
             double dZero = 0.0;
+
 
             double VendorTotalReturn = GetVendorTotalReturnForDate(sDate, sIndexName);
 
@@ -1762,37 +1775,48 @@ RU3000    20170103   CHF   1662.25918   1365.02441   1696.48181   1567.99955    
             {
 
                 VendorTotalReturn = Math.Round(VendorTotalReturn, totalReturnPrecision, MidpointRounding.AwayFromZero);
+                if (logReturnData)
+                    LogHelper.WriteLine("Vendor Total Return " + VendorTotalReturn.ToString());
 
                 IndexRows.ZeroAdventTotalReturn();
+                // Advent Total Return is the sum of: mWeight * mRateOfReturn * .01;
                 foreach (IndexRow indexRow in indexRows)
                     indexRow.CalculateAdventTotalReturn();
 
                 double AdventTotalReturn = IndexRows.AdventTotalReturn;
                 AdventTotalReturn = Math.Round(AdventTotalReturn, totalReturnPrecision, MidpointRounding.AwayFromZero);
-
+                if (logReturnData)
+                    LogHelper.WriteLine("Advent Total Return " + AdventTotalReturn.ToString());
+         
                 sharedData.AddTotalReturn(sDate, sIndexName, Vendors.Russell.ToString(), sVendorFormat, AdventTotalReturn, "AdvReturn");
-
 
                 double AdventVsVendorDiff = VendorTotalReturn - AdventTotalReturn;
 
                 AdventVsVendorDiff = Math.Round(AdventVsVendorDiff, totalReturnPrecision, MidpointRounding.AwayFromZero);
+                if (logReturnData)
+                    LogHelper.WriteLine("Advent Vs Vendor Diff " + AdventVsVendorDiff.ToString());
 
                 sharedData.AddTotalReturn(sDate, sIndexName, Vendors.Russell.ToString(), sVendorFormat, AdventVsVendorDiff, "Diff");
 
+                IndexRows.CalculateAddlContribution(AdventVsVendorDiff, sVendorFormat, logReturnData);
 
-                IndexRows.CalculateAddlContribution(AdventVsVendorDiff, sVendorFormat);
+                LogHelper.WriteLine("Identifier,Weight,RateOfReturn,RateOfReturnAdjustment,RateOfReturnAdjusted");
 
                 foreach (IndexRow indexRow in indexRows)
                 {
                     indexRow.CalculateAdventAdjustedReturn();
+                    if (logReturnData)
+                        LogHelper.WriteLine(indexRow.Identifier + "," + indexRow.Weight.ToString() + "," + indexRow.RateOfReturn.ToString() + "," + indexRow.RateOfReturnAdjustment + "," + indexRow.RateOfReturnAdjusted );
                 }
 
 
                 double AdventTotalReturnAdjusted = IndexRows.AdventTotalReturnAdjusted;
                 AdventTotalReturnAdjusted = Math.Round(AdventTotalReturnAdjusted, totalReturnPrecision, MidpointRounding.AwayFromZero);
+                if (logReturnData)
+                    LogHelper.WriteLine("Advent Total Return Adjusted " + AdventTotalReturnAdjusted.ToString());
+
                 sharedData.AddTotalReturn(sDate, sIndexName, Vendors.Russell.ToString(), sVendorFormat, AdventTotalReturnAdjusted, "AdvReturnAdj");
             }
-
         }
 
         private void RollUpRatesOfReturn(List<IndexRow> indexRowsRollUp, List<IndexRow> indexRowsIndustrySort, 

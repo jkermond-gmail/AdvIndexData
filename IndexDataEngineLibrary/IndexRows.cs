@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using AdventUtilityLibrary;
 
 namespace IndexDataEngineLibrary
 {
@@ -39,7 +40,7 @@ namespace IndexDataEngineLibrary
         }
 
 
-        public static void CalculateAddlContribution(double adventVsVendorDiff, string sVendorFormat)
+        public static void CalculateAddlContribution(double adventVsVendorDiff, string sVendorFormat, bool logReturnData)
         {
             AdventVsVendorDiff = adventVsVendorDiff;
 
@@ -61,6 +62,15 @@ namespace IndexDataEngineLibrary
 
             if (count > 0)
                 AddlContribution = (AdventVsVendorDiff / count);
+
+            if (logReturnData)
+            {
+                LogHelper.WriteLine("AddlContribution = (AdventVsVendorDiff / count);");
+                LogHelper.WriteLine("AddlContribution   " + AddlContribution.ToString());
+                LogHelper.WriteLine("AdventVsVendorDiff " + AdventVsVendorDiff.ToString());
+                LogHelper.WriteLine("count              " + count.ToString());
+            }
+
         }
 
         public static double AdventTotalReturn

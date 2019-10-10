@@ -56,6 +56,7 @@
             this.lblStartDate = new System.Windows.Forms.Label();
             this.cboVendor = new System.Windows.Forms.ComboBox();
             this.lblVendor = new System.Windows.Forms.Label();
+            this.chkLogReturnData = new System.Windows.Forms.CheckBox();
             this.tabUnitTest.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.SuspendLayout();
@@ -95,6 +96,7 @@
             // 
             // tabPage1
             // 
+            this.tabPage1.Controls.Add(this.chkLogReturnData);
             this.tabPage1.Controls.Add(this.btnTestSecMasterReport);
             this.tabPage1.Controls.Add(this.btnTestSecMaster);
             this.tabPage1.Controls.Add(this.btnProcessAllForDate);
@@ -344,6 +346,16 @@
             this.lblVendor.TabIndex = 4;
             this.lblVendor.Text = "Vendor";
             // 
+            // chkLogReturnData
+            // 
+            this.chkLogReturnData.AutoSize = true;
+            this.chkLogReturnData.Location = new System.Drawing.Point(228, 334);
+            this.chkLogReturnData.Name = "chkLogReturnData";
+            this.chkLogReturnData.Size = new System.Drawing.Size(105, 17);
+            this.chkLogReturnData.TabIndex = 20;
+            this.chkLogReturnData.Text = "Log Return Data";
+            this.chkLogReturnData.UseVisualStyleBackColor = true;
+            // 
             // IndexDataForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -393,6 +405,7 @@
         private System.Windows.Forms.Button btnProcessAllForDate;
         private System.Windows.Forms.Button btnTestSecMaster;
         private System.Windows.Forms.Button btnTestSecMasterReport;
+        private System.Windows.Forms.CheckBox chkLogReturnData;
     }
 }
 

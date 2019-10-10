@@ -1762,6 +1762,7 @@ RU3000    20170103   CHF   1662.25918   1365.02441   1696.48181   1567.99955    
             if (logReturnData)
             {
                 LogHelper.WriteLine("----------------------------------------------------------------------------------------------");
+                LogHelper.WriteLine("Total Return is the sum of: mWeight * mRateOfReturn * .01");
                 LogHelper.WriteLine("AdjustReturnsToMatchPublishedTotalReturns " + sDate + " " + sIndexName + " " + sVendorFormat);
             }
 
@@ -1816,6 +1817,10 @@ RU3000    20170103   CHF   1662.25918   1365.02441   1696.48181   1567.99955    
                     LogHelper.WriteLine("Advent Total Return Adjusted " + AdventTotalReturnAdjusted.ToString());
 
                 sharedData.AddTotalReturn(sDate, sIndexName, Vendors.Russell.ToString(), sVendorFormat, AdventTotalReturnAdjusted, "AdvReturnAdj");
+
+                if (logReturnData)
+                    LogHelper.WriteLine("----------------------------------------------------------------------------------------------");
+
             }
         }
 

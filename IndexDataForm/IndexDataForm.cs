@@ -125,7 +125,7 @@ namespace IndexDataForm
             string Indexname = (string)cbRussellIndices.SelectedItem;
             if (cboVendor.SelectedItem.Equals("Russell"))
             {
-                //Indexname = Indexname.ToUpper();
+                russellData.LogReturnData = chkLogReturnData.Checked;            
 
                 if (cboOutputType.Text.Equals("Constituent"))
                     russellData.GenerateReturnsForDateRange(lnkStartDate.Text, lnkEndDate.Text, Indexname, AdventOutputType.Constituent, chkHistoricalAxmlFile.Checked);

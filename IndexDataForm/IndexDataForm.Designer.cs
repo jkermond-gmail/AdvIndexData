@@ -320,7 +320,7 @@
             // 
             // monthCalendar1
             // 
-            this.monthCalendar1.Location = new System.Drawing.Point(181, 12);
+            this.monthCalendar1.Location = new System.Drawing.Point(194, 12);
             this.monthCalendar1.Name = "monthCalendar1";
             this.monthCalendar1.TabIndex = 4;
             this.monthCalendar1.DateSelected += new System.Windows.Forms.DateRangeEventHandler(this.monthCalendar1_DateSelected);
@@ -328,7 +328,7 @@
             // lnkEndDate
             // 
             this.lnkEndDate.AutoSize = true;
-            this.lnkEndDate.Location = new System.Drawing.Point(104, 64);
+            this.lnkEndDate.Location = new System.Drawing.Point(62, 34);
             this.lnkEndDate.Name = "lnkEndDate";
             this.lnkEndDate.Size = new System.Drawing.Size(65, 13);
             this.lnkEndDate.TabIndex = 3;
@@ -339,7 +339,7 @@
             // lnkStartDate
             // 
             this.lnkStartDate.AutoSize = true;
-            this.lnkStartDate.Location = new System.Drawing.Point(104, 42);
+            this.lnkStartDate.Location = new System.Drawing.Point(62, 12);
             this.lnkStartDate.Name = "lnkStartDate";
             this.lnkStartDate.Size = new System.Drawing.Size(65, 13);
             this.lnkStartDate.TabIndex = 2;
@@ -350,7 +350,7 @@
             // lblEndDate
             // 
             this.lblEndDate.AutoSize = true;
-            this.lblEndDate.Location = new System.Drawing.Point(36, 64);
+            this.lblEndDate.Location = new System.Drawing.Point(6, 34);
             this.lblEndDate.Name = "lblEndDate";
             this.lblEndDate.Size = new System.Drawing.Size(52, 13);
             this.lblEndDate.TabIndex = 1;
@@ -359,7 +359,7 @@
             // lblStartDate
             // 
             this.lblStartDate.AutoSize = true;
-            this.lblStartDate.Location = new System.Drawing.Point(36, 42);
+            this.lblStartDate.Location = new System.Drawing.Point(6, 12);
             this.lblStartDate.Name = "lblStartDate";
             this.lblStartDate.Size = new System.Drawing.Size(55, 13);
             this.lblStartDate.TabIndex = 0;

@@ -38,30 +38,6 @@ namespace IndexDataEngineLibrary
             sConnectionAmdVifs = ConfigurationManager.ConnectionStrings["dbConnectionAmdVifs"].ConnectionString;
         }
 
-        //public void TestGetStatusSummary(string sProcessDate)
-        //{
-        //    DateTime date = DateTime.Parse(sProcessDate);
-        //    InitializeConnectionStrings();
-        //    DateHelper.ConnectionString = sConnectionAmdVifs;
-        //    ProcessStatus.ConnectionString = sConnectionIndexData;
-        //    BeginSql();
-
-        //    int TotalProcessStatusRows = 0;
-        //    int CountAxmlConstituentData = 0;
-        //    int CountAxmlSectorData = 0;
-        //    int ExpectedConstituentClientFiles = 0;
-        //    int ActualConstituentClientFiles = 0;
-        //    int ExpectedSectorClientFiles = 0;
-        //    int ActualSectorClientFiles = 0;
-
-        //    ProcessStatus.GetStatusSummary("07/10/2019", out TotalProcessStatusRows, out CountAxmlConstituentData, out CountAxmlSectorData,
-        //                                    out ExpectedConstituentClientFiles, out ActualConstituentClientFiles, out ExpectedSectorClientFiles, out ActualSectorClientFiles);
-
-
-
-        //    EndSql();
-        //}
-
         public void TestGenerateStatusReport(string sProcessDate)
         {
             DateTime date = DateTime.Parse(sProcessDate);
@@ -154,7 +130,7 @@ namespace IndexDataEngineLibrary
             if (VifsProcessDate.Date > IndexDataProcessDate.Date)
             {
                 // Initialize everything cuz its a new day
-               LogHelper.ArchiveLog(IndexDataProcessDate.Date);
+                LogHelper.ArchiveLog(IndexDataProcessDate.Date);
                 InitializeProcessStatus(sVifsProcessDate);
                 setIndexDataProcessDate(sVifsProcessDate);
                 DeleteFilesInFtpFolders();
@@ -235,8 +211,6 @@ namespace IndexDataEngineLibrary
             int FilesDownloaded = 0;
             int JobsTotal = 0;
             int JobsProcessed = 0;
-            //int FilesGenerated = 0;
-
 
             foreach (KeyValuePair<string, string> element in listVendorDatasets)
             {
@@ -293,7 +267,6 @@ namespace IndexDataEngineLibrary
             string Dataset2 = "";
             string Dataset3 = "";
             string logFuncName = "AreVendorDatasetFilesDownloaded: ";
-
 
             if( Dataset.Equals("sp900"))
             {
@@ -392,7 +365,6 @@ namespace IndexDataEngineLibrary
             bool isDownloaded = false;
             SqlCommand cmd = null;
             string logFuncName = "VendorFilesDownloaded: ";
-
 
             string commandText = @"
                 select count(*) as FilesTotal from VIFs
@@ -607,7 +579,6 @@ namespace IndexDataEngineLibrary
                 dataSets.Add(Dataset);
             }
 
-
             foreach (string dataSet in dataSets)
             {
                 try
@@ -799,37 +770,8 @@ namespace IndexDataEngineLibrary
              */
         }
 
-        /// <summary>
-        /// getVIFLastProcessDate
-        /// </summary>
-        /// <returns></returns>
-        //private string VIFLastProcessDateOld()
-        //{
-        //        return(getSystemSettingValue("VIFLastProcessDate"));
-        //}
-        
-
-
         private string getSystemSettingValue(string SettingName, SqlConnection sqlConnection)
         {
-
-            //string sSettingValue = "";
-            //string SqlSelect = @"
-            //        SELECT SettingValue 
-            //        FROM SystemSettings 
-            //        WHERE SettingName = @SettingName
-            //        ";
-            //string sColumn = "SettingValue";
-            //using (AdoHelper db = new AdoHelper(sConnection))
-            //using (SqlDataReader dr = db.ExecDataReader(SqlSelect, "@SettingName", SettingName))
-            //{
-            //    sSettingValue = db.ReadDataReader(dr, sColumn);
-            //    dr.Close();
-            //}
-            //return (sSettingValue);
-
-
-
             string SettingValue = "";
             SqlDataReader dr1 = null;
 
@@ -872,8 +814,6 @@ namespace IndexDataEngineLibrary
 
         public static void setSystemSettingValue(string SettingName, string SettingValue, SqlConnection sqlConnection)
         {
-
-
             SqlCommand cmd = null;
 
             try
@@ -897,9 +837,6 @@ namespace IndexDataEngineLibrary
                 //LogHelper.WriteLine(logFuncName + "Rows Updated " + updateCount + " " + colName);
             }
         }
-
-
-
 
         private string getVIFsProcessDate()
         {
@@ -1256,7 +1193,6 @@ namespace IndexDataEngineLibrary
                     cnSql2.Close();
                 LogHelper.WriteLine("GenerateSecurityMasterChangesData Done");
             }
-
 
             return;
         }

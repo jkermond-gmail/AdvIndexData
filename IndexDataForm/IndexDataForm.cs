@@ -17,13 +17,12 @@ namespace IndexDataForm
 {
     public partial class IndexDataForm : Form
     {
+        #region TimerAndInitializationFunctionality
+
         internal int defaultTimerInterval = 1000 * 2;                           // 2 seconds
         internal int timerInterval = 1000 * 2;                                  // 2 seconds
         //internal int defaultTimerInterval = 1000 * 20;                        // 20 seconds
         //internal int defaultTimerInterval = 60 * 1000 * 2;                    // 2 min
-        //internal int TIMER_HOLD_WHILE_WORKING_INTERVAL = 60 * 1000 * 200 ;    // 200 min
-
-        //private System.Timers.Timer timer1 = new System.Timers.Timer();
 
         private IndexDataEngine indexDataEngine;
         private RussellData russellData = null;
@@ -32,17 +31,18 @@ namespace IndexDataForm
         public IndexDataForm()
         {
             InitializeComponent();
-            //LogHelper.StartLog("IndexDataLog.txt", @"\IndexData\Logs\", deleteExisting);
             LogHelper.StartLog();
 
             russellData = new RussellData();
             snpData = new SnpData();
+
             var v = AppSettings.Get<int>("timerInterval");
             if (v.Equals(0))
                 timerInterval = defaultTimerInterval;
             else
                 timerInterval = v;
         }
+
 
         private void btnStart_Click(object sender, EventArgs e)
         {
@@ -84,135 +84,15 @@ namespace IndexDataForm
                 timerRunIndexData.Stop();
             }
         }
+        #endregion TimerAndInitializationFunctionality
 
-        #region Russell tab page functionality
+        #region CalendarAndDateFunctionality
 
         private DateTime startDate;
         private DateTime endDate;
         private bool bStartDateSelected = false;
         private bool bEndDateSelected = false;
-
-        private void tabPage1_Click(object sender, EventArgs e)
-        {
-
-            if (tabPage1.Text.Equals("Russell"))
-            {
-            }
-            //else if (russellData != null)  // We are leaving tabRussellDb
-            //  russellData.RussellData_Finish();
-
-        }
-
-
-        private void btnCalculateOneIndexReturns_Click(object sender, EventArgs e)
-        {
-            russellData.CalculateAdventTotalReturnsForPeriod(lnkStartDate.Text, lnkEndDate.Text, (string)cbRussellIndices.SelectedItem);
-        }
-
-        private void btnCalculateAllIndexReturns_Click(object sender, EventArgs e)
-        {
-            string[] Indices = null;
-            Indices = russellData.GetIndices();
-            for (int i = 0; i < Indices.Length; i++)
-            {
-                string s = Indices[i];
-                russellData.CalculateAdventTotalReturnsForPeriod(lnkStartDate.Text, lnkEndDate.Text, Indices[i]);
-            }
-
-        }
-        private void btnGenerateReturns_Click(object sender, EventArgs e)
-        {
-            string Indexname = (string)cbRussellIndices.SelectedItem;
-            if (cboVendor.SelectedItem.Equals("Russell"))
-            {
-                russellData.LogReturnData = chkLogReturnData.Checked;            
-
-                if (cboOutputType.Text.Equals("Constituent"))
-                    russellData.GenerateReturnsForDateRange(lnkStartDate.Text, lnkEndDate.Text, Indexname, AdventOutputType.Constituent, chkHistoricalAxmlFile.Checked);
-                else if (cboOutputType.Text.Equals("Sector"))
-                    russellData.GenerateReturnsForDateRange(lnkStartDate.Text, lnkEndDate.Text, Indexname, AdventOutputType.Sector, chkHistoricalAxmlFile.Checked);
-            }
-            else if (cboVendor.SelectedItem.Equals("Snp"))
-            {
-                if (cboOutputType.Text.Equals("Constituent"))
-                    snpData.GenerateReturnsForDateRange(lnkStartDate.Text, lnkEndDate.Text, Indexname, AdventOutputType.Constituent, chkHistoricalAxmlFile.Checked);
-                else if (cboOutputType.Text.Equals("Sector"))
-                    snpData.GenerateReturnsForDateRange(lnkStartDate.Text, lnkEndDate.Text, Indexname, AdventOutputType.Sector, chkHistoricalAxmlFile.Checked);
-            }
-
-            //russellData.GenerateIndustryReturnsForDate(lnkEndDate.Text, (string)cbRussellIndices.SelectedItem);
-        }
-
-
-        private void btnUpdateRussellHoldings_Click(object sender, EventArgs e)
-        {
-            if (!bStartDateSelected)
-                startDate = Convert.ToDateTime(lnkStartDate.Text);
-            if (!bEndDateSelected)
-                endDate = Convert.ToDateTime(lnkEndDate.Text);
-
-            string DataSet = "All";
-
-            if (cboVendor.SelectedItem.Equals("Russell"))
-            {
-                russellData.ProcessVendorFiles(startDate, endDate, DataSet, true, true, true, true, true);
-            }
-            else if (cboVendor.SelectedItem.Equals("Snp"))
-            {
-                snpData.ProcessVendorFiles(startDate, endDate, DataSet, true, true, true, true, true);
-            }
-        }
-
-        private void btnCalculateTotalReturns_Click(object sender, EventArgs e)
-        {
-            string[] Indices = null;
-
-            if (cboVendor.SelectedItem.Equals("Russell"))
-            {
-                Indices = russellData.GetIndices();
-                for (int i = 0; i < Indices.Length; i++)
-                {
-                    string s = Indices[i];
-                    russellData.CalculateVendorTotalReturnsForPeriod(lnkStartDate.Text, lnkEndDate.Text, Indices[i]);
-                    russellData.CalculateAdventTotalReturnsForPeriod(lnkStartDate.Text, lnkEndDate.Text, Indices[i]);
-                    russellData.CalculateAdjustedTotalReturnsForPeriod(lnkStartDate.Text, lnkEndDate.Text, Indices[i]);
-                }
-
-            }
-            else if (cboVendor.SelectedItem.Equals("Snp"))
-            {
-                //Indices = snpData.GetIndices();
-                //for (int i = 0; i < Indices.Length; i++)
-                //{
-                //    string s = Indices[i];
-                //    snpData.CalculateVendorTotalReturnsForPeriod(lnkStartDate.Text, lnkEndDate.Text, Indices[i]);
-                //    snpData.CalculateAdventTotalReturnsForPeriod(lnkStartDate.Text, lnkEndDate.Text, Indices[i]);                    
-                //}
-                snpData.CalculateVendorTotalReturnsForPeriod(lnkStartDate.Text, lnkEndDate.Text, "500");
-                //snpData.CalculateAdventTotalReturnsForPeriod(lnkStartDate.Text, lnkEndDate.Text, "500");                    
-            }
-        }
-
-
         private Control calendarCaller;
-
-        //private void monthCalendar1_DateChanged(object sender, DateRangeEventArgs e)
-        //{
-        //    string selectedDate = monthCalendar1.SelectionEnd.ToShortDateString();
-        //    if (calendarCaller == lnkStartDate)
-        //    {
-        //        lnkStartDate.Text = selectedDate;
-        //        startDate = monthCalendar1.SelectionEnd;
-        //        bStartDateSelected = true;
-        //    }
-        //    else if (calendarCaller == lnkEndDate)
-        //    {
-        //        lnkEndDate.Text = selectedDate;
-        //        endDate = monthCalendar1.SelectionEnd;
-        //        bEndDateSelected = true;
-        //    }
-        //    monthCalendar1.Hide();
-        //}
 
         private void monthCalendar1_DateSelected(object sender, DateRangeEventArgs e)
         {
@@ -257,8 +137,9 @@ namespace IndexDataForm
             }
             monthCalendar1.Show();
         }
-        #endregion
+        #endregion CalendarAndDateFunctionality
 
+        #region VendorSelectionFunctionality
         private void cboVendor_SelectedIndexChanged(object sender, EventArgs e)
         {
             string[] Indices = null;
@@ -278,69 +159,76 @@ namespace IndexDataForm
                 cbRussellIndices.SelectedItem = "sp500";
             }
         }
+        #endregion VendorSelectionFunctionality
 
-        private void btnTestAxmlOutput_Click(object sender, EventArgs e)
+        #region GenerateReturnsFunctionality
+
+        private void btnGenerateReturns_Click(object sender, EventArgs e)
         {
-            IndexDataQA indexDataQA = new IndexDataQA();
-            string Indexname = cbRussellIndices.SelectedItem.ToString();
-            string Vendor = cboVendor.SelectedItem.ToString();
-            string OutputType = cboOutputType.SelectedItem.ToString();
+            string Indexname = (string)cbRussellIndices.SelectedItem;
+            if (cboVendor.SelectedItem.Equals("Russell"))
+            {
+                russellData.LogReturnData = chkLogReturnData.Checked;            
 
-            //indexDataQA.RunCompare();
-            indexDataQA.CompareAxmlForDateRange(Vendor, OutputType, Indexname, lnkStartDate.Text, lnkEndDate.Text);
+                if (cboOutputType.Text.Equals("Constituent"))
+                    russellData.GenerateReturnsForDateRange(lnkStartDate.Text, lnkEndDate.Text, Indexname, AdventOutputType.Constituent, chkHistoricalAxmlFile.Checked);
+                else if (cboOutputType.Text.Equals("Sector"))
+                    russellData.GenerateReturnsForDateRange(lnkStartDate.Text, lnkEndDate.Text, Indexname, AdventOutputType.Sector, chkHistoricalAxmlFile.Checked);
+            }
+            else if (cboVendor.SelectedItem.Equals("Snp"))
+            {
+                if (cboOutputType.Text.Equals("Constituent"))
+                    snpData.GenerateReturnsForDateRange(lnkStartDate.Text, lnkEndDate.Text, Indexname, AdventOutputType.Constituent, chkHistoricalAxmlFile.Checked);
+                else if (cboOutputType.Text.Equals("Sector"))
+                    snpData.GenerateReturnsForDateRange(lnkStartDate.Text, lnkEndDate.Text, Indexname, AdventOutputType.Sector, chkHistoricalAxmlFile.Checked);
+            }
         }
+        #endregion GenerateReturnsFunctionality
 
-        private void btnTestEndOfMonthDates_Click(object sender, EventArgs e)
+        #region UpdateHoldingsFunctionality
+        private void btnUpdateRussellHoldings_Click(object sender, EventArgs e)
         {
-            snpData.TestEndOfMonthDates(lnkStartDate.Text, lnkEndDate.Text);
+            if (!bStartDateSelected)
+                startDate = Convert.ToDateTime(lnkStartDate.Text);
+            if (!bEndDateSelected)
+                endDate = Convert.ToDateTime(lnkEndDate.Text);
 
+            string DataSet = "All";
+
+            if (cboVendor.SelectedItem.Equals("Russell"))
+            {
+                russellData.ProcessVendorFiles(startDate, endDate, DataSet, true, true, true, true, true);
+            }
+            else if (cboVendor.SelectedItem.Equals("Snp"))
+            {
+                snpData.ProcessVendorFiles(startDate, endDate, DataSet, true, true, true, true, true);
+            }
         }
+        #endregion UpdateHoldingsFunctionality
 
+        #region StatusReportFunctionality
         private void btnTestEmail_Click(object sender, EventArgs e)
         {
-            //Mail mail = new Mail();
-            //mail.SendMail("Message");
-
-            //DateHelper.IsEndofMonthOnWeekend("06/28/2019");
-            //DateHelper.IsEndofMonthOnWeekend("06/27/2019");
-
-            //indexDataEngine = new IndexDataEngine();
-            //indexDataEngine.CreateFtpFolders();
-            //snpData.TestFileCopy();
-            //snpData.TestFilesCopy();    
-
-            // JK: I added this code to see how the new version compared to the old version in terms of code lines
-            // old version has 173,234 lines of *.cs code
-            // new version has 18,308   lines of *.cs code
-            //string directory = @"C:\A_Development\visual studio 2017\Projects\Advent_ApxIndexData";
-            //string directory = @"C:\A_Development\visual studio 2017\Projects\AdvIndexData";
-
-            //string searchPattern = "*.cs";
-
-            //if (directory == null || !System.IO.Directory.Exists(directory))
-            //{
-            //}
-            //else
-            //{ 
-            //    var filesResults = System.IO.Directory.EnumerateFiles(directory, searchPattern, System.IO.SearchOption.AllDirectories)
-            //                                .Select(file => new
-            //                                {
-            //                                    FilePath = file,
-            //                                    TotalLines = System.IO.File.ReadLines(file).Count()
-            //                                }).ToList();
-            //    int totalLines = 0;
-            //    foreach (var result in filesResults)
-            //    {
-            //        totalLines += result.TotalLines;
-            //    }
-
-            //    LogHelper.WriteLine("totalLines " + totalLines);
-            //}
-
-
             indexDataEngine = new IndexDataEngine();
-            //indexDataEngine.TestGetStatusSummary(lnkStartDate.Text);
             indexDataEngine.TestGenerateStatusReport(lnkStartDate.Text); 
+        }
+        #endregion StatusReportFunctionality
+
+        #region RunIndexDataFunctionality
+        private void btnProcessAllForDate_Click(object sender, EventArgs e)
+        {
+            IndexDataEngine indexDataEngine = new IndexDataEngine();
+            indexDataEngine.Run(lnkStartDate.Text);
+        }
+        #endregion RunIndexDataFunctionality
+
+        #region testUI_tFunctionalityNotVisble
+        // ---------------------------------------------------------------------------
+        // ---------------------------------------------------------------------------
+        // -- All of the routines below are linked to test UI buttons that are set to Not Visible
+        private void btnCalculateOneIndexReturns_Click(object sender, EventArgs e)
+        {
+            russellData.CalculateAdventTotalReturnsForPeriod(lnkStartDate.Text, lnkEndDate.Text, (string)cbRussellIndices.SelectedItem);
         }
 
         private void btnTestFtp_Click(object sender, EventArgs e)
@@ -351,6 +239,22 @@ namespace IndexDataForm
             //indexDataEngine.CreateFtpFolders();
             //snpData.TestFileCopy();
             //snpData.TestFilesCopy();
+        }
+
+        private void btnTestEndOfMonthDates_Click(object sender, EventArgs e)
+        {
+            snpData.TestEndOfMonthDates(lnkStartDate.Text, lnkEndDate.Text);
+        }
+
+        private void btnCalculateAllIndexReturns_Click(object sender, EventArgs e)
+        {
+            string[] Indices = null;
+            Indices = russellData.GetIndices();
+            for (int i = 0; i < Indices.Length; i++)
+            {
+                string s = Indices[i];
+                russellData.CalculateAdventTotalReturnsForPeriod(lnkStartDate.Text, lnkEndDate.Text, Indices[i]);
+            }
         }
 
         private void btnTestSecMaster_Click(object sender, EventArgs e)
@@ -365,10 +269,37 @@ namespace IndexDataForm
             indexDataEngine.ProcessSecurityMasterReport(lnkStartDate.Text);
         }
 
-        private void btnProcessAllForDate_Click(object sender, EventArgs e)
+        private void btnCalculateTotalReturns_Click(object sender, EventArgs e)
         {
-            IndexDataEngine indexDataEngine = new IndexDataEngine();
-            indexDataEngine.Run(lnkStartDate.Text);
+            string[] Indices = null;
+
+            if (cboVendor.SelectedItem.Equals("Russell"))
+            {
+                Indices = russellData.GetIndices();
+                for (int i = 0; i < Indices.Length; i++)
+                {
+                    string s = Indices[i];
+                    russellData.CalculateVendorTotalReturnsForPeriod(lnkStartDate.Text, lnkEndDate.Text, Indices[i]);
+                    russellData.CalculateAdventTotalReturnsForPeriod(lnkStartDate.Text, lnkEndDate.Text, Indices[i]);
+                    russellData.CalculateAdjustedTotalReturnsForPeriod(lnkStartDate.Text, lnkEndDate.Text, Indices[i]);
+                }
+            }
+            else if (cboVendor.SelectedItem.Equals("Snp"))
+            {
+                snpData.CalculateVendorTotalReturnsForPeriod(lnkStartDate.Text, lnkEndDate.Text, "500");
+            }
         }
+
+        private void btnTestAxmlOutput_Click(object sender, EventArgs e)
+        {
+            IndexDataQA indexDataQA = new IndexDataQA();
+            string Indexname = cbRussellIndices.SelectedItem.ToString();
+            string Vendor = cboVendor.SelectedItem.ToString();
+            string OutputType = cboOutputType.SelectedItem.ToString();
+            indexDataQA.CompareAxmlForDateRange(Vendor, OutputType, Indexname, lnkStartDate.Text, lnkEndDate.Text);
+        }
+
+        #endregion testUI_tFunctionalityNotVisble
+
     }
 }

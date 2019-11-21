@@ -403,16 +403,6 @@ namespace IndexDataEngineLibrary
             string Identifier = "";
             string Source1 = "";
             string Source2 = "";
-            /*
-            SELECT Identifier
-            FROM AxmlOutput
-            where Source = 'Dev' and OutputType = 'Security' and IndexName = 'r3000'
-            and Identifier not in (
-            SELECT Identifier
-            FROM AxmlOutput
-            where Source = 'Prod' and OutputType = 'Security' and IndexName = 'r3000'
-            )
-            */
 
             LogHelper.WriteLine("CompareAxmlIdentifiers: " + IndexName + " " + ReturnDate.ToShortDateString() + " " + OutputType);
 

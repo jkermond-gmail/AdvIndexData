@@ -35,7 +35,7 @@ namespace IndexDataEngineLibrary
         private List<IndexRow> indexRowsSectorLevel2RollUp = new List<IndexRow>();
         private List<IndexRow> indexRowsSectorLevel3RollUp = new List<IndexRow>();
 
-        private const string NumberFormat = "0.#########";        
+        private const string NumberFormat = "0.#########";
 
         private SharedData sharedData = null;
 
@@ -285,7 +285,7 @@ namespace IndexDataEngineLibrary
             return (bUpdated);
         }
 
-        public void ProcessVendorFiles(DateTime oStartDate, DateTime oEndDate, string Dataset, bool bOpenFiles, bool bCloseFiles, 
+        public void ProcessVendorFiles(DateTime oStartDate, DateTime oEndDate, string Dataset, bool bOpenFiles, bool bCloseFiles,
                                        bool bTotalReturnFiles, bool bSecurityMaster, bool bSymbolChanges)
         {
             DateTime oProcessDate;
@@ -346,7 +346,7 @@ namespace IndexDataEngineLibrary
                             ProcessStatus.Update(oProcessDate, Vendors.Russell.ToString(), Dataset, "", ProcessStatus.WhichStatus.TotalReturnData, ProcessStatus.StatusValue.Pass);
                             LogHelper.WriteLine("Done      : " + FileName + " " + DateTime.Now);
                         }
-                    }                    
+                    }
                 }
             }
             catch
@@ -525,17 +525,17 @@ namespace IndexDataEngineLibrary
                     bTotalCount = TextLine.Contains("Total Count:");
                 if (bTotalCount && !bHeader1)
                     bHeader1 = (TextLine.StartsWith("  Date") == true);
-                if(bTotalCount && bHeader1 && !bHeader2)
+                if (bTotalCount && bHeader1 && !bHeader2)
                     bHeader2 = (TextLine.StartsWith("------") == true);
-                if(bTotalCount && bHeader1 && bHeader2 && TextLine.StartsWith("20"))
+                if (bTotalCount && bHeader1 && bHeader2 && TextLine.StartsWith("20"))
                 {
                     sDate = GetField(TextLine, 1, 8);
                     if (sDate.Length == 8)
                         DateTime.TryParseExact(sDate, "yyyyMMdd", mCultureInfo, DateTimeStyles.None, out oDate);
                     sOldSymbol = GetField(TextLine, 10, 8);
                     sNewSymbol = GetField(TextLine, 28, 8);
-                    sCompanyName = GetField(TextLine, 45, TextLine.Length - 45 + 1 );
-                    sharedData.AddSymbolChange( "R", oDate, sOldSymbol, sNewSymbol, sCompanyName);
+                    sCompanyName = GetField(TextLine, 45, TextLine.Length - 45 + 1);
+                    sharedData.AddSymbolChange("R", oDate, sOldSymbol, sNewSymbol, sCompanyName);
                 }
             }
             srFile.Close();
@@ -552,7 +552,7 @@ namespace IndexDataEngineLibrary
             //}
 
             StreamReader srFile = null;
-            for ( srFile = new StreamReader(FileName)
+            for (srFile = new StreamReader(FileName)
                ; srFile.EndOfStream == false
                ;)
             {
@@ -584,7 +584,7 @@ RU3000    20170103   CHF   1662.25918   1365.02441   1696.48181   1567.99955    
                             sVendorIndex = GetField(TextLine, 1, 10);
                             sCurrency = GetField(TextLine, 22, 3);
                             sTotal = GetField(TextLine, 28, 10);
-                            if( sIndices.Contains(sVendorIndex))
+                            if (sIndices.Contains(sVendorIndex))
                             {
                                 sAdventIndex = GetAdventIndex(sVendorIndex);
                                 DeleteRussellTotalReturnForIndex(FileDate, sAdventIndex);
@@ -703,7 +703,7 @@ RU3000    20170103   CHF   1662.25918   1365.02441   1696.48181   1567.99955    
 
                         Fld = GetField(TextLine, 10, 8);
                         if (Fld.Length == 8)
-                        { 
+                        {
                             drHoldings1["CUSIP"] = Fld;
                             sCUSIP = Fld;
                         }
@@ -748,7 +748,7 @@ RU3000    20170103   CHF   1662.25918   1365.02441   1696.48181   1567.99955    
 
                     if (ok)
                     {
-                    sharedData.AddSecurityMasterFull(sTicker, sCUSIP, "R", sCompanyName, sSector, oDate);
+                        sharedData.AddSecurityMasterFull(sTicker, sCUSIP, "R", sCompanyName, sSector, oDate);
 
                         if (r1000.Equals("Y"))
                         {
@@ -1560,7 +1560,7 @@ RU3000    20170103   CHF   1662.25918   1365.02441   1696.48181   1567.99955    
                 //string SqlSelect = "select AdventIndexName from VendorIndexMap ";
                 string SqlSelect = "select IndexClientName from VendorIndexMap ";
                 string SqlWhere = "where Vendor = 'Russell' and Supported = 'Yes' and IndexName ='" + VendorIndex + "'";
-//                string SqlWhere = "where Vendor = 'Russell' and Supported = 'Yes' and VendorIndexName ='" + VendorIndex + "'";
+                //                string SqlWhere = "where Vendor = 'Russell' and Supported = 'Yes' and VendorIndexName ='" + VendorIndex + "'";
                 conn.Open();
                 SqlCommand cmd = new SqlCommand(SqlSelect + SqlWhere, conn);
                 dr = cmd.ExecuteReader();
@@ -1771,7 +1771,7 @@ RU3000    20170103   CHF   1662.25918   1365.02441   1696.48181   1567.99955    
                 AdventTotalReturn = Math.Round(AdventTotalReturn, totalReturnPrecision, MidpointRounding.AwayFromZero);
                 if (logReturnData)
                     LogHelper.WriteLine("Advent Total Return " + AdventTotalReturn.ToString());
-         
+
                 sharedData.AddTotalReturn(sDate, sIndexName, Vendors.Russell.ToString(), sVendorFormat, AdventTotalReturn, "AdvReturn");
 
                 double AdventVsVendorDiff = VendorTotalReturn - AdventTotalReturn;
@@ -1790,7 +1790,7 @@ RU3000    20170103   CHF   1662.25918   1365.02441   1696.48181   1567.99955    
                 {
                     indexRow.CalculateAdventAdjustedReturn();
                     if (logReturnData)
-                        LogHelper.WriteLine(indexRow.Identifier + "," + indexRow.Weight.ToString() + "," + indexRow.RateOfReturn.ToString() + "," + indexRow.RateOfReturnAdjustment + "," + indexRow.RateOfReturnAdjusted );
+                        LogHelper.WriteLine(indexRow.Identifier + "," + indexRow.Weight.ToString() + "," + indexRow.RateOfReturn.ToString() + "," + indexRow.RateOfReturnAdjustment + "," + indexRow.RateOfReturnAdjusted);
                 }
 
 
@@ -1807,7 +1807,7 @@ RU3000    20170103   CHF   1662.25918   1365.02441   1696.48181   1567.99955    
             }
         }
 
-        private void RollUpRatesOfReturn(List<IndexRow> indexRowsRollUp, List<IndexRow> indexRowsIndustrySort, 
+        private void RollUpRatesOfReturn(List<IndexRow> indexRowsRollUp, List<IndexRow> indexRowsIndustrySort,
             IndexRow.VendorFormat vendorFormat, string sDate, string sIndexName)
         {
             foreach (IndexRow indexRowRollUp in indexRowsRollUp)
@@ -1883,7 +1883,7 @@ RU3000    20170103   CHF   1662.25918   1365.02441   1696.48181   1567.99955    
                     }
                 }
 
-                
+
                 for (IndexRow.VendorFormat vendorFormat = IndexRow.VendorFormat.SECTOR_LEVEL1; vendorFormat <= IndexRow.VendorFormat.SECTOR_LEVEL3; vendorFormat++)
                 {
                     string sCurrentIdentifier = "";
@@ -2015,7 +2015,7 @@ RU3000    20170103   CHF   1662.25918   1365.02441   1696.48181   1567.99955    
             ; (DateCompare = processDate.CompareTo(endDate)) <= 0
             ; processDate = DateHelper.NextBusinessDay(processDate))
             {
-                if( isHistoricalAxmlFile)
+                if (isHistoricalAxmlFile)
                 {
                     if (processDate.Equals(startDate))
                         isFirstDate = true;
@@ -2074,10 +2074,10 @@ RU3000    20170103   CHF   1662.25918   1365.02441   1696.48181   1567.99955    
 
                     if ((GotNext =
                         GetNextConstituentReturn(out sCusip, out sTicker,
-                                                 out sSector, out sSubSector, out sIndustry, 
+                                                 out sSector, out sSubSector, out sIndustry,
                                                  out sWeight, out sSecurityReturn)) == true)
                     {
-                        IndexRow indexRow = new IndexRow(sDate, sIndexName, sCusip, sTicker, 
+                        IndexRow indexRow = new IndexRow(sDate, sIndexName, sCusip, sTicker,
                                                          sSector, sSubSector, sIndustry, "",
                                                          sWeight, sSecurityReturn, IndexRow.VendorFormat.CONSTITUENT);
                         indexRow.CurrentTicker = sharedData.GetSecurityMasterCurrentTickerRussell(sTicker, sCusip, sDate);
@@ -2414,7 +2414,7 @@ RU3000    20170103   CHF   1662.25918   1365.02441   1696.48181   1567.99955    
                         dReturn = (double)dr[0];
                         dReturn = Math.Round(dReturn, 9, MidpointRounding.AwayFromZero);
                         string sReturn = dReturn.ToString();
-                        
+
                         //LogHelper.WriteLine(sDate + " " + sReturn);
                         if (bSaveReturnInDb)
                         {
@@ -2533,39 +2533,39 @@ RU3000    20170103   CHF   1662.25918   1365.02441   1696.48181   1567.99955    
             return (sTicker);
         }
 
-    public void DeleteRussellTotalReturnForIndex(DateTime FileDate, string sIndexName)
-    {
-       SqlConnection cnSql = new SqlConnection(sharedData.ConnectionStringIndexData);
+        public void DeleteRussellTotalReturnForIndex(DateTime FileDate, string sIndexName)
+        {
+            SqlConnection cnSql = new SqlConnection(sharedData.ConnectionStringIndexData);
             try
             {
-            string SqlDelete;
-            string SqlWhere;
-            SqlCommand cmd = null;
-            cnSql.Open();
-            SqlDelete = "delete FROM RussellDailyIndexReturns ";
-            SqlWhere = "where FileDate = @FileDate and IndexName = @IndexName";
-            cmd = new SqlCommand();
-            cmd.Connection = cnSql;
-            cmd.CommandText = SqlDelete + SqlWhere;
-            cmd.Parameters.Add("@FileDate", SqlDbType.DateTime);
-            cmd.Parameters["@FileDate"].Value = FileDate;
-            cmd.Parameters.Add("@IndexName", SqlDbType.VarChar);
-            cmd.Parameters["@IndexName"].Value = sIndexName;
-            cmd.ExecuteNonQuery();
-            cnSql.Close();
-        }
-        catch (SqlException ex)
-        {
-            if (ex.Number == 2627)
+                string SqlDelete;
+                string SqlWhere;
+                SqlCommand cmd = null;
+                cnSql.Open();
+                SqlDelete = "delete FROM RussellDailyIndexReturns ";
+                SqlWhere = "where FileDate = @FileDate and IndexName = @IndexName";
+                cmd = new SqlCommand();
+                cmd.Connection = cnSql;
+                cmd.CommandText = SqlDelete + SqlWhere;
+                cmd.Parameters.Add("@FileDate", SqlDbType.DateTime);
+                cmd.Parameters["@FileDate"].Value = FileDate;
+                cmd.Parameters.Add("@IndexName", SqlDbType.VarChar);
+                cmd.Parameters["@IndexName"].Value = sIndexName;
+                cmd.ExecuteNonQuery();
+                cnSql.Close();
+            }
+            catch (SqlException ex)
             {
-                LogHelper.WriteLine(ex.Message);
+                if (ex.Number == 2627)
+                {
+                    LogHelper.WriteLine(ex.Message);
+                }
+            }
+            finally
+            {
+                cnSql.Close();
             }
         }
-        finally
-        {
-            cnSql.Close();
-        }
-    }
 
 
 
@@ -2625,7 +2625,7 @@ RU3000    20170103   CHF   1662.25918   1365.02441   1696.48181   1567.99955    
             DateTime endDate = DateTime.Parse(sEndDate);
             DateTime prevDate = DateTime.MinValue;
 
-            for( DateTime date = startDate; date <= endDate; date = DateHelper.NextBusinessDay(date))
+            for (DateTime date = startDate; date <= endDate; date = DateHelper.NextBusinessDay(date))
             {
                 prevDate = DateHelper.PrevBusinessDay(date);
 
@@ -2761,14 +2761,14 @@ RU3000    20170103   CHF   1662.25918   1365.02441   1696.48181   1567.99955    
                             double dNum;
                             string s = "";
                             s = dr["AdvReturnDb"].ToString();
-                            if(s.Length > 0 && double.TryParse(s, out dNum))
+                            if (s.Length > 0 && double.TryParse(s, out dNum))
                                 dAdvReturn = Convert.ToDouble(dr["AdvReturnDb"].ToString());
                             s = dr["VendorReturn"].ToString();
                             if (s.Length > 0 && double.TryParse(s, out dNum))
                                 dVendorReturn = Convert.ToDouble(dr["VendorReturn"].ToString());
                             dr.Close();
 
-                            if((dVendorReturn.Equals(double.MinValue) == false) && (dAdvReturn.Equals(double.MinValue) == false))
+                            if ((dVendorReturn.Equals(double.MinValue) == false) && (dAdvReturn.Equals(double.MinValue) == false))
                             {
                                 dDiff = Math.Round((dVendorReturn - dAdvReturn), iTotalReturnPrecision, MidpointRounding.AwayFromZero);
 
@@ -2781,7 +2781,7 @@ RU3000    20170103   CHF   1662.25918   1365.02441   1696.48181   1567.99955    
                         }
                     }
                 }
-                
+
                 catch (SqlException ex)
                 {
                     if (ex.Number == 2627)
@@ -2795,9 +2795,78 @@ RU3000    20170103   CHF   1662.25918   1365.02441   1696.48181   1567.99955    
             }
         }
 
-
         /***************************************************/
-#endregion Testing Code used by Form2.Russell Tab
+        #endregion Testing Code used by Form2.Russell Tab
 
+
+        public List<string> GetClients()
+        {
+            return (sharedData.GetClients());
+        }
+
+        public List<string> GetClientIndices(string ClientID)
+        {
+            return (sharedData.GetClientIndices(ClientID));
+        }
+
+        public List<string> GetOutputTypes(string ClientID, string sIndexName)
+        {
+            return (sharedData.GetOutputTypes(ClientID, sIndexName));
+        }
+
+
+        public void CopyFilesToFtpFolder(string sFileDate, string sVendor, string dataSet, string sIndexName, string sOutputType)
+        {
+            Vendors vendor;
+
+            if (sVendor.Equals("Russell"))
+                vendor = Vendors.Russell;
+            else if (sVendor.Equals("Snp"))
+                vendor = Vendors.Snp;
+            else
+                vendor = Vendors.Snp;
+
+            AdventOutputType outputType;
+
+            if (sOutputType.Equals("Constituent"))
+                outputType = AdventOutputType.Constituent;
+            else if (sOutputType.Equals("Sector"))
+                outputType = AdventOutputType.Sector;
+            else
+                outputType = AdventOutputType.Sector;
+
+            sharedData.CopyFilesToFtpFolder(sFileDate, vendor, dataSet, sIndexName, outputType);
+
+            return;
+        }
+
+        public void CopyFileToFtpFolder(string clientId, string sFileDate, string sVendor, string sIndexName, string sOutputType )
+        {
+
+            if(clientId.Length > 0 && sFileDate.Length > 0 && sVendor.Length > 0 && sIndexName.Length > 0 && sOutputType.Length > 0)
+            {
+                Vendors vendor;
+
+                if(sVendor.Equals("Russell"))
+                    vendor = Vendors.Russell;
+                else if(sVendor.Equals("Snp"))
+                    vendor = Vendors.Snp;
+                else
+                    vendor = Vendors.Snp;
+
+                AdventOutputType outputType;
+
+                if(sOutputType.Equals("Constituent"))
+                    outputType = AdventOutputType.Constituent;
+                else if(sOutputType.Equals("Sector"))
+                    outputType = AdventOutputType.Sector;
+                else
+                    outputType = AdventOutputType.Sector;
+
+                sharedData.CopyFileToFtpFolder(clientId, sFileDate, vendor, sIndexName, outputType);
+            }
+            else
+                LogHelper.WriteLine("Make sure ClientID, FileDate, Vendor, IndexName, and Output Type are all selected");
+        }
     }
 }

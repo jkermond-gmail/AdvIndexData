@@ -57,8 +57,21 @@
             this.lnkStartDate = new System.Windows.Forms.LinkLabel();
             this.lblEndDate = new System.Windows.Forms.Label();
             this.lblStartDate = new System.Windows.Forms.Label();
+            this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.btnCopyFiles = new System.Windows.Forms.Button();
+            this.txtFileDate = new System.Windows.Forms.TextBox();
+            this.lblFileDate = new System.Windows.Forms.Label();
+            this.monthCalendar2 = new System.Windows.Forms.MonthCalendar();
+            this.cboIndices2 = new System.Windows.Forms.ComboBox();
+            this.lblOutputType = new System.Windows.Forms.Label();
+            this.cboOutputType2 = new System.Windows.Forms.ComboBox();
+            this.cboClients = new System.Windows.Forms.ComboBox();
+            this.lblClients = new System.Windows.Forms.Label();
+            this.lblIndex = new System.Windows.Forms.Label();
+            this.lblFileDate2 = new System.Windows.Forms.Label();
             this.tabUnitTest.SuspendLayout();
             this.tabPage1.SuspendLayout();
+            this.tabPage2.SuspendLayout();
             this.SuspendLayout();
             // 
             // btnStart
@@ -88,6 +101,7 @@
             // tabUnitTest
             // 
             this.tabUnitTest.Controls.Add(this.tabPage1);
+            this.tabUnitTest.Controls.Add(this.tabPage2);
             this.tabUnitTest.Location = new System.Drawing.Point(13, 72);
             this.tabUnitTest.Name = "tabUnitTest";
             this.tabUnitTest.SelectedIndex = 0;
@@ -365,6 +379,123 @@
             this.lblStartDate.TabIndex = 0;
             this.lblStartDate.Text = "Start Date";
             // 
+            // tabPage2
+            // 
+            this.tabPage2.Controls.Add(this.lblFileDate2);
+            this.tabPage2.Controls.Add(this.lblIndex);
+            this.tabPage2.Controls.Add(this.btnCopyFiles);
+            this.tabPage2.Controls.Add(this.txtFileDate);
+            this.tabPage2.Controls.Add(this.lblFileDate);
+            this.tabPage2.Controls.Add(this.monthCalendar2);
+            this.tabPage2.Controls.Add(this.cboIndices2);
+            this.tabPage2.Controls.Add(this.lblOutputType);
+            this.tabPage2.Controls.Add(this.cboOutputType2);
+            this.tabPage2.Controls.Add(this.cboClients);
+            this.tabPage2.Controls.Add(this.lblClients);
+            this.tabPage2.Location = new System.Drawing.Point(4, 22);
+            this.tabPage2.Name = "tabPage2";
+            this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage2.Size = new System.Drawing.Size(443, 491);
+            this.tabPage2.TabIndex = 1;
+            this.tabPage2.Text = "Copy Client Files";
+            this.tabPage2.UseVisualStyleBackColor = true;
+            // 
+            // btnCopyFiles
+            // 
+            this.btnCopyFiles.Location = new System.Drawing.Point(111, 337);
+            this.btnCopyFiles.Name = "btnCopyFiles";
+            this.btnCopyFiles.Size = new System.Drawing.Size(199, 23);
+            this.btnCopyFiles.TabIndex = 18;
+            this.btnCopyFiles.Text = "Copy Files to Client\'s FTP Folder";
+            this.btnCopyFiles.UseVisualStyleBackColor = true;
+            this.btnCopyFiles.Click += new System.EventHandler(this.btnCopyFiles_Click);
+            // 
+            // txtFileDate
+            // 
+            this.txtFileDate.Location = new System.Drawing.Point(111, 292);
+            this.txtFileDate.Name = "txtFileDate";
+            this.txtFileDate.Size = new System.Drawing.Size(100, 20);
+            this.txtFileDate.TabIndex = 17;
+            // 
+            // lblFileDate
+            // 
+            this.lblFileDate.AutoSize = true;
+            this.lblFileDate.Location = new System.Drawing.Point(56, 295);
+            this.lblFileDate.Name = "lblFileDate";
+            this.lblFileDate.Size = new System.Drawing.Size(49, 13);
+            this.lblFileDate.TabIndex = 16;
+            this.lblFileDate.Text = "File Date";
+            // 
+            // monthCalendar2
+            // 
+            this.monthCalendar2.Location = new System.Drawing.Point(111, 110);
+            this.monthCalendar2.Name = "monthCalendar2";
+            this.monthCalendar2.TabIndex = 15;
+            this.monthCalendar2.DateChanged += new System.Windows.Forms.DateRangeEventHandler(this.monthCalendar2_DateChanged);
+            // 
+            // cboIndices2
+            // 
+            this.cboIndices2.FormattingEnabled = true;
+            this.cboIndices2.Location = new System.Drawing.Point(111, 47);
+            this.cboIndices2.Name = "cboIndices2";
+            this.cboIndices2.Size = new System.Drawing.Size(121, 21);
+            this.cboIndices2.TabIndex = 14;
+            this.cboIndices2.SelectedIndexChanged += new System.EventHandler(this.cboIndices2_SelectedIndexChanged);
+            // 
+            // lblOutputType
+            // 
+            this.lblOutputType.AutoSize = true;
+            this.lblOutputType.Location = new System.Drawing.Point(6, 80);
+            this.lblOutputType.Name = "lblOutputType";
+            this.lblOutputType.Size = new System.Drawing.Size(99, 13);
+            this.lblOutputType.TabIndex = 13;
+            this.lblOutputType.Text = "Select Output Type";
+            // 
+            // cboOutputType2
+            // 
+            this.cboOutputType2.FormattingEnabled = true;
+            this.cboOutputType2.Location = new System.Drawing.Point(111, 77);
+            this.cboOutputType2.Name = "cboOutputType2";
+            this.cboOutputType2.Size = new System.Drawing.Size(121, 21);
+            this.cboOutputType2.TabIndex = 12;
+            this.cboOutputType2.SelectedIndexChanged += new System.EventHandler(this.cboOutputType2_SelectedIndexChanged);
+            // 
+            // cboClients
+            // 
+            this.cboClients.FormattingEnabled = true;
+            this.cboClients.Location = new System.Drawing.Point(111, 17);
+            this.cboClients.Name = "cboClients";
+            this.cboClients.Size = new System.Drawing.Size(121, 21);
+            this.cboClients.TabIndex = 1;
+            this.cboClients.SelectedIndexChanged += new System.EventHandler(this.cbClients_SelectedIndexChanged);
+            // 
+            // lblClients
+            // 
+            this.lblClients.AutoSize = true;
+            this.lblClients.Location = new System.Drawing.Point(39, 20);
+            this.lblClients.Name = "lblClients";
+            this.lblClients.Size = new System.Drawing.Size(66, 13);
+            this.lblClients.TabIndex = 0;
+            this.lblClients.Text = "Select Client";
+            // 
+            // lblIndex
+            // 
+            this.lblIndex.AutoSize = true;
+            this.lblIndex.Location = new System.Drawing.Point(39, 50);
+            this.lblIndex.Name = "lblIndex";
+            this.lblIndex.Size = new System.Drawing.Size(66, 13);
+            this.lblIndex.TabIndex = 19;
+            this.lblIndex.Text = "Select Index";
+            // 
+            // lblFileDate2
+            // 
+            this.lblFileDate2.AutoSize = true;
+            this.lblFileDate2.Location = new System.Drawing.Point(23, 110);
+            this.lblFileDate2.Name = "lblFileDate2";
+            this.lblFileDate2.Size = new System.Drawing.Size(82, 13);
+            this.lblFileDate2.TabIndex = 20;
+            this.lblFileDate2.Text = "Select File Date";
+            // 
             // IndexDataForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -378,6 +509,8 @@
             this.tabUnitTest.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);
             this.tabPage1.PerformLayout();
+            this.tabPage2.ResumeLayout(false);
+            this.tabPage2.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -412,6 +545,18 @@
         private System.Windows.Forms.Button btnTestSecMaster;
         private System.Windows.Forms.Button btnTestSecMasterReport;
         private System.Windows.Forms.CheckBox chkLogReturnData;
+        private System.Windows.Forms.TabPage tabPage2;
+        private System.Windows.Forms.ComboBox cboClients;
+        private System.Windows.Forms.Label lblClients;
+        private System.Windows.Forms.ComboBox cboIndices2;
+        private System.Windows.Forms.Label lblOutputType;
+        private System.Windows.Forms.ComboBox cboOutputType2;
+        private System.Windows.Forms.MonthCalendar monthCalendar2;
+        private System.Windows.Forms.Label lblFileDate;
+        private System.Windows.Forms.TextBox txtFileDate;
+        private System.Windows.Forms.Button btnCopyFiles;
+        private System.Windows.Forms.Label lblIndex;
+        private System.Windows.Forms.Label lblFileDate2;
     }
 }
 

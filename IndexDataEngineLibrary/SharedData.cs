@@ -1270,5 +1270,129 @@ namespace IndexDataEngineLibrary
                 LogHelper.WriteLine(logFuncName + " done ");
             }
         }
+
+        public List<string> GetClients()
+        {
+            SqlConnection conn = new SqlConnection(mConnectionStringIndexData);
+            SqlDataReader dr = null;
+            List<string> clients = new List<string>();
+
+            try
+            {
+                string SqlSelect = @"
+                    SELECT distinct ClientID
+                    FROM Clients
+                    ORDER BY ClientID
+                    ";
+                conn.Open();
+                SqlCommand cmd = new SqlCommand(SqlSelect, conn);
+                {
+                    dr = cmd.ExecuteReader();
+                    int i = 0;
+                    while (dr.Read())
+                    {
+                        clients.Add(dr["ClientID"].ToString());
+                        i += 1;
+                    }
+                }
+            }
+            catch (SqlException ex)
+            {
+                LogHelper.WriteLine(ex.Message);
+            }
+
+            finally
+            {
+                dr.Close();
+                conn.Close();
+            }
+            return (clients);
+        }
+
+        public List<string> GetClientIndices( string ClientID)
+        {
+            SqlConnection conn = new SqlConnection(mConnectionStringIndexData);
+            SqlDataReader dr = null;
+            List<string> indices = new List<string>();
+
+            try
+            {
+                string SqlSelect = @"
+                    SELECT distinct v.IndexClientName
+                    FROM JobIndexIds ji
+                    inner join VendorIndexMap v on v.IndexName = ji.IndexName
+                    where ClientID = @ClientID
+                    order by v.IndexClientName
+                    ";
+                conn.Open();
+                SqlCommand cmd = new SqlCommand(SqlSelect, conn);
+                cmd.Parameters.Add("@ClientID", SqlDbType.VarChar);
+                cmd.Parameters["@ClientID"].Value = ClientID;
+                dr = cmd.ExecuteReader();
+                int i = 0;
+                while (dr.Read())
+                {
+                    indices.Add(dr["IndexClientName"].ToString());
+                    i += 1;
+                }
+            }
+            catch (SqlException ex)
+            {
+                LogHelper.WriteLine(ex.Message);
+            }
+
+            finally
+            {
+                dr.Close();
+                conn.Close();
+            }
+            return (indices);
+        }
+
+        public List<string> GetOutputTypes(string ClientID, string IndexName)
+        {
+            SqlConnection conn = new SqlConnection(mConnectionStringIndexData);
+            SqlDataReader dr = null;
+            List<string> indices = new List<string>();
+
+            try
+            {
+                string SqlSelect = @"
+                    select distinct j.InputFormat from jobs j
+                    inner join jobindexids ji on ji.ClientID = j.ClientID and ji.JobName = j.JobName
+                    inner join VendorIndexMap v on v.IndexName = ji.IndexName
+                    where j.clientID = @ClientID and v.IndexClientName = @IndexName
+                    ";
+                conn.Open();
+                SqlCommand cmd = new SqlCommand(SqlSelect, conn);
+                cmd.Parameters.Add("@ClientID", SqlDbType.VarChar);
+                cmd.Parameters["@ClientID"].Value = ClientID;
+                cmd.Parameters.Add("@IndexName", SqlDbType.VarChar);
+                cmd.Parameters["@IndexName"].Value = IndexName;
+                dr = cmd.ExecuteReader();
+                int i = 0;
+                string inputFormat = "";
+                while (dr.Read())
+                {
+                    inputFormat = dr["InputFormat"].ToString();
+                    if(inputFormat.Equals("RussellRGS") || inputFormat.Equals("StandardPoorsGICS"))
+                        indices.Add("Sector");
+                    else if (inputFormat.Equals("RussellSecurity") || inputFormat.Equals("StandardPoorsSecurity"))
+                        indices.Add("Constituent");
+                    i += 1;
+                }
+            }
+            catch (SqlException ex)
+            {
+                LogHelper.WriteLine(ex.Message);
+            }
+
+            finally
+            {
+                dr.Close();
+                conn.Close();
+            }
+            return (indices);
+        }
     }
 }

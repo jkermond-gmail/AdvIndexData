@@ -41,6 +41,12 @@ namespace IndexDataForm
                 timerInterval = defaultTimerInterval;
             else
                 timerInterval = v;
+
+            List<string> clients = null;
+            cboClients.Items.Clear();
+            clients = russellData.GetClients();
+            foreach (string client in clients)
+                cboClients.Items.Add(client);
         }
 
 
@@ -300,6 +306,57 @@ namespace IndexDataForm
         }
 
         #endregion testUI_tFunctionalityNotVisble
+
+        #region CopyClientFile_Functionality
+
+        private void cbClients_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+            List<string> clientIndices = null;
+            cboIndices2.Items.Clear();
+            cboIndices2.SelectedItem = "";
+            cboIndices2.Text = "";
+
+            cboOutputType2.Items.Clear();
+            cboOutputType2.SelectedItem = "";
+            cboOutputType2.Text = "";
+            clientIndices = russellData.GetClientIndices((string)cboClients.SelectedItem);
+            foreach (string clientIndex in clientIndices)
+                cboIndices2.Items.Add(clientIndex);
+        }
+
+        private void monthCalendar2_DateChanged(object sender, DateRangeEventArgs e)
+        {
+            txtFileDate.Text = monthCalendar2.SelectionEnd.ToShortDateString();
+        }
+
+        private void cboIndices2_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            cboOutputType2.Items.Clear();
+            cboOutputType2.SelectedItem = "";
+            cboOutputType2.Text = "";
+            List<string> outputTypes = null;
+            outputTypes = russellData.GetOutputTypes((string)cboClients.SelectedItem, (string)cboIndices2.SelectedItem);
+            foreach (string outputType in outputTypes)
+                cboOutputType2.Items.Add(outputType);
+        }
+
+        private void btnCopyFiles_Click(object sender, EventArgs e)
+        {
+            string vendor = "";
+            if (cboIndices2.Text.StartsWith("r"))
+                vendor = "Russell";
+            else if (cboIndices2.Text.StartsWith("s"))
+                vendor = "Snp";
+
+            russellData.CopyFileToFtpFolder(cboClients.Text, txtFileDate.Text, vendor, cboIndices2.Text, cboOutputType2.Text);
+        }
+
+        private void cboOutputType2_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
+        #endregion CopyClientFile_Functionality
 
     }
 }

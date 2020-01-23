@@ -519,6 +519,51 @@ namespace IndexDataEngineLibrary
             return (Indices);
         }
 
+        public string GetAxmlBatchID( string IndexName)
+        {
+            string AxmlBatchID = "";
+            SqlDataReader dr = null;
+
+            try
+            {
+                if(mSqlConn == null)
+                {
+                    mSqlConn = new SqlConnection(mConnectionStringIndexData);
+                    mSqlConn.Open();
+                }
+
+                string SqlSelect = "select AxmlBatchID from VendorIndexMap ";
+                string SqlWhere = "where IndexClientName = @IndexName";
+
+                SqlCommand cmd = new SqlCommand(SqlSelect + SqlWhere, mSqlConn);
+
+                cmd.Parameters.Add("@IndexName", SqlDbType.VarChar);
+                cmd.Parameters["@IndexName"].Value = IndexName;
+                dr = cmd.ExecuteReader();
+
+                if( dr.HasRows)
+                {
+                    if( dr.Read())
+                    {
+                        AxmlBatchID = dr["AxmlBatchID"].ToString();
+                    }
+                }
+            }
+            catch(SqlException ex)
+            {
+                LogHelper.WriteLine(ex.Message);
+            }
+
+            finally
+            {
+                dr.Close();
+            }
+
+            return (AxmlBatchID);
+        }
+
+
+
         public void AddTotalReturn(string sDate, string sIndexName, string sVendor, string sVendorFormat,
                                    double dReturn, string sWhichReturn)
         {
@@ -674,18 +719,20 @@ namespace IndexDataEngineLibrary
 
             string prefix = "";
             string accountProvider = "";
+
             string batch = "";
-            if (vendor.Equals(Vendors.Snp))
+            string batchID = GetAxmlBatchID(sIndexName);
+            batch = "batch=\"" + batchID + "\">";
+
+            if(vendor.Equals(Vendors.Snp))
             {
                 prefix = "ix-";
                 accountProvider = "<AccountProvider name=\"StandardAndPoors\" code=\"ix\">";
-                batch = "batch=\"7\">";
             }
             else if (vendor.Equals(Vendors.Russell))
             {
                 prefix = "rl-";
                 accountProvider = "<AccountProvider name=\"Russell\" code=\"rl\">";
-                batch = "batch=\"1\">";
             }
 
             if (IsFirstDate && IsLastDate)
@@ -832,7 +879,11 @@ namespace IndexDataEngineLibrary
 
             string prefix = "";
             string accountProvider = "";
+
             string batch = "";
+            string batchID = GetAxmlBatchID(sIndexName);
+            batch = "batch=\"" + batchID + "\">";
+
             string level1Class = "";
             string level2Class = "";
             string level3Class = "";
@@ -842,7 +893,6 @@ namespace IndexDataEngineLibrary
             {
                 prefix = "ix-";
                 accountProvider = "<AccountProvider name=\"StandardAndPoors\" code=\"ix\">";
-                batch = "batch=\"7\">";
                 level1Class = "class=\"GICSSector\"";
                 level2Class = "class=\"GICSIndGrp\"";
                 level3Class = "class=\"GICSIndustry\"";
@@ -852,7 +902,6 @@ namespace IndexDataEngineLibrary
             {
                 prefix = "rl-";
                 accountProvider = "<AccountProvider name=\"Russell\" code=\"rl\">";
-                batch = "batch=\"1\">";
                 level1Class = "class=\"RGSSector\"";
                 level2Class = "class=\"RGSSubSector\"";
                 level3Class = "class=\"RGSIndustry\"";

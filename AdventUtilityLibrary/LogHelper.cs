@@ -104,6 +104,11 @@ namespace AdventUtilityLibrary
             if (swLogFile.BaseStream != null)
             {
                 swLogFile.Flush();
+
+                // Close and re-open the file to update the file's timestamp for production Sitescope monitors
+                swLogFile.Close();
+                bool append = true;
+                swLogFile = new StreamWriter(mLogFileNameWithPath, append);
             }
         }
 

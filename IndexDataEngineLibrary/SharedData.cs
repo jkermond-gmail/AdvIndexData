@@ -67,13 +67,13 @@ namespace IndexDataEngineLibrary
             mConnectionStringAmdVifs = ConfigurationManager.ConnectionStrings["dbConnectionAmdVifs"].ConnectionString;
         }
 
-        public void AddSecurityMasterFull(string Ticker, string Cusip, string Vendor, string CompanyName, string SectorCode, DateTime EndDate)
+        public void AddSecurityMasterFull(string Ticker, string Cusip, string Vendor, string CompanyName, string SectorCode, string Exchange, DateTime EndDate)
         {
-            AddSecurityMasterFull("", Ticker, Cusip, Vendor, CompanyName, SectorCode, EndDate);
+            AddSecurityMasterFull("", Ticker, Cusip, Vendor, CompanyName, SectorCode, Exchange, EndDate);
         }
 
 
-        public void AddSecurityMasterFull(string StockKey, string Ticker, string Cusip, string Vendor, string CompanyName, string SectorCode, DateTime EndDate)
+        public void AddSecurityMasterFull(string StockKey, string Ticker, string Cusip, string Vendor, string CompanyName, string SectorCode, string Exchange, DateTime EndDate)
         {
             try
             {
@@ -154,8 +154,8 @@ namespace IndexDataEngineLibrary
                     cmd.Parameters.Add("@BeginDate", SqlDbType.DateTime);
                     cmd.Parameters["@BeginDate"].Value = EndDate;
                     cmd.CommandText =
-                        "insert into HistoricalSecurityMasterFull (Ticker, Cusip, StockKey, Vendor, CompanyName, SectorCode, BeginDate, EndDate) " +
-                        "Values ( @Ticker, @Cusip, @StockKey, @Vendor, @CompanyName, @SectorCode, @BeginDate, @EndDate ) ";
+                        "insert into HistoricalSecurityMasterFull (Ticker, Cusip, StockKey, Vendor, CompanyName, SectorCode, Exchange, BeginDate, EndDate) " +
+                        "Values ( @Ticker, @Cusip, @StockKey, @Vendor, @CompanyName, @SectorCode, @Exchange, @BeginDate, @EndDate ) ";
                 }
                 else
                 {
@@ -164,6 +164,7 @@ namespace IndexDataEngineLibrary
                         "StockKey = @StockKey, " +
                         "CompanyName = @CompanyName, " +
                         "SectorCode = @SectorCode, " +
+                        "Exchange = @Exchange, " +
                         "EndDate = @EndDate " +
                         "where Ticker = @Ticker and Cusip = @Cusip and Vendor = @Vendor";
                 }
@@ -173,6 +174,8 @@ namespace IndexDataEngineLibrary
                 cmd.Parameters["@CompanyName"].Value = CompanyName;
                 cmd.Parameters.Add("@SectorCode", SqlDbType.VarChar);
                 cmd.Parameters["@SectorCode"].Value = SectorCode;
+                cmd.Parameters.Add("@Exchange", SqlDbType.VarChar);
+                cmd.Parameters["@Exchange"].Value = Exchange;
                 cmd.Parameters.Add("@EndDate", SqlDbType.DateTime);
                 cmd.Parameters["@EndDate"].Value = EndDate;
                 cmd.ExecuteNonQuery();

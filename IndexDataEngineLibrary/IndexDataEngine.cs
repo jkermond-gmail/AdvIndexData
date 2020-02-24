@@ -1037,8 +1037,8 @@ namespace IndexDataEngineLibrary
 
                 cmd.CommandText = @"
                     INSERT INTO HistoricalSecurityMasterFullCopy (
-	                id, Ticker, Cusip, Vendor, StockKey, CompanyName, SectorCode, BeginDate, EndDate)
-	                SELECT id, Ticker, Cusip, Vendor, StockKey, CompanyName, SectorCode, BeginDate, EndDate
+	                id, Ticker, Cusip, Vendor, StockKey, CompanyName, SectorCode, Exchange, BeginDate, EndDate)
+	                SELECT id, Ticker, Cusip, Vendor, StockKey, CompanyName, SectorCode, Exchange, BeginDate, EndDate
 	                FROM HistoricalSecurityMasterFull ORDER BY id
                 ";
                 cmd.ExecuteNonQuery();
@@ -1077,8 +1077,8 @@ namespace IndexDataEngineLibrary
             ";
             string insertText = @"
                 insert into HistoricalSecurityMasterFullChanges
-                (id, ProcessDate, ChangeType, CusipNew, TickerNew, CompanyNameNew, SectorCodeNew)
-                select id, BeginDate, 'Add', Cusip, Ticker, CompanyName, SectorCode from HistoricalSecurityMasterFull where id = @id
+                (id, ProcessDate, ChangeType, CusipNew, TickerNew, CompanyNameNew, SectorCodeNew, ExchangeNew)
+                select id, BeginDate, 'Add', Cusip, Ticker, CompanyName, SectorCode, Exchange from HistoricalSecurityMasterFull where id = @id
             ";
             try
             {
@@ -1125,8 +1125,8 @@ namespace IndexDataEngineLibrary
 
                 insertText = @"
                     insert into HistoricalSecurityMasterFullChanges
-                    (id, ProcessDate, ChangeType, Cusip, Ticker, CompanyName, SectorCode)
-                    select id, @ProcessDate, 'Delete', Cusip, Ticker, CompanyName, SectorCode from HistoricalSecurityMasterFull where id = @id
+                    (id, ProcessDate, ChangeType, Cusip, Ticker, CompanyName, SectorCode, Exchange)
+                    select id, @ProcessDate, 'Delete', Cusip, Ticker, CompanyName, SectorCode, Exchange from HistoricalSecurityMasterFull where id = @id
                 ";
                 cmd2.CommandText = insertText;
                 cmd2.Parameters.Add("@ProcessDate", SqlDbType.Date);
@@ -1153,7 +1153,8 @@ namespace IndexDataEngineLibrary
                     inner join HistoricalSecurityMasterFullCopy hprev on h.id = hprev.id
                     where h.EndDate = @ProcessDate and hprev.EndDate = @PrevProcessDate
                     and h.Vendor = 'R' and hprev.Vendor = 'R' 
-                    and (h.Ticker<> hprev.Ticker OR h.Cusip<> hprev.Cusip or h.CompanyName<> hprev.CompanyName or h.SectorCode<> hprev.SectorCode)
+                    and (h.Ticker <> hprev.Ticker OR h.Cusip <> hprev.Cusip or h.CompanyName <> hprev.CompanyName or h.SectorCode <> hprev.SectorCode
+                    or h.Exchange <> hprev.Exchange)
                 ";
                 cmd.CommandText = selectText;
                 cmd.Parameters.Add("@ProcessDate", SqlDbType.Date);
@@ -1161,8 +1162,9 @@ namespace IndexDataEngineLibrary
 
                 insertText = @"
                     insert into HistoricalSecurityMasterFullChanges
-                    (id, ProcessDate, ChangeType, Cusip, CusipNew, Ticker, TickerNew, CompanyName, CompanyNameNew, SectorCode, SectorCodeNew)
-                    select h.id, h.EndDate, 'Update', hprev.Cusip, h.Cusip, hprev.Ticker, h.Ticker, hprev.CompanyName, h.CompanyName, hprev.SectorCode, h.SectorCode
+                    (id, ProcessDate, ChangeType, Cusip, CusipNew, Ticker, TickerNew, CompanyName, CompanyNameNew, SectorCode, SectorCodeNew, Exchange, ExchangeNew)
+                    select h.id, h.EndDate, 'Update', hprev.Cusip, h.Cusip, hprev.Ticker, h.Ticker, hprev.CompanyName, h.CompanyName, 
+                    hprev.SectorCode, h.SectorCode, hprev.Exchange, h.Exchange
 	                from HistoricalSecurityMasterFull h
                     inner join HistoricalSecurityMasterFullCopy hprev on h.id = hprev.id
                     where h.id = @id and hprev.id = @id
@@ -1230,8 +1232,8 @@ namespace IndexDataEngineLibrary
 
             using (StreamWriter file = new StreamWriter(filename))
             {
-                file.WriteLine("Date     Action Cusip     New Cusip  Ticker     New Ticker Name                      New Name                  Sector  New Sector");
-                file.WriteLine("-------- ------ --------- ---------- ---------- ---------- ------------------------- ------------------------- ------- ----------");
+                file.WriteLine("Date     Action Cusip     New Cusip  Ticker     New Ticker Name                      New Name                  Sector  New Sector Exchange     New Exchange ");
+                file.WriteLine("-------- ------ --------- ---------- ---------- ---------- ------------------------- ------------------------- ------- ---------- ------------ ------------");
             }
 
             SqlCommand cmd = null;
@@ -1279,8 +1281,13 @@ namespace IndexDataEngineLibrary
                             SectorCode = SectorCode.PadRight(7 + 1);
                             string SectorCodeNew = GetColString(dr, "SectorCodeNew");
                             SectorCodeNew = SectorCodeNew.PadRight(7 + 1);
+                            string Exchange = GetColString(dr, "Exchange");
+                            Exchange = Exchange.PadRight(12 + 1);
+                            string ExchangeNew = GetColString(dr, "ExchangeNew");
+                            ExchangeNew = ExchangeNew.PadRight(12 + 1);
 
-                            file.WriteLine(ProcessDate + ChangeType + Cusip + CusipNew + Ticker + TickerNew + CompanyName + CompanyNameNew + SectorCode + SectorCodeNew);
+                            file.WriteLine(ProcessDate + ChangeType + Cusip + CusipNew + Ticker + TickerNew + CompanyName + CompanyNameNew + SectorCode + SectorCodeNew
+                                           + Exchange + ExchangeNew);
                         }
                     }
                     else

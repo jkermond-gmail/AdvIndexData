@@ -687,6 +687,7 @@ RU3000    20170103   CHF   1662.25918   1365.02441   1696.48181   1567.99955    
                     string sTicker = "";
                     string sCompanyName = "";
                     string sSector = "";
+                    string sExchange = "";
 
                     if (ok)
                     {
@@ -744,11 +745,14 @@ RU3000    20170103   CHF   1662.25918   1365.02441   1696.48181   1567.99955    
                         Fld = GetField(TextLine, 278, 7);
                         drHoldings1["Sector"] = Fld;
                         sSector = Fld;
+
+                        Fld = GetField(TextLine, 42, 12);
+                        sExchange = Fld;
                     }
 
                     if (ok)
                     {
-                        sharedData.AddSecurityMasterFull(sTicker, sCUSIP, "R", sCompanyName, sSector, oDate);
+                        sharedData.AddSecurityMasterFull(sTicker, sCUSIP, "R", sCompanyName, sSector, sExchange, oDate);
 
                         if (r1000.Equals("Y"))
                         {

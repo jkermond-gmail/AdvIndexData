@@ -698,8 +698,9 @@ _SPMLP.SDL
                     cmd.Parameters["@Weight"].Value = sValue;
 
                     string sCompanyName = ParseColumn(dr, "COMPANY");
+                    string sExchange = "";
 
-                    sharedData.AddSecurityMasterFull(sStockKey, sTicker, sCUSIP, "S", sCompanyName, sSector, oDate);
+                    sharedData.AddSecurityMasterFull(sStockKey, sTicker, sCUSIP, "S", sCompanyName, sSector, sExchange, oDate);
 
                     try
                     {

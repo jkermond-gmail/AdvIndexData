@@ -1210,11 +1210,11 @@ namespace IndexDataEngineLibrary
         20190520 Update 90539J109  04911A107 UBSH       AUB        NASDAQ                    N Y Y N N Y Y N                         UNION BANKSHARES CORP      ATLANTIC UNION BANKSHARE 10            1010              1010400           
         20190520 Update 91914N202  91914N301 VLRX                  NASDAQ                    N N N N N N N Y                         VALERITAS HOLDINGS INC                              02            0220              0220471           
 
-            new report from new production version Nov 2019
+            new report from new production version Mar 2020
 
-        Date     Action Cusip     New Cusip  Ticker     New Ticker Name                      New Name                  Sector  New Sector
-        -------- ------ --------- ---------- ---------- ---------- ------------------------- ------------------------- ------- ----------
-        20190904 Add              01234567              ATest                                Atest Co                          1234567 
+        Date     Action Cusip     New Cusip  Ticker     New Ticker Name                      New Name                  Sector  New Sector Exchange     New Exchange 
+        -------- ------ --------- ---------- ---------- ---------- ------------------------- ------------------------- ------- ---------- ------------ ------------"
+        20190904 Add              01234567              ATest                                Atest Co                          1234567    NYSE         NASDAQ
         20190904 Update 12345678  1234567x   DUMMY      DUMMY      NA                        NA                        1234567 1234567 
         20190904 Update 52603A20  52603A20   LC         LC         LENDINGCLUB CORPORATION   LENDINGCLUB CORPORATIONx  1020489 1020489 
         20190904 Update 69320M10  69320M10   PCB        PCB        PCB BANCORP               PCB BANCORP               1010400 101040x 

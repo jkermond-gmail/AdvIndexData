@@ -948,13 +948,13 @@ namespace IndexDataEngineLibrary
                 /////////////////////////////////////////// Level 1
                 if (addDummyEndOfMonthAxmlBefore)
                 {
-                    file.WriteLine("<XSXPeriod from=\"" + sPrevBusinessDate + "\" through=\"" + sPrevEndOfMonthDate + "\" indexperfiso=\"usd\" " + level1Class + "> ");
+                    file.WriteLine("<XNXPeriod from=\"" + sPrevBusinessDate + "\" through=\"" + sPrevEndOfMonthDate + "\" indexperfiso=\"usd\" " + level1Class + "> ");
                     foreach (IndexRow indexRow in indexRowsSectorLevel1RollUp)
                     {
                         file.WriteLine("<XNXDetail code=\"" + indexRow.SectorLevel1 + "\" weight=\"" + indexRow.Weight.ToString(NumberFormat, mCultureInfo) + "\" irr=\"" + "0" + "\"/>");
                     }
-                    file.WriteLine("</XSXPeriod>");
-                    file.WriteLine("<XSXPeriod from=\"" + sPrevEndOfMonthDate + "\" through=\"" + DateHelper.ConvertToYYYYMMDD(sBusinessDate) + "\" indexperfiso=\"usd\" " + level1Class + "> ");
+                    file.WriteLine("</XNXPeriod>");
+                    file.WriteLine("<XNXPeriod from=\"" + sPrevEndOfMonthDate + "\" through=\"" + DateHelper.ConvertToYYYYMMDD(sBusinessDate) + "\" indexperfiso=\"usd\" " + level1Class + "> ");
                 }
                 else
                 {
@@ -969,24 +969,24 @@ namespace IndexDataEngineLibrary
 
                 if (addDummyEndOfMonthAxmlAfter)
                 {
-                    file.WriteLine("<XSXPeriod from=\"" + DateHelper.ConvertToYYYYMMDD(sBusinessDate) + "\" through=\"" + sEndOfMonthDate + "\" indexperfiso=\"usd\" " + level1Class + "> ");
+                    file.WriteLine("<XNXPeriod from=\"" + DateHelper.ConvertToYYYYMMDD(sBusinessDate) + "\" through=\"" + sEndOfMonthDate + "\" indexperfiso=\"usd\" " + level1Class + "> ");
                     foreach (IndexRow indexRow in indexRowsSectorLevel1RollUp)
                     {
                         file.WriteLine("<XNXDetail code=\"" + indexRow.SectorLevel1 + "\" weight=\"" + indexRow.Weight.ToString(NumberFormat, mCultureInfo) + "\" irr=\"" + "0" + "\"/>");
                     }
-                    file.WriteLine("</XSXPeriod>");
+                    file.WriteLine("</XNXPeriod>");
                 }
 
                 /////////////////////////////////////////// Level 2
                 if (addDummyEndOfMonthAxmlBefore)
                 {
-                    file.WriteLine("<XSXPeriod from=\"" + sPrevBusinessDate + "\" through=\"" + sPrevEndOfMonthDate + "\" indexperfiso=\"usd\" " + level2Class + "> ");
+                    file.WriteLine("<XNXPeriod from=\"" + sPrevBusinessDate + "\" through=\"" + sPrevEndOfMonthDate + "\" indexperfiso=\"usd\" " + level2Class + "> ");
                     foreach (IndexRow indexRow in indexRowsSectorLevel2RollUp)
                     {
                         file.WriteLine("<XNXDetail code=\"" + indexRow.SectorLevel2 + "\" weight=\"" + indexRow.Weight.ToString(NumberFormat, mCultureInfo) + "\" irr=\"" + "0" + "\"/>");
                     }
-                    file.WriteLine("</XSXPeriod>");
-                    file.WriteLine("<XSXPeriod from=\"" + sPrevEndOfMonthDate + "\" through=\"" + DateHelper.ConvertToYYYYMMDD(sBusinessDate) + "\" indexperfiso=\"usd\" " + level2Class + "> ");
+                    file.WriteLine("</XNXPeriod>");
+                    file.WriteLine("<XNXPeriod from=\"" + sPrevEndOfMonthDate + "\" through=\"" + DateHelper.ConvertToYYYYMMDD(sBusinessDate) + "\" indexperfiso=\"usd\" " + level2Class + "> ");
                 }
                 else
                 {
@@ -1001,24 +1001,24 @@ namespace IndexDataEngineLibrary
 
                 if (addDummyEndOfMonthAxmlAfter)
                 {
-                    file.WriteLine("<XSXPeriod from=\"" + DateHelper.ConvertToYYYYMMDD(sBusinessDate) + "\" through=\"" + sEndOfMonthDate + "\" indexperfiso=\"usd\" " + level2Class + "> ");
+                    file.WriteLine("<XNXPeriod from=\"" + DateHelper.ConvertToYYYYMMDD(sBusinessDate) + "\" through=\"" + sEndOfMonthDate + "\" indexperfiso=\"usd\" " + level2Class + "> ");
                     foreach (IndexRow indexRow in indexRowsSectorLevel2RollUp)
                     {
                         file.WriteLine("<XNXDetail code=\"" + indexRow.SectorLevel2 + "\" weight=\"" + indexRow.Weight.ToString(NumberFormat, mCultureInfo) + "\" irr=\"" + "0" + "\"/>");
                     }
-                    file.WriteLine("</XSXPeriod>");
+                    file.WriteLine("</XNXPeriod>");
                 }
 
                 /////////////////////////////////////////// Level 3               
                 if (addDummyEndOfMonthAxmlBefore)
                 {
-                    file.WriteLine("<XSXPeriod from=\"" + sPrevBusinessDate + "\" through=\"" + sPrevEndOfMonthDate + "\" indexperfiso=\"usd\" " + level3Class + "> ");
+                    file.WriteLine("<XNXPeriod from=\"" + sPrevBusinessDate + "\" through=\"" + sPrevEndOfMonthDate + "\" indexperfiso=\"usd\" " + level3Class + "> ");
                     foreach (IndexRow indexRow in indexRowsSectorLevel3RollUp)
                     {
                         file.WriteLine("<XNXDetail code=\"" + indexRow.SectorLevel3 + "\" weight=\"" + indexRow.Weight.ToString(NumberFormat, mCultureInfo) + "\" irr=\"" + "0" + "\"/>");
                     }
-                    file.WriteLine("</XSXPeriod>");
-                    file.WriteLine("<XSXPeriod from=\"" + sPrevEndOfMonthDate + "\" through=\"" + DateHelper.ConvertToYYYYMMDD(sBusinessDate) + "\" indexperfiso=\"usd\" " + level3Class + "> ");
+                    file.WriteLine("</XNXPeriod>");
+                    file.WriteLine("<XNXPeriod from=\"" + sPrevEndOfMonthDate + "\" through=\"" + DateHelper.ConvertToYYYYMMDD(sBusinessDate) + "\" indexperfiso=\"usd\" " + level3Class + "> ");
                 }
                 else
                 {
@@ -1033,12 +1033,12 @@ namespace IndexDataEngineLibrary
 
                 if (addDummyEndOfMonthAxmlAfter)
                 {
-                    file.WriteLine("<XSXPeriod from=\"" + DateHelper.ConvertToYYYYMMDD(sBusinessDate) + "\" through=\"" + sEndOfMonthDate + "\" indexperfiso=\"usd\" " + level3Class + "> ");
+                    file.WriteLine("<XNXPeriod from=\"" + DateHelper.ConvertToYYYYMMDD(sBusinessDate) + "\" through=\"" + sEndOfMonthDate + "\" indexperfiso=\"usd\" " + level3Class + "> ");
                     foreach (IndexRow indexRow in indexRowsSectorLevel3RollUp)
                     {
                         file.WriteLine("<XNXDetail code=\"" + indexRow.SectorLevel3 + "\" weight=\"" + indexRow.Weight.ToString(NumberFormat, mCultureInfo) + "\" irr=\"" + "0" + "\"/>");
                     }
-                    file.WriteLine("</XSXPeriod>");
+                    file.WriteLine("</XNXPeriod>");
                 }
 
                 /////////////////////////////////////////// Level 4
@@ -1047,13 +1047,13 @@ namespace IndexDataEngineLibrary
 
                     if (addDummyEndOfMonthAxmlBefore)
                     {
-                        file.WriteLine("<XSXPeriod from=\"" + sPrevBusinessDate + "\" through=\"" + sPrevEndOfMonthDate + "\" indexperfiso=\"usd\" " + level4Class + "> ");
+                        file.WriteLine("<XNXPeriod from=\"" + sPrevBusinessDate + "\" through=\"" + sPrevEndOfMonthDate + "\" indexperfiso=\"usd\" " + level4Class + "> ");
                         foreach (IndexRow indexRow in indexRowsSectorLevel4RollUp)
                         {
                             file.WriteLine("<XNXDetail code=\"" + indexRow.SectorLevel4 + "\" weight=\"" + indexRow.Weight.ToString(NumberFormat, mCultureInfo) + "\" irr=\"" + "0" + "\"/>");
                         }
-                        file.WriteLine("</XSXPeriod>");
-                        file.WriteLine("<XSXPeriod from=\"" + sPrevEndOfMonthDate + "\" through=\"" + DateHelper.ConvertToYYYYMMDD(sBusinessDate) + "\" indexperfiso=\"usd\" " + level4Class + "> ");
+                        file.WriteLine("</XNXPeriod>");
+                        file.WriteLine("<XNXPeriod from=\"" + sPrevEndOfMonthDate + "\" through=\"" + DateHelper.ConvertToYYYYMMDD(sBusinessDate) + "\" indexperfiso=\"usd\" " + level4Class + "> ");
                     }
                     else
                     {
@@ -1068,12 +1068,12 @@ namespace IndexDataEngineLibrary
 
                     if (addDummyEndOfMonthAxmlAfter)
                     {
-                        file.WriteLine("<XSXPeriod from=\"" + DateHelper.ConvertToYYYYMMDD(sBusinessDate) + "\" through=\"" + sEndOfMonthDate + "\" indexperfiso=\"usd\" " + level4Class + "> ");
+                        file.WriteLine("<XNXPeriod from=\"" + DateHelper.ConvertToYYYYMMDD(sBusinessDate) + "\" through=\"" + sEndOfMonthDate + "\" indexperfiso=\"usd\" " + level4Class + "> ");
                         foreach (IndexRow indexRow in indexRowsSectorLevel4RollUp)
                         {
                             file.WriteLine("<XNXDetail code=\"" + indexRow.SectorLevel4 + "\" weight=\"" + indexRow.Weight.ToString(NumberFormat, mCultureInfo) + "\" irr=\"" + "0" + "\"/>");
                         }
-                        file.WriteLine("</XSXPeriod>");
+                        file.WriteLine("</XNXPeriod>");
                     }
                 }
             }

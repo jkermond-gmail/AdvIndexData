@@ -106,7 +106,7 @@ namespace IndexDataEngineLibrary
             InitializeProcessStatus(sVifsProcessDate);
             testing = true;
             ProcessIndexDataDatasets(sVifsProcessDate, false);
-            ProcessIndexDataDatasets(sVifsProcessDate, false); // A second call will make sure the sp 900, 1000, and 1500 are complete
+            //ProcessIndexDataDatasets(sVifsProcessDate, false); // A second call will make sure the sp 900, 1000, and 1500 are complete
             EndSql();
         }
 
@@ -536,6 +536,22 @@ namespace IndexDataEngineLibrary
                     TimeSpan end = new TimeSpan(21, 5, 0);      // 9:05PM
 
                     if ((timeOfDay >= start) && (timeOfDay <= end))
+                    {
+                        GenerateStatusReport(sProcessDate);
+                    }
+
+                    start = new TimeSpan(22, 0, 0);    // 10:00PM
+                    end = new TimeSpan(22, 5, 0);      // 10:05PM
+
+                    if((timeOfDay >= start) && (timeOfDay <= end))
+                    {
+                        GenerateStatusReport(sProcessDate);
+                    }
+
+                    start = new TimeSpan(21, 0, 0);    // 11:00PM
+                    end = new TimeSpan(21, 5, 0);      // 11:05PM
+
+                    if((timeOfDay >= start) && (timeOfDay <= end))
                     {
                         GenerateStatusReport(sProcessDate);
                         setSystemSettingValue("StatusReportDate", sProcessDate, cnSqlIndexData);
@@ -1280,7 +1296,7 @@ namespace IndexDataEngineLibrary
                             string SectorCode = GetColString(dr, "SectorCode");
                             SectorCode = SectorCode.PadRight(7 + 1);
                             string SectorCodeNew = GetColString(dr, "SectorCodeNew");
-                            SectorCodeNew = SectorCodeNew.PadRight(7 + 1);
+                            SectorCodeNew = SectorCodeNew.PadRight(7 + 4);
                             string Exchange = GetColString(dr, "Exchange");
                             Exchange = Exchange.PadRight(12 + 1);
                             string ExchangeNew = GetColString(dr, "ExchangeNew");

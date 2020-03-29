@@ -26,7 +26,8 @@ namespace AdventUtilityLibrary
             {
                 MailMessage mail = new MailMessage();
                 SmtpClient SmtpServer = new SmtpClient();
-                mail.To.Add("jkermond@advent.com");
+                mail.To.Add("jkermond@sscinc.com");
+                mail.To.Add("ebytchkova@sscinc.com");
                 mail.From = new MailAddress("advindexdata@hubdata.com");
                 mail.Subject = subject;
                 mail.IsBodyHtml = false;

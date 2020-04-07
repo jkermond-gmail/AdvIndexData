@@ -125,9 +125,12 @@ namespace IndexDataEngineLibrary
 
             IndexDataProcessDate = DateTime.ParseExact(sIndexDataProcessDate, "MM/dd/yyyy", CultureInfo.InvariantCulture);
 
-            GenerateStatusReportIfNeeded(sVifsProcessDate);
+            GenerateStatusReportIfNeeded(sVifsProcessDate, 21); //9PM
+            GenerateStatusReportIfNeeded(sVifsProcessDate, 22); //10PM
+            GenerateStatusReportIfNeeded(sVifsProcessDate, 23); //11PM
 
-            if (VifsProcessDate.Date > IndexDataProcessDate.Date)
+
+            if(VifsProcessDate.Date > IndexDataProcessDate.Date)
             {
                 // Initialize everything cuz its a new day
                 LogHelper.ArchiveLog(IndexDataProcessDate.Date);
@@ -522,39 +525,25 @@ namespace IndexDataEngineLibrary
         }
 
 
-        private void GenerateStatusReportIfNeeded(string sProcessDate)
+        private void GenerateStatusReportIfNeeded(string sProcessDate, int Hour)
         {
-            string sReportDate = getSystemSettingValue("StatusReportDate", cnSqlIndexData);
+            string sReportDate = getSystemSettingValue("StatusReportDate" + Hour.ToString(), cnSqlIndexData); 
             DateTime reportDate = DateTime.ParseExact(sReportDate, "MM/dd/yyyy", CultureInfo.InvariantCulture);
-            if( reportDate < IndexDataProcessDate)
+            DateTime now = DateTime.Now;
+
+            if(reportDate < IndexDataProcessDate)
             {
-                DateTime now = DateTime.Now;
-                if (now.Hour <= 21)
+                
+                if(now.Hour <= Hour)
                 {
                     TimeSpan timeOfDay = DateTime.Now.TimeOfDay;
-                    TimeSpan start = new TimeSpan(21, 0, 0);    // 9:00PM
-                    TimeSpan end = new TimeSpan(21, 5, 0);      // 9:05PM
-
-                    if ((timeOfDay >= start) && (timeOfDay <= end))
-                    {
-                        GenerateStatusReport(sProcessDate);
-                    }
-
-                    start = new TimeSpan(22, 0, 0);    // 10:00PM
-                    end = new TimeSpan(22, 5, 0);      // 10:05PM
+                    TimeSpan start = new TimeSpan(Hour, 0, 0);    // Hour:00PM
+                    TimeSpan end = new TimeSpan(Hour, 5, 0);      // Hour:05PM
 
                     if((timeOfDay >= start) && (timeOfDay <= end))
                     {
                         GenerateStatusReport(sProcessDate);
-                    }
-
-                    start = new TimeSpan(21, 0, 0);    // 11:00PM
-                    end = new TimeSpan(21, 5, 0);      // 11:05PM
-
-                    if((timeOfDay >= start) && (timeOfDay <= end))
-                    {
-                        GenerateStatusReport(sProcessDate);
-                        setSystemSettingValue("StatusReportDate", sProcessDate, cnSqlIndexData);
+                        setSystemSettingValue("StatusReportDate" + Hour.ToString(), sProcessDate, cnSqlIndexData);
                     }
                 }
             }

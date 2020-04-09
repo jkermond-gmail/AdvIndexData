@@ -532,9 +532,8 @@ namespace IndexDataEngineLibrary
             DateTime now = DateTime.Now;
 
             if(reportDate < IndexDataProcessDate)
-            {
-                
-                if(now.Hour <= Hour)
+            {                
+                if(now.Hour.Equals(Hour))
                 {
                     TimeSpan timeOfDay = DateTime.Now.TimeOfDay;
                     TimeSpan start = new TimeSpan(Hour, 0, 0);    // Hour:00PM

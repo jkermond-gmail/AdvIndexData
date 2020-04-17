@@ -1236,8 +1236,8 @@ namespace IndexDataEngineLibrary
 
             using (StreamWriter file = new StreamWriter(filename))
             {
-                file.WriteLine("Date     Action Cusip     New Cusip  Ticker     New Ticker Name                      New Name                  Sector  New Sector Exchange     New Exchange ");
-                file.WriteLine("-------- ------ --------- ---------- ---------- ---------- ------------------------- ------------------------- ------- ---------- ------------ ------------");
+                file.WriteLine("Date     Action Cusip      New Cusip   Ticker     New Ticker Name                      New Name                  Sector  New Sector Exchange     New Exchange ");
+                file.WriteLine("-------- ------ ---------- ----------- ---------- ---------- ------------------------- ------------------------- ------- ---------- ------------ ------------");
             }
 
             SqlCommand cmd = null;
@@ -1270,9 +1270,11 @@ namespace IndexDataEngineLibrary
                             string ChangeType = GetColString(dr, "ChangeType");
                             ChangeType = ChangeType.PadRight(6 + 1);
                             string Cusip = GetColString(dr, "Cusip");
-                            Cusip = Cusip.PadRight(9 + 1);
+                            Cusip = Cusip + CalculateCheckDigit(Cusip);
+                            Cusip = Cusip.PadRight(10 + 1);
                             string CusipNew = GetColString(dr, "CusipNew");
-                            CusipNew = CusipNew.PadRight(9 + 2);
+                            CusipNew = CusipNew + CalculateCheckDigit(CusipNew);
+                            CusipNew = CusipNew.PadRight(10 + 2);
                             string Ticker = GetColString(dr, "Ticker");
                             Ticker = Ticker.PadRight(10 + 1);
                             string TickerNew = GetColString(dr, "TickerNew");
@@ -1311,6 +1313,36 @@ namespace IndexDataEngineLibrary
             }
 
             return;
+        }
+
+        public static string CalculateCheckDigit(string cusip)
+        {
+            int sum = 0;
+            char[] digits = cusip.ToUpper().ToCharArray();
+            string alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ*@#";
+            string checkDigit = "";
+
+            if(cusip.Length.Equals(8))
+            {
+                for(int i = 0; i < digits.Length; i++)
+                {
+                    int val;
+                    if(!int.TryParse(digits[i].ToString(), out val))
+                        val = alphabet.IndexOf(digits[i]) + 10;
+
+                    if((i % 2) != 0)
+                        val *= 2;
+
+                    val = (val % 10) + (val / 10);
+
+                    sum += val;
+                }
+
+                int check = (10 - (sum % 10)) % 10;
+                checkDigit = check.ToString();
+            }
+
+            return(checkDigit);
         }
 
         public static string GetColString(SqlDataReader dr, string colName)

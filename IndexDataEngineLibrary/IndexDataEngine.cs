@@ -1043,7 +1043,9 @@ namespace IndexDataEngineLibrary
                     INSERT INTO HistoricalSecurityMasterFullCopy (
 	                id, Ticker, Cusip, Vendor, StockKey, CompanyName, SectorCode, Exchange, BeginDate, EndDate)
 	                SELECT id, Ticker, Cusip, Vendor, StockKey, CompanyName, SectorCode, Exchange, BeginDate, EndDate
-	                FROM HistoricalSecurityMasterFull ORDER BY id
+	                FROM HistoricalSecurityMasterFull  
+                    WHERE Vendor = 'R' 
+                    ORDER BY id
                 ";
                 cmd.ExecuteNonQuery();
                 LogHelper.WriteLine("Insert is done");
@@ -1077,7 +1079,7 @@ namespace IndexDataEngineLibrary
             // First Get the new adds
             string selectText = @"
                 select id from HistoricalSecurityMasterFull where id not in 
-                (select id from HistoricalSecurityMasterFullCopy)
+                (select id from HistoricalSecurityMasterFullCopy) and Vendor = 'R'
             ";
             string insertText = @"
                 insert into HistoricalSecurityMasterFullChanges
@@ -1121,7 +1123,7 @@ namespace IndexDataEngineLibrary
                 string sPrevProcessDate = DateHelper.PrevBusinessDayMMDDYYYY_Slash(sProcessDate);
                 selectText = @"
                     select id from HistoricalSecurityMasterFullCopy where EndDate = @PrevProcessDate and id in
-                    (select id from HistoricalSecurityMasterFull where EndDate = @PrevProcessDate)
+                    (select id from HistoricalSecurityMasterFull where EndDate = @PrevProcessDate and Vendor = 'R')
                 ";
                 cmd.CommandText = selectText;
                 cmd.Parameters.Add("@PrevProcessDate", SqlDbType.Date);

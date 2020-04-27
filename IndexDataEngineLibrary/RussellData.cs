@@ -1192,7 +1192,7 @@ RU3000    20170103   CHF   1662.25918   1365.02441   1696.48181   1567.99955    
             {
                 cnSql.Open();
                 string SqlSelect = @"
-                    SELECT oldSymbol FROM HistoricalCusipChanges WHERE newSymbol = @newSymbol
+                    SELECT oldSymbol FROM HistoricalSymbolChanges WHERE newSymbol = @newSymbol
                     ";
 
                 SqlCommand cmd = new SqlCommand(SqlSelect, cnSql);

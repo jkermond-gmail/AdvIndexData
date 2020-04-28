@@ -302,7 +302,6 @@ namespace IndexDataEngineLibrary
                    ; (DateCompare = oProcessDate.CompareTo(oEndDate)) <= 0
                    ; oProcessDate = oProcessDate.AddDays(1))
                 {
-                    //DateHelper.IsHoliday(oProcessDate);                    
                     if (bOpenFiles || bSymbolChanges)
                     {
                         FileName = FilePath + "H_OPEN_R3000E_" + oProcessDate.ToString("yyyyMMdd") + "_RGS.TXT";
@@ -325,14 +324,23 @@ namespace IndexDataEngineLibrary
                         }
                     }
 
-                    if (bCloseFiles)
+                    if (bCloseFiles || bSymbolChanges)
                     {
                         FileName = FilePath + "H_" + oProcessDate.ToString("yyyyMMdd") + "_RGS_R3000E.TXT";
                         if (File.Exists(FileName))
                         {
                             LogHelper.WriteLine("Processing: " + FileName + " " + DateTime.Now);
-                            AddRussellClosingData(VendorFileFormats.H_CLOSE_RGS, FileName, oProcessDate);
-                            ProcessStatus.Update(oProcessDate, Vendors.Russell.ToString(), Dataset, "", ProcessStatus.WhichStatus.CloseData, ProcessStatus.StatusValue.Pass);
+                            if (bCloseFiles)
+                            { 
+                                AddRussellClosingData(VendorFileFormats.H_CLOSE_RGS, FileName, oProcessDate);
+                                ProcessStatus.Update(oProcessDate, Vendors.Russell.ToString(), Dataset, "", ProcessStatus.WhichStatus.CloseData, ProcessStatus.StatusValue.Pass);                            
+                            }
+                            if(bSymbolChanges)
+                            {
+                                AddRussellSymbolChangeData(VendorFileFormats.H_CLOSE_RGS, FileName, oProcessDate);
+                                ProcessStatus.Update(oProcessDate, Vendors.Russell.ToString(), Dataset, "", ProcessStatus.WhichStatus.SymbolChangeData, ProcessStatus.StatusValue.Pass);
+                            }
+
                             LogHelper.WriteLine("Done      : " + FileName + " " + DateTime.Now);
                         }
                     }
@@ -487,13 +495,7 @@ namespace IndexDataEngineLibrary
 
         private void AddRussellSymbolChangeData(VendorFileFormats FileFormat, string FileName, DateTime FileDate)
         {
-
             string[] sIndices = GetVendorIndices();
-            //foreach (string sIndex in sIndices)
-            //{
-            //    DeleteTotalReturn(FileDate, sIndex);
-            //}
-
             bool bTotalCount = false;
             bool bHeader1 = false;
             bool bHeader2 = false;

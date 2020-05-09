@@ -58,6 +58,8 @@
             this.lblEndDate = new System.Windows.Forms.Label();
             this.lblStartDate = new System.Windows.Forms.Label();
             this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.lblFileDate2 = new System.Windows.Forms.Label();
+            this.lblIndex = new System.Windows.Forms.Label();
             this.btnCopyFiles = new System.Windows.Forms.Button();
             this.txtFileDate = new System.Windows.Forms.TextBox();
             this.lblFileDate = new System.Windows.Forms.Label();
@@ -67,8 +69,6 @@
             this.cboOutputType2 = new System.Windows.Forms.ComboBox();
             this.cboClients = new System.Windows.Forms.ComboBox();
             this.lblClients = new System.Windows.Forms.Label();
-            this.lblIndex = new System.Windows.Forms.Label();
-            this.lblFileDate2 = new System.Windows.Forms.Label();
             this.tabUnitTest.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tabPage2.SuspendLayout();
@@ -181,7 +181,6 @@
             this.btnTestSecMasterReport.TabIndex = 19;
             this.btnTestSecMasterReport.Text = "Test Sec Master Report";
             this.btnTestSecMasterReport.UseVisualStyleBackColor = true;
-            this.btnTestSecMasterReport.Visible = false;
             this.btnTestSecMasterReport.Click += new System.EventHandler(this.btnTestSecMasterReport_Click);
             // 
             // btnTestSecMaster
@@ -400,6 +399,24 @@
             this.tabPage2.Text = "Copy Client Files";
             this.tabPage2.UseVisualStyleBackColor = true;
             // 
+            // lblFileDate2
+            // 
+            this.lblFileDate2.AutoSize = true;
+            this.lblFileDate2.Location = new System.Drawing.Point(23, 110);
+            this.lblFileDate2.Name = "lblFileDate2";
+            this.lblFileDate2.Size = new System.Drawing.Size(82, 13);
+            this.lblFileDate2.TabIndex = 20;
+            this.lblFileDate2.Text = "Select File Date";
+            // 
+            // lblIndex
+            // 
+            this.lblIndex.AutoSize = true;
+            this.lblIndex.Location = new System.Drawing.Point(39, 50);
+            this.lblIndex.Name = "lblIndex";
+            this.lblIndex.Size = new System.Drawing.Size(66, 13);
+            this.lblIndex.TabIndex = 19;
+            this.lblIndex.Text = "Select Index";
+            // 
             // btnCopyFiles
             // 
             this.btnCopyFiles.Location = new System.Drawing.Point(111, 337);
@@ -477,24 +494,6 @@
             this.lblClients.Size = new System.Drawing.Size(66, 13);
             this.lblClients.TabIndex = 0;
             this.lblClients.Text = "Select Client";
-            // 
-            // lblIndex
-            // 
-            this.lblIndex.AutoSize = true;
-            this.lblIndex.Location = new System.Drawing.Point(39, 50);
-            this.lblIndex.Name = "lblIndex";
-            this.lblIndex.Size = new System.Drawing.Size(66, 13);
-            this.lblIndex.TabIndex = 19;
-            this.lblIndex.Text = "Select Index";
-            // 
-            // lblFileDate2
-            // 
-            this.lblFileDate2.AutoSize = true;
-            this.lblFileDate2.Location = new System.Drawing.Point(23, 110);
-            this.lblFileDate2.Name = "lblFileDate2";
-            this.lblFileDate2.Size = new System.Drawing.Size(82, 13);
-            this.lblFileDate2.TabIndex = 20;
-            this.lblFileDate2.Text = "Select File Date";
             // 
             // IndexDataForm
             // 

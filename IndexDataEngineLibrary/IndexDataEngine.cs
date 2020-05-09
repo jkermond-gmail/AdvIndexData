@@ -1243,12 +1243,23 @@ namespace IndexDataEngineLibrary
             }
 
             SqlCommand cmd = null;
-            string selectText = @"
-                select * from HistoricalSecurityMasterFullChanges where ProcessDate = @ProcessDate
-                order by ChangeType, Cusip
-            ";
+
             try
             {
+                /*
+                Vendor ChangeDate              OldSymbol  NewSymbol  CompanyName
+                ------ ----------------------- ---------- ---------- ------------------------------
+                R      2020-05-07 00:00:00.000 91354310   90278Q10   UFP INDUSTRIES INC
+                R      2020-05-04 00:00:00.000 45782F10   65440510   9 METERS BIOPHARMA INC
+                R      2020-05-04 00:00:00.000 INNT       NMTR       9 METERS BIOPHARMA INC
+                R      2020-04-28 00:00:00.000 DO         DOFSQ      DIAMOND OFFSHR DRILLING
+                R      2020-04-24 00:00:00.000 FTR        FTRCQ      FRONTIER COMMUNICATIONS
+
+                 */
+                string selectText = @"
+                SELECT * FROM
+                  HistoricalSymbolChanges WHERE ChangeDate = @ProcessDate
+                ";
                 cmd = new SqlCommand
                 {
                     Connection = cnSqlIndexData,
@@ -1265,8 +1276,110 @@ namespace IndexDataEngineLibrary
                     {
                         while (dr.Read())
                         {
-                            string ProcessDate = GetColString(dr, "ProcessDate");
+                            string ProcessDate = GetColString(dr, "ChangeDate");
                             if (ProcessDate.Length > 0)
+                                ProcessDate = DateHelper.ConvertToYYYYMMDD(ProcessDate);
+                            ProcessDate = ProcessDate.PadRight(8 + 1);
+                            string ChangeType = "Update";
+                            ChangeType = ChangeType.PadRight(6 + 1);
+
+                            string Cusip = GetColString(dr, "OldSymbol");
+                            bool isCusipChange = false;
+                            if(Cusip.Length.Equals(8))
+                            {
+                                isCusipChange = true;
+                                Cusip = Cusip + CalculateCheckDigit(Cusip);
+                                Cusip = Cusip.PadRight(10 + 1);
+                            }
+                            else
+                            {
+                                Cusip = "";
+                                Cusip = Cusip.PadRight(10 + 1);
+                            }
+
+                            string CusipNew = GetColString(dr, "NewSymbol");
+                            if(CusipNew.Length.Equals(8))
+                            {
+                                CusipNew = CusipNew + CalculateCheckDigit(CusipNew);
+                                CusipNew = CusipNew.PadRight(10 + 2);
+                            }
+                            else
+                            {
+                                CusipNew = "";
+                                CusipNew = CusipNew.PadRight(10 + 2);
+                            }
+
+                            string Ticker = "";
+                            string TickerNew = "";
+
+                            if( isCusipChange)
+                            {
+                                Ticker = Ticker.PadRight(10 + 1);
+                                TickerNew = TickerNew.PadRight(10 + 1);
+                            }
+                            else
+                            {
+                                Ticker = GetColString(dr, "OldSymbol");
+                                Ticker = Ticker.PadRight(10 + 1);
+                                TickerNew = GetColString(dr, "NewSymbol");
+                                TickerNew = TickerNew.PadRight(10 + 1);
+                            }
+
+
+                            string CompanyName = "";
+                            CompanyName = CompanyName.PadRight(25 + 1);
+                            string CompanyNameNew = GetColString(dr, "CompanyName");
+                            CompanyNameNew = CompanyNameNew.PadRight(25 + 1);
+                            string SectorCode = "";
+                            SectorCode = SectorCode.PadRight(7 + 1);
+                            string SectorCodeNew = "";
+                            SectorCodeNew = SectorCodeNew.PadRight(7 + 4);
+                            string Exchange = "";
+                            Exchange = Exchange.PadRight(12 + 1);
+                            string ExchangeNew = "";
+                            ExchangeNew = ExchangeNew.PadRight(12 + 1);
+
+                            file.WriteLine(ProcessDate + ChangeType + Cusip + CusipNew + Ticker + TickerNew + CompanyName + CompanyNameNew + SectorCode + SectorCodeNew
+                                           + Exchange + ExchangeNew);
+                        }
+                    }
+                    else
+                    {
+                        //file.WriteLine(DateHelper.ConvertToYYYYMMDD(sProcessDate) + " No Ticker or CUSIP Changes");
+                    }
+                }
+                dr.Close();
+                /////////////////////////////////
+                selectText = @"
+                SELECT *
+                  FROM HistoricalSecurityMasterFullChanges
+                  WHERE 
+	                ProcessDate = @ProcessDate
+	                and (id not in (
+	                  SELECT id
+                      FROM HistoricalSecurityMasterFullChanges
+                      WHERE 
+	                  ProcessDate = @ProcessDate
+	                  and (
+	                     (cusip in ( SELECT OldSymbol FROM HistoricalSymbolChanges WHERE ChangeDate = @ProcessDate ))
+	                     or (Ticker in ( SELECT OldSymbol FROM HistoricalSymbolChanges WHERE ChangeDate = @ProcessDate ))
+		                 or (CusipNew in ( SELECT NewSymbol FROM HistoricalSymbolChanges WHERE ChangeDate = @ProcessDate ))
+		                 or (TickerNew in ( SELECT NewSymbol FROM HistoricalSymbolChanges WHERE ChangeDate = @ProcessDate ))
+		                 )
+	                ))
+                ";
+                cmd.CommandText = selectText;
+
+                dr = null;
+                dr = cmd.ExecuteReader();
+                using(StreamWriter file = new StreamWriter(filename, true))
+                {
+                    if(dr.HasRows)
+                    {
+                        while(dr.Read())
+                        {
+                            string ProcessDate = GetColString(dr, "ProcessDate");
+                            if(ProcessDate.Length > 0)
                                 ProcessDate = DateHelper.ConvertToYYYYMMDD(ProcessDate);
                             ProcessDate = ProcessDate.PadRight(8 + 1);
                             string ChangeType = GetColString(dr, "ChangeType");
@@ -1300,10 +1413,11 @@ namespace IndexDataEngineLibrary
                     }
                     else
                     {
-                        file.WriteLine(DateHelper.ConvertToYYYYMMDD(sProcessDate) + " No Changes");
+                        //file.WriteLine(DateHelper.ConvertToYYYYMMDD(sProcessDate) + " No Other Changes");
                     }
                 }
                 dr.Close();
+
             }
             catch (SqlException ex)
             {

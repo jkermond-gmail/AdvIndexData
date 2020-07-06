@@ -16,7 +16,8 @@ namespace IndexDataEngineLibrary
     public enum Vendors
     {
         Russell,
-        Snp
+        Snp,
+        RussellIcb
     }
 
     public enum AdventOutputType

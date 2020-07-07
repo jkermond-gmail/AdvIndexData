@@ -9,6 +9,7 @@ using System.Data;
 using System.Globalization;
 
 using AdventUtilityLibrary;
+using LumenWorks.Framework.IO.Csv;
 
 
 namespace IndexDataEngineLibrary
@@ -34,6 +35,7 @@ namespace IndexDataEngineLibrary
         private List<IndexRow> indexRowsSectorLevel1RollUp = new List<IndexRow>();
         private List<IndexRow> indexRowsSectorLevel2RollUp = new List<IndexRow>();
         private List<IndexRow> indexRowsSectorLevel3RollUp = new List<IndexRow>();
+        private List<IndexRow> indexRowsSectorLevel4RollUp = new List<IndexRow>();
 
         private const string NumberFormat = "0.#########";
 
@@ -41,15 +43,15 @@ namespace IndexDataEngineLibrary
 
         private enum VendorFileFormats
         {
-            H_OPEN_RGS,
-            H_CLOSE_RGS,
+            H_OPEN_ICB,
+            H_CLOSE_ICB,
             ALL
         }
 
         private int[] VendorFileRecLengths = new int[]
         {
-            605,    //  H_OPEN_RGS
-            591,    //  H_CLOSE_RGS
+            605,    //  H_OPEN_ICB
+            591,    //  H_CLOSE_ICB
             153    //  ALL
         };
 
@@ -214,7 +216,7 @@ namespace IndexDataEngineLibrary
                 cnSql.Open();
                 string SqlSelect = @"
                     SELECT     TOP 1 FileDate, VendorTotal, AdventTotal
-                    FROM         RussellDailyTotals
+                    FROM         RussellIcbDailyTotals
                     WHERE     (FileType = 'open')
                     ORDER BY FileDate desc
                     ";
@@ -235,7 +237,7 @@ namespace IndexDataEngineLibrary
 
                 SqlSelect = @"
                     SELECT     TOP 1 FileDate, VendorTotal, AdventTotal
-                    FROM         RussellDailyTotals
+                    FROM         RussellIcbDailyTotals
                     WHERE     (FileType = 'close')
                     ORDER BY FileDate desc
                     ";
@@ -290,7 +292,7 @@ namespace IndexDataEngineLibrary
         {
             DateTime oProcessDate;
             int DateCompare;
-            string FilePath = AppSettings.Get<string>("VifsPath.Russell");
+            string FilePath = AppSettings.Get<string>("VifsPath.RussellIcb");
             string FileName;
             string sMsg = "ProcessVendorFiles: ";
 
@@ -304,49 +306,51 @@ namespace IndexDataEngineLibrary
                 {
                     if(bOpenFiles || bSymbolChanges)
                     {
-                        FileName = FilePath + "H_OPEN_R3000E_" + oProcessDate.ToString("yyyyMMdd") + "_RGS.TXT";
+                        FileName = FilePath + "H_OPEN_R3000E_" + oProcessDate.ToString("yyyyMMdd") + ".csv";
                         if(File.Exists(FileName))
                         {
                             LogHelper.WriteLine("Processing: " + FileName + " " + DateTime.Now);
                             if(bOpenFiles)
                             {
-                                AddRussellOpeningData(VendorFileFormats.H_OPEN_RGS, FileName, oProcessDate);
+                                AddRussellOpeningData(VendorFileFormats.H_OPEN_ICB, FileName, oProcessDate);
                                 ProcessStatus.Update(oProcessDate, Vendors.Russell.ToString(), Dataset, "", ProcessStatus.WhichStatus.OpenData, ProcessStatus.StatusValue.Pass);
                                 ProcessStatus.Update(oProcessDate, Vendors.Russell.ToString(), Dataset, "", ProcessStatus.WhichStatus.SecurityMasterData, ProcessStatus.StatusValue.Pass);
 
                             }
-                            if(bSymbolChanges)
-                            {
-                                AddRussellSymbolChangeData(VendorFileFormats.H_OPEN_RGS, FileName, oProcessDate);
-                                ProcessStatus.Update(oProcessDate, Vendors.Russell.ToString(), Dataset, "", ProcessStatus.WhichStatus.SymbolChangeData, ProcessStatus.StatusValue.Pass);
-                            }
+                            //if(bSymbolChanges)
+                            //{
+                            //    AddRussellSymbolChangeData(VendorFileFormats.H_OPEN_ICB, FileName, oProcessDate);
+                            //    ProcessStatus.Update(oProcessDate, Vendors.Russell.ToString(), Dataset, "", ProcessStatus.WhichStatus.SymbolChangeData, ProcessStatus.StatusValue.Pass);
+                            //}
                             LogHelper.WriteLine("Done      : " + FileName + " " + DateTime.Now);
                         }
                     }
 
-                    if(bCloseFiles || bSymbolChanges)
+                    if(bCloseFiles /*|| bSymbolChanges */)
                     {
-                        FileName = FilePath + "H_" + oProcessDate.ToString("yyyyMMdd") + "_RGS_R3000E.TXT";
+                        FileName = FilePath + "H_" + oProcessDate.ToString("yyyyMMdd") + "_R3000E.csv";
                         if(File.Exists(FileName))
                         {
                             LogHelper.WriteLine("Processing: " + FileName + " " + DateTime.Now);
                             if(bCloseFiles)
                             {
-                                AddRussellClosingData(VendorFileFormats.H_CLOSE_RGS, FileName, oProcessDate);
+                                AddRussellClosingData(VendorFileFormats.H_CLOSE_ICB, FileName, oProcessDate);
                                 ProcessStatus.Update(oProcessDate, Vendors.Russell.ToString(), Dataset, "", ProcessStatus.WhichStatus.CloseData, ProcessStatus.StatusValue.Pass);
                             }
+                            /*
                             if(bSymbolChanges)
                             {
                                 AddRussellSymbolChangeData(VendorFileFormats.H_CLOSE_RGS, FileName, oProcessDate);
                                 ProcessStatus.Update(oProcessDate, Vendors.Russell.ToString(), Dataset, "", ProcessStatus.WhichStatus.SymbolChangeData, ProcessStatus.StatusValue.Pass);
                             }
+                            */
 
                             LogHelper.WriteLine("Done      : " + FileName + " " + DateTime.Now);
                         }
                     }
                     if(bTotalReturnFiles)
                     {
-                        FileName = FilePath + "ALL" + oProcessDate.ToString("yyyyMMdd") + ".TXT";
+                        FileName = FilePath + "ALL" + oProcessDate.ToString("yyyyMMdd") + ".csv";
                         if(File.Exists(FileName))
                         {
                             LogHelper.WriteLine("Processing: " + FileName + " " + DateTime.Now);
@@ -383,16 +387,16 @@ namespace IndexDataEngineLibrary
             int AdventTotal = SecuritiesTotal - ZeroSharesTotal;
             LogHelper.WriteLine(FileName + ": SecurityCount " + AdventTotal +
                                 " VendorTotalCount " + VendorTotal + " Zero Shares " + ZeroSharesTotal);
-            //CREATE TABLE dbo.RussellDailyTotals
+            //CREATE TABLE dbo.RussellIcbDailyTotals
             //(
             //    FileType        varchar(50)   COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
             //    FileDate        DateOnly_Type NOT NULL,
             //    FileName        varchar(80)   COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
             //    VendorTotal     int           NOT NULL,
             //    AdventTotal     int           NOT NULL,
-            //    ZeroSharesTotal int           CONSTRAINT DF_RussellDailyTotals_ZeroSharesTotal DEFAULT 0 NOT NULL,
-            //    dateModified    datetime      CONSTRAINT DF_RussellDailyTotals_dateModified DEFAULT getdate() NOT NULL,
-            //    CONSTRAINT PK_RussellDailyTotals
+            //    ZeroSharesTotal int           CONSTRAINT DF_RussellIcbDailyTotals_ZeroSharesTotal DEFAULT 0 NOT NULL,
+            //    dateModified    datetime      CONSTRAINT DF_RussellIcbDailyTotals_dateModified DEFAULT getdate() NOT NULL,
+            //    CONSTRAINT PK_RussellIcbDailyTotals
             //    PRIMARY KEY CLUSTERED (FileType,FileDate)
             //)
 
@@ -402,16 +406,16 @@ namespace IndexDataEngineLibrary
                 string sFileType = "";
                 switch(FileFormat)
                 {
-                    case VendorFileFormats.H_CLOSE_RGS:
+                    case VendorFileFormats.H_CLOSE_ICB:
                         sFileType = "Close";
                         break;
-                    case VendorFileFormats.H_OPEN_RGS:
+                    case VendorFileFormats.H_OPEN_ICB:
                         sFileType = "Open";
                         break;
                 }
                 cnSql.Open();
                 string SqlSelect = @"
-                    select count(*) from RussellDailyTotals
+                    select count(*) from RussellIcbDailyTotals
                     where FileType = @FileType
                     and FileDate = @FileDate
                     ";
@@ -425,14 +429,14 @@ namespace IndexDataEngineLibrary
                 if(iCount == 1)
                 {
                     cmd.CommandText = @"
-                        delete from RussellDailyTotals
+                        delete from RussellIcbDailyTotals
                         where FileType = @FileType
                         and FileDate = @FileDate
                         ";
                     cmd.ExecuteNonQuery();
                 }
                 cmd.CommandText = @"
-                    insert into RussellDailyTotals (FileType, FileDate, FileName, VendorTotal, AdventTotal, ZeroSharesTotal)
+                    insert into RussellIcbDailyTotals (FileType, FileDate, FileName, VendorTotal, AdventTotal, ZeroSharesTotal)
                     Values (@FileType, @FileDate, @FileName, @VendorTotal, @AdventTotal, @ZeroSharesTotal)
                     ";
                 cmd.Parameters.Add("@FileName", SqlDbType.VarChar);
@@ -553,39 +557,37 @@ namespace IndexDataEngineLibrary
             //    DeleteTotalReturn(FileDate, sIndex);
             //}
 
-            StreamReader srFile = null;
-            for(srFile = new StreamReader(FileName)
-               ; srFile.EndOfStream == false
-               ;)
+            DataTable dt = ReadCsvIntoTable(FileName);
+            int i = 0;
+
+            foreach(DataRow dr in dt.Rows)
             {
-                bool IsHeader = false;
-                string sVendorIndex = "";
-                string sAdventIndex = "";
-                string sCurrency = "";
-                string sTotal = "";
-                string TextLine = srFile.ReadLine();
-                /*
+                i += 1;
 
-INDEX     DATE       CRNY  TOTAL        PRICE       100% HEDGED      NET              BAMV                    EMV                    CASH DIV       COUNT
-RU3000    20170103   USD   6792.92649   2466.56602   1972.19108   1860.35653      23369771298.25550      23562268983.97530           597209.90000    2978
-RU3000    20170103   AUD   2206.69607   1812.10850   2256.57456   2081.56375      32274231863.63735      32634721555.08207           827160.52557    2978
-RU3000    20170103   CAD   2292.89757   1882.89599   1820.72665   2162.87713      31340031799.52560      31602893274.75688           801007.77837    2978
-RU3000    20170103   CHF   1662.25918   1365.02441   1696.48181   1567.99955      23751867058.98201      24244396671.06139           614499.12660    2978
+                bool ok = true;
 
-                */
-
-                if(TextLine.Length == VendorFileRecLengths[(int)FileFormat])
+                string Fld = ParseColumn(dr, "INDEX", 0); 
+                if(i == 1)
+                    ok = false;
+                else
                 {
-                    IsHeader = (TextLine.StartsWith("INDEX") == true);
-                    if(!IsHeader && TextLine.StartsWith("R"))
-                    {
-                        sCurrency = GetField(TextLine, 22, 3);
+                    ok = true;
 
-                        if(TextLine.StartsWith("R") && !IsHeader && sCurrency.Equals("USD"))
+                    if(Fld.StartsWith("XX")) // EOF
+                        ok = false;
+                    else if(Fld.StartsWith("R"))
+                    {
+                        string sVendorIndex = "";
+                        string sAdventIndex = "";
+                        string sCurrency = "";
+                        string sTotal = "";
+
+                        sCurrency = ParseColumn(dr, "CRNY", 2);
+                        if(sCurrency.Equals("USD"))
                         {
-                            sVendorIndex = GetField(TextLine, 1, 10);
-                            sCurrency = GetField(TextLine, 22, 3);
-                            sTotal = GetField(TextLine, 28, 10);
+                            sVendorIndex = ParseColumn(dr, "INDEX", 0);
+                            sTotal = ParseColumn(dr, "TOTAL", 3);
+
                             if(sIndices.Contains(sVendorIndex))
                             {
                                 sAdventIndex = GetAdventIndex(sVendorIndex);
@@ -595,14 +597,88 @@ RU3000    20170103   CHF   1662.25918   1365.02441   1696.48181   1567.99955    
                                 CalculateVendorTotalReturnsForPeriod(sStartAndEndDate, sStartAndEndDate, sAdventIndex);
                                 CalculateAdventTotalReturnsForPeriod(sStartAndEndDate, sStartAndEndDate, sAdventIndex);
                                 CalculateAdjustedTotalReturnsForPeriod(sStartAndEndDate, sStartAndEndDate, sAdventIndex);
-
                             }
                         }
-                    }
+                    }                      
                 }
+
+
             }
-            srFile.Close();
         }
+
+        void csv_ParseError(object sender, ParseErrorEventArgs e)
+        {
+            //if (e.Error is MissingFieldCsvException)
+            //LogHelper.WriteLine("APUtilities: CsvParseError: " + DateTime.Now);
+            //LogHelper.WriteLine("         CurrentFieldIndex: " + e.Error.CurrentFieldIndex);
+            //LogHelper.WriteLine("           CurrentPosition: " + e.Error.CurrentPosition);
+            //LogHelper.WriteLine("        CurrentRecordIndex: " + e.Error.CurrentRecordIndex);
+            //LogHelper.WriteLine("                   Message: " + e.Error.Message);
+            //LogHelper.WriteLine("                   RawDate: " + e.Error.RawData);
+            //LogHelper.WriteLine("--------------------------: " );
+
+            e.Action = ParseErrorAction.AdvanceToNextLine;
+        }
+
+
+        private DataTable ReadCsvIntoTable(string Filename)
+        {
+            DataTable dt = new DataTable();
+            try
+            {
+                bool HasHeaders = false;
+                using(CsvReader csv =
+                           new CsvReader(new StreamReader(Filename), HasHeaders))
+                {
+                    csv.DefaultParseErrorAction = ParseErrorAction.RaiseEvent;
+                    csv.ParseError += csv_ParseError;
+                    dt.Load(csv);
+                }
+
+                // // Old read that didn't work cuz of # comment character which is ok
+                //using (CsvReader csv =
+                //           new CsvReader(new StreamReader(Filename), HasHeaders, '\t'))
+                //{
+                //    csv.DefaultParseErrorAction = ParseErrorAction.RaiseEvent;
+                //    csv.ParseError += csv_ParseError;
+                //    dt.Load(csv);
+                //}
+            }
+            catch
+            {
+            }
+            finally
+            {
+            }
+            return (dt);
+        }
+
+        private string ParseColumn(DataRow dr, string column)
+        {
+            string value = "";
+            if(dr.Table.Columns.Contains(column))
+            {
+                if(!dr.IsNull(column))
+                    value = dr[column].ToString();
+            }
+            return (value);
+        }
+
+        private string ParseColumn(DataRow dr, string column, int index)
+        {
+            string value = "";
+
+            value = dr[index].ToString();
+
+            //if(dr.Table.Columns.Contains(column))
+            //{
+            //    if(!dr.IsNull(column))
+            //        value = dr[column].ToString();
+            //}
+            return (value);
+        }
+
+
 
         private void AddRussellOpeningData(VendorFileFormats FileFormat, string FileName, DateTime FileDate)
         {
@@ -618,7 +694,7 @@ RU3000    20170103   CHF   1662.25918   1365.02441   1696.48181   1567.99955    
             cnSql1.Open();
             cnSql2.Open();
 
-            SqlDelete = "delete FROM RussellDailyHoldings1 ";
+            SqlDelete = "delete FROM RussellIcbDailyHoldings1 ";
             SqlWhere = "where FileDate = @FileDate";
             cmdHoldings = new SqlCommand();
             cmdHoldings.Connection = cnSql1;
@@ -626,13 +702,13 @@ RU3000    20170103   CHF   1662.25918   1365.02441   1696.48181   1567.99955    
             cmdHoldings.Parameters.Add("@FileDate", SqlDbType.DateTime);
             cmdHoldings.Parameters["@FileDate"].Value = FileDate;
             cmdHoldings.ExecuteNonQuery();
-            SqlDelete = "delete FROM RussellDailyHoldings2 ";
+            SqlDelete = "delete FROM RussellIcbDailyHoldings2 ";
             cmdHoldings.CommandText = SqlDelete + SqlWhere;
             cmdHoldings.ExecuteNonQuery();
 
 
-            string sTable1 = "RussellDailyHoldings1";
-            string sTable2 = "RussellDailyHoldings2";
+            string sTable1 = "RussellIcbDailyHoldings1";
+            string sTable2 = "RussellIcbDailyHoldings2";
 
             SqlDataAdapter daAdvIndexData1 = new SqlDataAdapter(
                     "select * from " + sTable1 + " where FileDate = '" + FileDate + "'", cnSql1);
@@ -650,7 +726,6 @@ RU3000    20170103   CHF   1662.25918   1365.02441   1696.48181   1567.99955    
             DataRow drHoldings1 = null;
             DataRow drHoldings2 = null;
 
-            string TextLine;
             CultureInfo enUS = new CultureInfo("en-US");
             string sSharesValue = "";
             string sSharesGrowth = "";
@@ -664,97 +739,106 @@ RU3000    20170103   CHF   1662.25918   1365.02441   1696.48181   1567.99955    
             string rmicro = "";
             int SecurityCount = 0;
             int SharesDenominatorZeroCount = 0;
-            bool FoundTotalCount = false;
 
-            for(srHoldingsFile = new StreamReader(FileName)
-               ; srHoldingsFile.EndOfStream == false
-               ;)
+            DataTable dt = ReadCsvIntoTable(FileName);
+            int i = 0;
+
+            // Date Cons Code Reserved    Cusip ISIN    Ticker Exchange    Constituent Name    Industry Code   Supersector Code    Sector Code Subsector Code  Cash Dividend   ShareChg Shares  Reserved Investability Weight Value Probability Growth Probability Defensive Probability Dynamic Probability Return  MTD Return  Mkt Cap(USD) after investability weight Reserved    R1000 R2000   R2500 RMID    RTOP200 RSCC    RTOP50 R3000   RMICRO WT-R3E  WT - R3EG WT - R3EV WT - R1   WT - R1G  WT - R1V  WT - R2   WT - R2G  WT - R2V  WT - R25  WT - R25G WT - R25V WT - RMID WT - MIDG WT - MIDV WT - RT2  WT - RT2G WT - RT2V WT - RSSC WT - RSSCG    WT - RSSCV    WT - R3   WT - R3G  WT - R3V  WT - MICRO    WT - MICROG   WT - MICROV
+
+            foreach(DataRow dr in dt.Rows)
             {
-                bool add = false;
-                bool IsHeader1 = false;
-                bool IsHeader2 = false;
+                i += 1;
 
-                TextLine = srHoldingsFile.ReadLine();
+                bool ok = true;
 
-                if(!FoundTotalCount)
-                    FoundTotalCount = TextLine.Contains(TOTAL_COUNT);
+                string sCUSIP = "";
+                string sTicker = "";
+                string sCompanyName = "";
+                string sSector = "";
+                string sExchange = "";
 
-                if(TextLine.Length == VendorFileRecLengths[(int)FileFormat] && !FoundTotalCount)
+                if(i == 1)
+                    ok = false;
+                else
                 {
-                    IsHeader1 = (TextLine.StartsWith("Date") == true);
-                    IsHeader2 = (TextLine.StartsWith("----") == true);
-                    bool ok = (TextLine.StartsWith("20") == true) && !IsHeader1 && !IsHeader2;
+                    Fld = ParseColumn(dr, "Date", 0);  // 0
+                    if(Fld.StartsWith("XX")) // EOF
+                        ok = false;
+                    else
+                        ok = true;
+                }
 
-                    string sCUSIP = "";
-                    string sTicker = "";
-                    string sCompanyName = "";
-                    string sSector = "";
-                    string sExchange = "";
+                if(ok)
+                {
+                    drHoldings1 = dtHoldings1.NewRow();
 
-                    if(ok)
+                    Fld = ParseColumn(dr, "Date", 0);  // 0
+                    if( Fld.Length == 8 && DateTime.TryParseExact(Fld, "yyyyMMdd", enUS, DateTimeStyles.None, out oDate))
                     {
-                        drHoldings1 = dtHoldings1.NewRow();
-
-                        Fld = GetField(TextLine, 1, 8);
-                        if(Fld.Length == 8 && DateTime.TryParseExact(Fld, "yyyyMMdd", enUS, DateTimeStyles.None, out oDate))
-                        {
-                            Fld = oDate.ToString("MM/dd/yyyy");
-                            drHoldings1["FileDate"] = Fld;
-                        }
-                        else
-                            ok = false;
-
-                        Fld = GetField(TextLine, 10, 8);
-                        if(Fld.Length == 8)
-                        {
-                            drHoldings1["CUSIP"] = Fld;
-                            sCUSIP = Fld;
-                        }
-                        else
-                            ok = false;
-
-                        Fld = GetField(TextLine, 33, 7);
-                        if(Fld.Length >= 1)
-                        {
-                            drHoldings1["Ticker"] = Fld;
-                            sTicker = Fld;
-                        }
-                        else
-                            ok = false;
-                        Fld = GetField(TextLine, 74, 13);
-                        drHoldings1["MktValue"] = Fld;
-
-                        Fld = GetField(TextLine, 102, 9);
-                        drHoldings1["SharesDenominator"] = Fld;
-                        if(Convert.ToInt32(Fld.ToString()) == 0)
-                            SharesDenominatorZeroCount += 1;
-
-                        sSharesValue = GetField(TextLine, 112, 9);
-                        sSharesGrowth = GetField(TextLine, 122, 9);
-
-                        r1000 = GetField(TextLine, 132, 1);
-                        r2000 = GetField(TextLine, 134, 1);
-                        r2500 = GetField(TextLine, 136, 1);
-                        rmid = GetField(TextLine, 138, 1);
-                        rtop200 = GetField(TextLine, 140, 1);
-                        rsmallc = GetField(TextLine, 142, 1);
-                        r3000 = GetField(TextLine, 144, 1);
-                        rmicro = GetField(TextLine, 148, 1);
-
-                        Fld = GetField(TextLine, 164, 25);
-                        sCompanyName = Fld;
-
-                        Fld = GetField(TextLine, 278, 7);
-                        drHoldings1["Sector"] = Fld;
-                        sSector = Fld;
-
-                        Fld = GetField(TextLine, 42, 12);
-                        sExchange = Fld;
+                        Fld = oDate.ToString("MM/dd/yyyy");
+                        drHoldings1["FileDate"] = Fld;
                     }
+                    else
+                        ok = false;
+
+                    Fld = ParseColumn(dr, "Cusip", 3); // 3
+                    if(Fld.Length == 9)
+                    {
+                        Fld = Fld.Substring(0, 8);
+                        drHoldings1["CUSIP"] = Fld;
+                        sCUSIP = Fld;
+                    }
+                    else
+                        ok = false;
+
+                    Fld = ParseColumn(dr, "Ticker", 5);    // 5        
+                    if(Fld.Length >= 1)
+                    {
+                        drHoldings1["Ticker"] = Fld;
+                        sTicker = Fld;
+                    }
+                    else
+                        ok = false;
+                    LogHelper.WriteLine(sTicker + " " + SecurityCount);
+                    if (sTicker.Equals("WVE"))
+                        ok = true;
+
+                    Fld = ParseColumn(dr, "Mkt Cap (USD) after investability weight", 23); // 23
+                    drHoldings1["MktValue"] = Fld;
+
+                    Fld = ParseColumn(dr, "Shares", 14); // 14
+                    drHoldings1["SharesDenominator"] = Fld;
+                    if(Convert.ToInt32(Fld.ToString()) == 0)
+                        SharesDenominatorZeroCount += 1;
+
+                    // ToDo these are a multiplier rather than an amount
+                    Fld = ParseColumn(dr, "Value Probability", 17); // 17
+                    sSharesValue = "0";
+                    Fld = ParseColumn(dr, "Growth Probability", 18); // 18
+                    sSharesGrowth = "0";
+
+                    r1000 = ParseColumn(dr, "R1000", 25); // 25
+                    r2000 = ParseColumn(dr, "R2000", 26); // 26
+                    r2500 = ParseColumn(dr, "R2500", 27); // 27
+                    rmid = ParseColumn(dr, "RMID", 28);   // 28
+                    rtop200 = ParseColumn(dr, "RTOP200", 29); // 29
+                    rsmallc = ParseColumn(dr, "RSCC", 30); // 30
+                    r3000 = ParseColumn(dr, "R3000", 32);  // 32
+                    rmicro = ParseColumn(dr, "RMICRO", 33);// 33
+
+                    Fld = ParseColumn(dr, "Constituent Name", 7); // 7
+                    sCompanyName = Fld;
+
+                    Fld = ParseColumn(dr, "Subsector Code", 11); // 11
+                    drHoldings1["Sector"] = Fld;
+                    sSector = Fld;
+
+                    Fld = ParseColumn(dr, "Exchange", 6); // 6
+                    sExchange = Fld;
 
                     if(ok)
                     {
-                        sharedData.AddSecurityMasterFull(sTicker, sCUSIP, "R", sCompanyName, sSector, sExchange, oDate);
+                        //sharedData.AddSecurityMasterFull(sTicker, sCUSIP, "I", sCompanyName, sSector, sExchange, oDate);
 
                         if(r1000.Equals("Y"))
                         {
@@ -977,7 +1061,6 @@ RU3000    20170103   CHF   1662.25918   1365.02441   1696.48181   1567.99955    
                         try
                         {
                             dtHoldings1.Rows.Add(drHoldings1);
-                            add = true;
 
                         }
                         catch(SqlException ex)
@@ -985,7 +1068,6 @@ RU3000    20170103   CHF   1662.25918   1365.02441   1696.48181   1567.99955    
                             if(ex.Number == 2627)
                             {
                                 LogHelper.WriteLine(ex.Message);
-                                LogHelper.WriteLine(FileName + ":" + TextLine);
                             }
                         }
                         finally
@@ -993,15 +1075,15 @@ RU3000    20170103   CHF   1662.25918   1365.02441   1696.48181   1567.99955    
                         }
                     }
                 }
-                else if(FoundTotalCount)
-                {
-                    AddTotalConstituentCounts(FileDate, FileFormat, FileName, TextLine, SecurityCount, SharesDenominatorZeroCount);
-                    break;
-                }
-                if(!add && !IsHeader1 && !IsHeader2 && (TextLine.Length > 0))
-                {
-                    LogHelper.WriteLine("Skipping line:" + TextLine.ToString());
-                }
+                //else if(FoundTotalCount)
+                //{
+                //    AddTotalConstituentCounts(FileDate, FileFormat, FileName, TextLine, SecurityCount, SharesDenominatorZeroCount);
+                //    break;
+                //}
+                //if(!add && !IsHeader1 && !IsHeader2 && (TextLine.Length > 0))
+                //{
+                //    LogHelper.WriteLine("Skipping line:" + TextLine.ToString());
+                //}
             }
             try
             {
@@ -1018,7 +1100,6 @@ RU3000    20170103   CHF   1662.25918   1365.02441   1696.48181   1567.99955    
             finally
             {
             }
-            srHoldingsFile.Close();
         }
 
 
@@ -1027,7 +1108,7 @@ RU3000    20170103   CHF   1662.25918   1365.02441   1696.48181   1567.99955    
         {
             SqlConnection cnSql = new SqlConnection(sharedData.ConnectionStringIndexData);
             cnSql.Open();
-            string sTable = "RussellDailyHoldings1";
+            string sTable = "RussellIcbDailyHoldings1";
             string SqlUpdate = "update " + sTable + " set SecurityReturn = @SecurityReturn ";
             string SqlWhere = "where FileDate = @FileDate and CUSIP = @CUSIP ";
             SqlCommand cmdHoldingsRec = new SqlCommand(SqlUpdate + SqlWhere, cnSql);
@@ -1035,122 +1116,122 @@ RU3000    20170103   CHF   1662.25918   1365.02441   1696.48181   1567.99955    
             cmdHoldingsRec.Parameters.Add("@CUSIP", SqlDbType.VarChar, 8);
             cmdHoldingsRec.Parameters.Add("@SecurityReturn", SqlDbType.VarChar, 7);
 
-            string TextLine;
             CultureInfo enUS = new CultureInfo("en-US");
 
             DateTime oDate = DateTime.MinValue;
+            string Fld;
             string sFileDate = "";
             string sCUSIP = "";
             string sSecurityReturn = "";
             string sShares = "";
-            StreamReader srHoldingsFile = null;
             int SecurityCount = 0;
             int SharesDenominatorZeroCount = 0;
 
-            bool FoundTotalCount = false;
-            for(srHoldingsFile = new StreamReader(FileName)
-               ; srHoldingsFile.EndOfStream == false
-               ;)
+            DataTable dt = ReadCsvIntoTable(FileName);
+            int i = 0;
+
+            foreach(DataRow dr in dt.Rows)
             {
-                bool add = false;
-                bool IsHeader1 = false;
-                bool IsHeader2 = false;
+                i += 1;
 
-                TextLine = srHoldingsFile.ReadLine();
+                bool ok = true;
 
-                if(!FoundTotalCount)
-                    FoundTotalCount = TextLine.Contains(TOTAL_COUNT);
-
-                if(TextLine.Length == VendorFileRecLengths[(int)FileFormat] && !FoundTotalCount)
+                Fld = ParseColumn(dr, "Date", 0);  // 0
+                if(i == 1)
+                    ok = false;
+                else
                 {
-                    IsHeader1 = (TextLine.StartsWith("Date") == true);
-                    IsHeader2 = (TextLine.StartsWith("----") == true);
-                    bool ok = (TextLine.StartsWith("20") == true) && !IsHeader1 && !IsHeader2;
+                    if(Fld.StartsWith("XX")) // EOF
+                        ok = false;
+                    else
+                        ok = true;
+                }
 
-                    if(ok)
+                if(ok)
+                {
+                    Fld = ParseColumn(dr, "Date", 0);  // 0
+                    if(Fld.Length == 8 && DateTime.TryParseExact(Fld, "yyyyMMdd", enUS, DateTimeStyles.None, out oDate))
                     {
-                        sFileDate = GetField(TextLine, 1, 8);
-                        if(sFileDate.Length == 8 && DateTime.TryParseExact(sFileDate, "yyyyMMdd", enUS, DateTimeStyles.None, out oDate))
-                        {
-                            sFileDate = oDate.ToString("MM/dd/yyyy");
-                        }
-                        else
-                            ok = false;
-
-                        sCUSIP = GetField(TextLine, 10, 8);
-                        if(sCUSIP.Length != 8)
-                            ok = false;
-
-                        sSecurityReturn = GetField(TextLine, 55, 7);
-                        sShares = GetField(TextLine, 88, 9);
-                        if(Convert.ToInt32(sShares.ToString()) == 0)
-                            SharesDenominatorZeroCount += 1;
+                        Fld = oDate.ToString("MM/dd/yyyy");
+                        sFileDate = oDate.ToString("MM/dd/yyyy");
                     }
+                    else
+                        ok = false;
 
-                    if(ok)
+
+                    Fld = ParseColumn(dr, "Cusip", 3); // 3
+                    if(Fld.Length == 9)
                     {
-                        SecurityCount += 1;
-                        try
-                        {
-                            if(GetDailyHoldings1Count(oDate, sCUSIP) == 0)
-                            {
-                                string sOldCUSIP = GetOldCUSIP(sCUSIP);
-                                if(sOldCUSIP.Length == 8)
-                                {
-                                    if(GetDailyHoldings1Count(oDate, sOldCUSIP) == 0)
-                                    {
-                                        LogHelper.WriteLine("Skipping line:" + TextLine.ToString());
-                                        LogHelper.WriteLine("Can't find opening holdings1 for " + sCUSIP.ToString() +
-                                                            " linked to Old CUSIP " + sOldCUSIP.ToString());
-                                        ok = false;
-                                    }
+                        Fld = Fld.Substring(0, 8);
+                        sCUSIP = Fld;
+                    }
+                    else
+                        ok = false;
 
-                                    //throw new Exception("AddRussellClosingData can't update " + sCUSIP + " for date" + oDate.ToShortDateString());
-                                    else
-                                        sCUSIP = sOldCUSIP;
-                                }
-                                else if(sOldCUSIP.Length == 0)
+                    Fld = ParseColumn(dr, "Return", 21);
+                    sSecurityReturn = Fld;
+
+                    Fld = ParseColumn(dr, "Shares", 10);
+                    sShares = Fld;
+                    if(Convert.ToInt32(sShares.ToString()) == 0)
+                        SharesDenominatorZeroCount += 1;
+                }
+
+                if(ok)
+                {
+                    SecurityCount += 1;
+                    try
+                    {
+                        if(GetDailyHoldings1Count(oDate, sCUSIP) == 0)
+                        {
+                            string sOldCUSIP = GetOldCUSIP(sCUSIP);
+                            if(sOldCUSIP.Length == 8)
+                            {
+                                if(GetDailyHoldings1Count(oDate, sOldCUSIP) == 0)
                                 {
-                                    LogHelper.WriteLine("Skipping line:" + TextLine.ToString());
-                                    LogHelper.WriteLine("Can't find opening holdings1 for " + sCUSIP.ToString());
+                                    LogHelper.WriteLine("Can't find opening holdings1 for " + sCUSIP.ToString() +
+                                                        " linked to Old CUSIP " + sOldCUSIP.ToString());
                                     ok = false;
                                 }
 
+                                //throw new Exception("AddRussellClosingData can't update " + sCUSIP + " for date" + oDate.ToShortDateString());
+                                else
+                                    sCUSIP = sOldCUSIP;
                             }
-                            if(ok)
+                            else if(sOldCUSIP.Length == 0)
                             {
-                                cmdHoldingsRec.Parameters["@CUSIP"].Value = sCUSIP;
-                                cmdHoldingsRec.Parameters["@FileDate"].Value = oDate;
-                                cmdHoldingsRec.Parameters["@SecurityReturn"].Value = sSecurityReturn;
-                                cmdHoldingsRec.ExecuteNonQuery();
-                                add = true;
+                                LogHelper.WriteLine("Skipping line:" + sCUSIP.ToString());
+                                LogHelper.WriteLine("Can't find opening holdings1 for " + sCUSIP.ToString());
+                                ok = false;
                             }
-                        }
 
-                        catch(SqlException ex)
-                        {
-                            if(ex.Number == 2627)
-                            {
-                                LogHelper.WriteLine(ex.Message);
-                                LogHelper.WriteLine(FileName + ":" + TextLine);
-                            }
                         }
-                        finally
+                        if(ok)
                         {
+                            cmdHoldingsRec.Parameters["@CUSIP"].Value = sCUSIP;
+                            cmdHoldingsRec.Parameters["@FileDate"].Value = oDate;
+                            cmdHoldingsRec.Parameters["@SecurityReturn"].Value = sSecurityReturn;
+                            cmdHoldingsRec.ExecuteNonQuery();
                         }
                     }
+
+                    catch(SqlException ex)
+                    {
+                        if(ex.Number == 2627)
+                        {
+                            LogHelper.WriteLine(ex.Message);
+                            LogHelper.WriteLine(FileName + ":" + sCUSIP);
+                        }
+                    }
+                    finally
+                    {
+                    }
                 }
-                else if(FoundTotalCount)
+                if(!ok)
                 {
-                    AddTotalConstituentCounts(FileDate, FileFormat, FileName, TextLine, SecurityCount, SharesDenominatorZeroCount);
-                    break;
-                }
-                if(!add && !IsHeader1 && !IsHeader2 && (TextLine.Length > 0))
-                {
-                    LogHelper.WriteLine("Skipping line:" + TextLine.ToString());
+                    LogHelper.WriteLine("Skipping line:" + Fld);
                 }
             }
-            srHoldingsFile.Close();
         }
 
         public int GetDailyHoldings1Count(DateTime FileDate, string sCUSIP)
@@ -1160,7 +1241,7 @@ RU3000    20170103   CHF   1662.25918   1365.02441   1696.48181   1567.99955    
             try
             {
                 string SqlSelectCount = @"
-                    select count(CUSIP) from RussellDailyHoldings1 where FileDate = @FileDate and CUSIP = @CUSIP 
+                    select count(CUSIP) from RussellIcbDailyHoldings1 where FileDate = @FileDate and CUSIP = @CUSIP 
                     ";
                 conn.Open();
                 SqlCommand cmd = new SqlCommand(SqlSelectCount, conn);
@@ -1245,7 +1326,7 @@ RU3000    20170103   CHF   1662.25918   1365.02441   1696.48181   1567.99955    
                 }
 
                 string SqlSelect = @"
-                    select SecurityReturn from  RussellDailyHoldings1
+                    select SecurityReturn from  RussellIcbDailyHoldings1
                     where FileDate = @FileDate and CUSIP = @CUSIP
                     ";
 
@@ -1264,7 +1345,7 @@ RU3000    20170103   CHF   1662.25918   1365.02441   1696.48181   1567.99955    
                 }
                 else
                 {
-                    string msg = "no row found RussellDailyHoldings1: " + FileDate.ToShortDateString() + "CUSIP: " + CUSIP;
+                    string msg = "no row found RussellIcbDailyHoldings1: " + FileDate.ToShortDateString() + "CUSIP: " + CUSIP;
                     //ConsoleWriter.cWriteInfo(msg);
                 }
             }
@@ -1491,7 +1572,7 @@ RU3000    20170103   CHF   1662.25918   1365.02441   1696.48181   1567.99955    
         public void AddRussellTotalReturnForIndex(DateTime oDate, string sIndexName, string sTotalReturn)
         {
             /*
-            CREATE TABLE[dbo].[RussellDailyIndexReturns] (
+            CREATE TABLE[dbo].[RussellIcbDailyIndexReturns] (
 	        [IndexName] [varchar] (9) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
             [FileDate] [DateOnly_Type] NOT NULL,
             [TotalReturn] [varchar] (12) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL 
@@ -1505,7 +1586,7 @@ RU3000    20170103   CHF   1662.25918   1365.02441   1696.48181   1567.99955    
                     mSqlConn.Open();
                 }
                 string SqlSelect = @"
-                    select count(*) from RussellDailyIndexReturns
+                    select count(*) from RussellIcbDailyIndexReturns
                     where IndexName = @IndexName 
                     and FileDate = @FileDate 
                     ";
@@ -1521,7 +1602,7 @@ RU3000    20170103   CHF   1662.25918   1365.02441   1696.48181   1567.99955    
                 if(iCount == 0)
                 {
                     cmd.CommandText =
-                        "insert into RussellDailyIndexReturns (IndexName, FileDate, TotalReturn) " +
+                        "insert into RussellIcbDailyIndexReturns (IndexName, FileDate, TotalReturn) " +
                         "Values (@IndexName, @FileDate, @TotalReturn)";
                 }
                 //else
@@ -1686,7 +1767,7 @@ RU3000    20170103   CHF   1662.25918   1365.02441   1696.48181   1567.99955    
                 //LogHelper.WriteLine(sMsg + sStartDate + " to " + sEndDate + " index " + sIndexName);
                 string SqlSelect;
                 string SqlWhere;
-                SqlSelect = "select count (distinct FileDate) from RussellDailyHoldings1 ";
+                SqlSelect = "select count (distinct FileDate) from RussellIcbDailyHoldings1 ";
                 SqlWhere = "where FileDate >= '" + sStartDate + "' ";
                 SqlWhere += "and FileDate <= '" + sEndDate + "' ";
                 conn.Open();
@@ -1695,7 +1776,7 @@ RU3000    20170103   CHF   1662.25918   1365.02441   1696.48181   1567.99955    
                 if(count > 0)
                 {
                     IndexReturnArray = new IndexReturnStruct[count];
-                    SqlSelect = "select distinct FileDate from RussellDailyHoldings1 ";
+                    SqlSelect = "select distinct FileDate from RussellIcbDailyHoldings1 ";
                     cmd.CommandText = SqlSelect + SqlWhere;
                     dr = cmd.ExecuteReader();
                     int i = 0;
@@ -1871,26 +1952,28 @@ RU3000    20170103   CHF   1662.25918   1365.02441   1696.48181   1567.99955    
                 {
                     string sCusip = null;
                     string sTicker = null;
+                    string sIndustry = null;
+                    string sSuperSector = null;
                     string sSector = null;
                     string sSubSector = null;
-                    string sIndustry = null;
+
                     string sWeight = null;
                     string sSecurityReturn = null;
 
                     if((GotNext =
                         GetNextConstituentReturn(out sCusip, out sTicker,
-                                                 out sSector, out sSubSector, out sIndustry,
+                                                 out sIndustry, out sSuperSector, out sSector, out sSubSector,
                                                  out sWeight, out sSecurityReturn)) == true)
                     {
                         IndexRow indexRow = new IndexRow(sDate, sIndexName, sCusip, sTicker,
-                                                         sSector, sSubSector, sIndustry, "",
+                                                         sIndustry, sSuperSector, sSector, sSubSector,
                                                          sWeight, sSecurityReturn, IndexRow.VendorFormat.CONSTITUENT);
                         indexRowsIndustrySort.Add(indexRow);
                     }
                 }
 
 
-                for(IndexRow.VendorFormat vendorFormat = IndexRow.VendorFormat.SECTOR_LEVEL1; vendorFormat <= IndexRow.VendorFormat.SECTOR_LEVEL3; vendorFormat++)
+                for(IndexRow.VendorFormat vendorFormat = IndexRow.VendorFormat.SECTOR_LEVEL1; vendorFormat <= IndexRow.VendorFormat.SECTOR_LEVEL4; vendorFormat++)
                 {
                     string sCurrentIdentifier = "";
                     double rolledUpWeight = 0;
@@ -1925,6 +2008,12 @@ RU3000    20170103   CHF   1662.25918   1365.02441   1696.48181   1567.99955    
                                                                      "", "", sCurrentIdentifier, "",
                                                                      rolledUpWeight.ToString(), "", vendorFormat);
                                     indexRowsSectorLevel3RollUp.Add(rollUpIndexRow3); break;
+                                case IndexRow.VendorFormat.SECTOR_LEVEL4:
+                                    IndexRow rollUpIndexRow4 = new IndexRow(sDate, sIndexName, "", "",
+                                                                     "", "", "", sCurrentIdentifier,
+                                                                     rolledUpWeight.ToString(), "", vendorFormat);
+                                    indexRowsSectorLevel4RollUp.Add(rollUpIndexRow4); break;
+
                             }
 
                             //... and then move on to start accumulating the next sector's info
@@ -1950,6 +2039,12 @@ RU3000    20170103   CHF   1662.25918   1365.02441   1696.48181   1567.99955    
                                                                      "", "", sCurrentIdentifier, "",
                                                                      rolledUpWeight.ToString(), "", vendorFormat);
                                     indexRowsSectorLevel3RollUp.Add(rollUpIndexRow3); break;
+                                case IndexRow.VendorFormat.SECTOR_LEVEL4:
+                                    IndexRow rollUpIndexRow4 = new IndexRow(sDate, sIndexName, "", "",
+                                                                     "", "", "", sCurrentIdentifier,
+                                                                     rolledUpWeight.ToString(), "", vendorFormat);
+                                    indexRowsSectorLevel4RollUp.Add(rollUpIndexRow4); break;
+
                             }
                         }
                     }
@@ -1965,42 +2060,10 @@ RU3000    20170103   CHF   1662.25918   1365.02441   1696.48181   1567.99955    
                         case IndexRow.VendorFormat.SECTOR_LEVEL3:
                             RollUpRatesOfReturn(indexRowsSectorLevel3RollUp, indexRowsIndustrySort, vendorFormat, sDate, sIndexName);
                             break;
+                        case IndexRow.VendorFormat.SECTOR_LEVEL4:
+                            RollUpRatesOfReturn(indexRowsSectorLevel4RollUp, indexRowsIndustrySort, vendorFormat, sDate, sIndexName);
+                            break;
                     }
-
-
-                    /*
-                    foreach (IndexRow indexRowSector in indexRowsSectorLevel1RollUp)
-                        foreach (IndexRow indexRowConstituent in indexRowsIndustrySort)
-                        {
-                            string CompareIndentifier = "";
-                            switch (vendorFormat)
-                            {
-                                case IndexRow.VendorFormat.SECTOR:
-                                    CompareIndentifier = indexRowConstituent.Sector; break;
-                                case IndexRow.VendorFormat.SUBSECTOR:
-                                    CompareIndentifier = indexRowConstituent.SubSector; break;
-                                case IndexRow.VendorFormat.INDUSTRY:
-                                    CompareIndentifier = indexRowConstituent.Industry; break;
-                            }
-                            if (CompareIndentifier == indexRowSector.Identifier)
-                                indexRowSector.RateOfReturn += indexRowConstituent.RateOfReturn * indexRowConstituent.Weight / indexRowSector.Weight;
-                        }
-
-                    LogHelper.WriteLine("---Before---");
-                    foreach (IndexRow indexRowSector in indexRowsSectorLevel1RollUp)
-                    {
-                        LogHelper.WriteLine(indexRowSector.Identifier + " " + indexRowSector.Weight.ToString() + " " + indexRowSector.RateOfReturn.ToString());
-                    }
-
-                    AdjustReturnsToMatchPublishedTotalReturns(indexRowsSectorLevel1RollUp, sDate, sIndexName);
-                    LogHelper.WriteLine("---After---");
-
-                    foreach (IndexRow indexRowSector in indexRowsSectorLevel1RollUp)
-                    {
-                        LogHelper.WriteLine(indexRowSector.Identifier + " " + indexRowSector.Weight.ToString() + " " + indexRowSector.RateOfReturnAdjusted.ToString());
-                    }
-                    LogHelper.WriteLine("---Done---");
-                    */
                 }
             }
         }
@@ -2046,15 +2109,15 @@ RU3000    20170103   CHF   1662.25918   1365.02441   1696.48181   1567.99955    
                 {
                     GenerateConstituentReturnsForDate(processDate.ToString("MM/dd/yyyy"), sIndexName);
                     sharedData.GenerateAxmlFileConstituents(processDate.ToString("MM/dd/yyyy"), fileDate.ToString("MM/dd/yyyy"),
-                                                            sIndexName, Vendors.Russell, indexRowsTickerSort,
+                                                            sIndexName, Vendors.RussellIcb, indexRowsTickerSort,
                                                             isFirstDate, isLastDate);
                 }
                 else if(adventOutputType.Equals(AdventOutputType.Sector))
                 {
                     GenerateIndustryReturnsForDate(processDate.ToString("MM/dd/yyyy"), sIndexName);
                     sharedData.GenerateAxmlFileSectors(processDate.ToString("MM/dd/yyyy"), fileDate.ToString("MM/dd/yyyy"),
-                                                       sIndexName, Vendors.Russell,
-                                                       indexRowsSectorLevel1RollUp, indexRowsSectorLevel2RollUp, indexRowsSectorLevel3RollUp,
+                                                       sIndexName, Vendors.RussellIcb,
+                                                       indexRowsSectorLevel1RollUp, indexRowsSectorLevel2RollUp, indexRowsSectorLevel3RollUp, indexRowsSectorLevel4RollUp,
                                                        isFirstDate, isLastDate);
                 }
             }
@@ -2072,19 +2135,20 @@ RU3000    20170103   CHF   1662.25918   1365.02441   1696.48181   1567.99955    
                     i += 1;
                     string sCusip = null;
                     string sTicker = null;
+                    string sIndustry = null;
+                    string sSuperSector = null;
                     string sSector = null;
                     string sSubSector = null;
-                    string sIndustry = null;
                     string sWeight = null;
                     string sSecurityReturn = null;
 
                     if((GotNext =
                         GetNextConstituentReturn(out sCusip, out sTicker,
-                                                 out sSector, out sSubSector, out sIndustry,
+                                                 out sIndustry, out sSuperSector, out sSector, out sSubSector,
                                                  out sWeight, out sSecurityReturn)) == true)
                     {
                         IndexRow indexRow = new IndexRow(sDate, sIndexName, sCusip, sTicker,
-                                                         sSector, sSubSector, sIndustry, "",
+                                                         sIndustry, sSuperSector, sSector, sSubSector,
                                                          sWeight, sSecurityReturn, IndexRow.VendorFormat.CONSTITUENT);
                         indexRow.CurrentTicker = sharedData.GetSecurityMasterCurrentTickerRussell(sTicker, sCusip, sDate);
                         indexRowsTickerSort.Add(indexRow);
@@ -2117,16 +2181,21 @@ RU3000    20170103   CHF   1662.25918   1365.02441   1696.48181   1567.99955    
                     SET @IndexName = 'r3000';
 
                  */
+                 /*
+                    •	ICBIndustry, ICBSuperSector, ICBSector, ICBSubSector
+                    •	Example: 50, 5010, 501010, 50101025
+                */
+
                 string SqlSelect = @"
                     SELECT h1.FileDate, h2.IndexName, h1.CUSIP, lower(h1.Ticker) as Ticker, h1.SecurityReturn, 
-                    LEFT(h1.Sector,2) As Sector, LEFT(h1.Sector,4) As SubSector, h1.Sector As Industry,
+                    LEFT(h1.Sector,2) As Industry, LEFT(h1.Sector,4) As SuperSector, LEFT(h1.Sector,6) As Sector, h1.Sector As SubSector,
                         ROUND((( (cast(h1.MktValue as float) * 
                                     (cast(h2.SharesNumerator as float)/h1.SharesDenominator))/
                         (SELECT     
                             sum( cast(h1.MktValue as float) * 
                                  (cast(h2.SharesNumerator as float)/h1.SharesDenominator))
-                         FROM         RussellDailyHoldings1 h1 
-                            inner join dbo.RussellDailyHoldings2 h2 on 
+                         FROM         RussellIcbDailyHoldings1 h1 
+                            inner join dbo.RussellIcbDailyHoldings2 h2 on 
                             h1.FileDate = h2.FileDate and 
                             h1.CUSIP = h2.CUSIP
                          WHERE 
@@ -2134,8 +2203,8 @@ RU3000    20170103   CHF   1662.25918   1365.02441   1696.48181   1567.99955    
                             h2.IndexName = @IndexName and 
                             h2.SharesNumerator > 0 and h1.SharesDenominator > 0)
                         ) * 100 ),12) As Weight
-                    FROM         RussellDailyHoldings1 h1 inner join
-                          dbo.RussellDailyHoldings2 h2 on 
+                    FROM         RussellIcbDailyHoldings1 h1 inner join
+                          dbo.RussellIcbDailyHoldings2 h2 on 
                           h1.FileDate = h2.FileDate and 
                           h1.CUSIP = h2.CUSIP
                     WHERE 
@@ -2197,16 +2266,18 @@ RU3000    20170103   CHF   1662.25918   1365.02441   1696.48181   1567.99955    
 
 
         public bool GetNextConstituentReturn(out string sCusip, out string sTicker,
-                                             out string sSector, out string sSubSector, out string sIndustry,
+                                             /*out string sSector, out string sSubSector, out string sIndustry,*/
+                                             out string sIndustry, out string sSuperSector, out string sSector, out string sSubSector,
                                              out string sWeight, out string sSecurityReturn)
         {
             string sMsg = null;
             bool GetNext = false;
             sCusip = "";
             sTicker = "";
+            sIndustry = "";
+            sSuperSector = "";
             sSector = "";
             sSubSector = "";
-            sIndustry = "";
             sWeight = "";
             sSecurityReturn = "";
 
@@ -2221,9 +2292,11 @@ RU3000    20170103   CHF   1662.25918   1365.02441   1696.48181   1567.99955    
                         sOriginalTicker = sOriginalTicker.ToLower();
                         sWeight = mSqlDr["Weight"].ToString();
                         sSecurityReturn = mSqlDr["SecurityReturn"].ToString();
+                        sIndustry = mSqlDr["Industry"].ToString(); 
+                        sSuperSector = mSqlDr["SuperSector"].ToString();
                         sSector = mSqlDr["Sector"].ToString();
                         sSubSector = mSqlDr["SubSector"].ToString();
-                        sIndustry = mSqlDr["Industry"].ToString();
+
                         string sFileDate = mSqlDr["FileDate"].ToString(); ;
 
                         ConstituentCount += 1;
@@ -2381,8 +2454,8 @@ RU3000    20170103   CHF   1662.25918   1365.02441   1696.48181   1567.99955    
                         (SELECT     
                             sum( cast(h1.MktValue as float) * 
                                  (cast(h2.SharesNumerator as float)/h1.SharesDenominator))
-                         FROM         RussellDailyHoldings1 h1 
-                            inner join dbo.RussellDailyHoldings2 h2 on 
+                         FROM         RussellIcbDailyHoldings1 h1 
+                            inner join dbo.RussellIcbDailyHoldings2 h2 on 
                             h1.FileDate = h2.FileDate and 
                             h1.CUSIP = h2.CUSIP
                          WHERE 
@@ -2390,8 +2463,8 @@ RU3000    20170103   CHF   1662.25918   1365.02441   1696.48181   1567.99955    
                             h2.IndexName = @IndexName and 
                             h2.SharesNumerator > 0 and h1.SharesDenominator > 0)
                         ) * cast(h1.SecurityReturn as float) ),9) As WeightedCalcReturn9 
-                    FROM         RussellDailyHoldings1 h1 inner join
-                          dbo.RussellDailyHoldings2 h2 on 
+                    FROM         RussellIcbDailyHoldings1 h1 inner join
+                          dbo.RussellIcbDailyHoldings2 h2 on 
                           h1.FileDate = h2.FileDate and 
                           h1.CUSIP = h2.CUSIP
                     WHERE 
@@ -2548,7 +2621,7 @@ RU3000    20170103   CHF   1662.25918   1365.02441   1696.48181   1567.99955    
                 string SqlWhere;
                 SqlCommand cmd = null;
                 cnSql.Open();
-                SqlDelete = "delete FROM RussellDailyIndexReturns ";
+                SqlDelete = "delete FROM RussellIcbDailyIndexReturns ";
                 SqlWhere = "where FileDate = @FileDate and IndexName = @IndexName";
                 cmd = new SqlCommand();
                 cmd.Connection = cnSql;
@@ -2645,7 +2718,7 @@ RU3000    20170103   CHF   1662.25918   1365.02441   1696.48181   1567.99955    
                     string sTotalReturn = String.Empty;
                     string sTotalReturnPrev = String.Empty;
                     string SqlSelect = @"
-                    select count(*) from RussellDailyIndexReturns
+                    select count(*) from RussellIcbDailyIndexReturns
                     where IndexName = @IndexName 
                     and FileDate = @FileDate 
                     ";
@@ -2665,7 +2738,7 @@ RU3000    20170103   CHF   1662.25918   1365.02441   1696.48181   1567.99955    
                         if(iCount == 1)
                         {
                             SqlSelect = @"
-                            select TotalReturn from RussellDailyIndexReturns
+                            select TotalReturn from RussellIcbDailyIndexReturns
                             where IndexName = @IndexName 
                             and FileDate = @FileDate 
                             ";

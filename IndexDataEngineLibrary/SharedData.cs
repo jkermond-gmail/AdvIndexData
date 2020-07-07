@@ -910,8 +910,17 @@ namespace IndexDataEngineLibrary
                 level2Class = "class=\"RGSSubSector\"";
                 level3Class = "class=\"RGSIndustry\"";
             }
+            else if(vendor.Equals(Vendors.RussellIcb))
+            {
+                prefix = "rl-";
+                accountProvider = "<AccountProvider name=\"Russell\" code=\"rl\">";
+                level1Class = "class=\"ICBIndustry\"";
+                level2Class = "class=\"ICBSuperSector\"";
+                level3Class = "class=\"ICBSector\"";
+                level4Class = "class=\"ICBSubSector\"";
+            }
 
-            if (IsFirstDate && IsLastDate)
+            if(IsFirstDate && IsLastDate)
             {
                 addDummyEndOfMonthAxmlAfter = DateHelper.IsEndofMonthOnWeekend(sBusinessDate);
 
@@ -1043,9 +1052,8 @@ namespace IndexDataEngineLibrary
                 }
 
                 /////////////////////////////////////////// Level 4
-                if (vendor.Equals(Vendors.Snp))
+                if (vendor.Equals(Vendors.Snp) || vendor.Equals(Vendors.RussellIcb))
                 {
-
                     if (addDummyEndOfMonthAxmlBefore)
                     {
                         file.WriteLine("<XNXPeriod from=\"" + sPrevBusinessDate + "\" through=\"" + sPrevEndOfMonthDate + "\" indexperfiso=\"usd\" " + level4Class + "> ");

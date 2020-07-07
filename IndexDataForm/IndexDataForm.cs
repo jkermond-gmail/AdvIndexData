@@ -26,6 +26,7 @@ namespace IndexDataForm
 
         private IndexDataEngine indexDataEngine;
         private RussellData russellData = null;
+        private RussellIcbData russellIcbData = null;
         private SnpData snpData = null;
 
         public IndexDataForm()
@@ -34,6 +35,7 @@ namespace IndexDataForm
             LogHelper.StartLog();
 
             russellData = new RussellData();
+            russellIcbData = new RussellIcbData();
             snpData = new SnpData();
 
             var v = AppSettings.Get<int>("timerInterval");
@@ -152,7 +154,13 @@ namespace IndexDataForm
 
             cbRussellIndices.Items.Clear();
 
-            if (cboVendor.SelectedItem.Equals("Russell"))
+            if(cboVendor.SelectedItem.Equals("RussellIcb"))
+            {
+                Indices = russellData.GetIndices();
+                cbRussellIndices.Items.AddRange(Indices);
+                cbRussellIndices.SelectedItem = "r3000";
+            }
+            else if(cboVendor.SelectedItem.Equals("Russell"))
             {
                 Indices = russellData.GetIndices();
                 cbRussellIndices.Items.AddRange(Indices);
@@ -172,7 +180,16 @@ namespace IndexDataForm
         private void btnGenerateReturns_Click(object sender, EventArgs e)
         {
             string Indexname = (string)cbRussellIndices.SelectedItem;
-            if (cboVendor.SelectedItem.Equals("Russell"))
+            if(cboVendor.SelectedItem.Equals("RussellIcb"))
+            {
+                russellIcbData.LogReturnData = chkLogReturnData.Checked;
+
+                if(cboOutputType.Text.Equals("Constituent"))
+                    russellIcbData.GenerateReturnsForDateRange(lnkStartDate.Text, lnkEndDate.Text, Indexname, AdventOutputType.Constituent, chkHistoricalAxmlFile.Checked);
+                else if(cboOutputType.Text.Equals("Sector"))
+                    russellIcbData.GenerateReturnsForDateRange(lnkStartDate.Text, lnkEndDate.Text, Indexname, AdventOutputType.Sector, chkHistoricalAxmlFile.Checked);
+            }
+            else if(cboVendor.SelectedItem.Equals("Russell"))
             {
                 russellData.LogReturnData = chkLogReturnData.Checked;            
 
@@ -204,6 +221,10 @@ namespace IndexDataForm
             if (cboVendor.SelectedItem.Equals("Russell"))
             {
                 russellData.ProcessVendorFiles(startDate, endDate, DataSet, true, true, true, true, true);
+            }
+            else if(cboVendor.SelectedItem.Equals("RussellIcb"))
+            {
+                russellIcbData.ProcessVendorFiles(startDate, endDate, DataSet, true, true, true, true, true);
             }
             else if (cboVendor.SelectedItem.Equals("Snp"))
             {

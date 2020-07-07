@@ -617,7 +617,12 @@ namespace IndexDataEngineLibrary
             JobsTotal = 0;
             JobsProcessed = 0;
 
-            if (Vendor.Equals("Russell"))
+            if (Vendor.Equals("RussellICB"))
+            {
+                RussellIcbData russellIcbData = new RussellIcbData();
+                russellIcbData.ProcessVendorDatasetJobs(Dataset, sProcessDate);
+            }
+            else if(Vendor.Equals("Russell"))
             {
                 RussellData russellData = new RussellData();
                 russellData.ProcessVendorDatasetJobs(Dataset, sProcessDate);

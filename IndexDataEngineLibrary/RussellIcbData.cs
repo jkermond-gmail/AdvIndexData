@@ -361,8 +361,12 @@ namespace IndexDataEngineLibrary
                     }
                 }
             }
-            catch
+            catch(SqlException ex)
             {
+                if(ex.Number == 2627)
+                {
+                    LogHelper.WriteLine(ex.Message);
+                }
             }
             finally
             {
@@ -807,15 +811,23 @@ namespace IndexDataEngineLibrary
                     drHoldings1["MktValue"] = Fld;
 
                     Fld = ParseColumn(dr, "Shares", 14); // 14
+                    double dShares = Convert.ToDouble(Fld);
                     drHoldings1["SharesDenominator"] = Fld;
                     if(Convert.ToInt32(Fld.ToString()) == 0)
                         SharesDenominatorZeroCount += 1;
 
-                    // ToDo these are a multiplier rather than an amount
+                    // value and growth are multipliers rather than an amount
                     Fld = ParseColumn(dr, "Value Probability", 17); // 17
-                    sSharesValue = "0";
+                    double dMultiplier = Convert.ToDouble(Fld);
+                    double dValueShares = dShares * dMultiplier;
+                    dValueShares = Math.Round(dValueShares, MidpointRounding.AwayFromZero);
+                    sSharesValue = Convert.ToString(Convert.ToInt32(dValueShares));
+
                     Fld = ParseColumn(dr, "Growth Probability", 18); // 18
-                    sSharesGrowth = "0";
+                    dMultiplier = Convert.ToDouble(Fld);
+                    double dGrowthShares = dShares * dMultiplier;
+                    dGrowthShares = Math.Round(dGrowthShares, MidpointRounding.AwayFromZero);
+                    sSharesGrowth = Convert.ToString(Convert.ToInt32(dGrowthShares));
 
                     r1000 = ParseColumn(dr, "R1000", 25); // 25
                     r2000 = ParseColumn(dr, "R2000", 26); // 26
@@ -2490,9 +2502,17 @@ namespace IndexDataEngineLibrary
                 {
                     if(dr.Read())
                     {
-                        dReturn = (double)dr[0];
-                        dReturn = Math.Round(dReturn, 9, MidpointRounding.AwayFromZero);
-                        string sReturn = dReturn.ToString();
+                        string sReturn = dr[0].ToString();
+                        if(sReturn == null || sReturn.Length.Equals(0))
+                        {
+                            sReturn = "0";
+                        }
+                        else
+                        {
+                            dReturn = (double)dr[0];
+                            dReturn = Math.Round(dReturn, 9, MidpointRounding.AwayFromZero);
+                            sReturn = dReturn.ToString();
+                        }
 
                         //LogHelper.WriteLine(sDate + " " + sReturn);
                         if(bSaveReturnInDb)

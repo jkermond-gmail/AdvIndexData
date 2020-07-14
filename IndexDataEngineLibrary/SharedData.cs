@@ -733,7 +733,7 @@ namespace IndexDataEngineLibrary
                 prefix = "ix-";
                 accountProvider = "<AccountProvider name=\"StandardAndPoors\" code=\"ix\">";
             }
-            else if (vendor.Equals(Vendors.Russell))
+            else if (vendor.Equals(Vendors.Russell) || vendor.Equals(Vendors.RussellIcb))
             {
                 prefix = "rl-";
                 accountProvider = "<AccountProvider name=\"Russell\" code=\"rl\">";

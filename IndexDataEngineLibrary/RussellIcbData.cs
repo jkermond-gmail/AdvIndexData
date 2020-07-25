@@ -2236,7 +2236,7 @@ namespace IndexDataEngineLibrary
                         break;
                     case AdventOutputType.Sector:
                         SqlOrderBy = @"
-                        ORDER BY Industry
+                        ORDER BY SubSector
                         ";
                         break;
                     default:
@@ -2363,90 +2363,21 @@ namespace IndexDataEngineLibrary
             return (GetNext);
         }
 
-        public bool GetNextSectorReturn(out string sSector, out string sWeight, out string sReturn)
-        {
-            return (GetNextRgsReturn("Sector", out sSector, out sWeight, out sReturn));
-        }
-
-        public bool GetNextSubSectorReturn(out string sSubSector, out string sWeight, out string sReturn)
-        {
-            return (GetNextRgsReturn("SubSector", out sSubSector, out sWeight, out sReturn));
-        }
-
-        public bool GetNextIndustryReturn(out string sIndustry, out string sWeight, out string sReturn)
-        {
-            return (GetNextRgsReturn("Industry", out sIndustry, out sWeight, out sReturn));
-        }
-
-        public bool GetNextRgsReturn(string sRgsCategory, out string sRgsId, out string sWeight, out string sReturn)
-        {
-            bool GetNext = false;
-            sRgsId = "";
-            sWeight = "";
-            sReturn = "";
-            string sMsg = "";
-
-            CultureInfo OutputCultureInfo = CultureInfo.GetCultureInfo("en-US");
-
-            try
-            {
-                if(mSqlDr.HasRows)
-                {
-                    bool done = false;
-                    while(!done)
-                    {
-                        if((GetNext = mSqlDr.Read()) == true)
-                        {
-                            if(mPrevId.Length == 0)
-                            {
-                                mPrevId = mSqlDr[sRgsCategory].ToString();
-                                mRolledUpWeight = Convert.ToDouble(mSqlDr["Weight"].ToString());
-                                mRolledUpReturn = Convert.ToDouble(mSqlDr["SecurityReturn"].ToString());
-                            }
-                            else if(mPrevId.Equals(mSqlDr[sRgsCategory].ToString()))
-                            {
-                                mRolledUpWeight += Convert.ToDouble(mSqlDr["Weight"].ToString());
-                                mRolledUpReturn += Convert.ToDouble(mSqlDr["SecurityReturn"].ToString());
-                            }
-                            else
-                            {
-                                done = true;
-                                sRgsId = mPrevId;
-                                sWeight = mRolledUpWeight.ToString(mNumberFormat12, OutputCultureInfo);
-                                sReturn = mRolledUpReturn.ToString(mNumberFormat4, OutputCultureInfo);
-                                mPrevId = mSqlDr[sRgsCategory].ToString();
-                                mRolledUpWeight = Convert.ToDouble(mSqlDr["Weight"].ToString());
-                                mRolledUpReturn = Convert.ToDouble(mSqlDr["SecurityReturn"].ToString());
-                            }
-                        }
-                        else
-                        {
-                            done = true;
-                            sRgsId = mPrevId;
-                            sWeight = mRolledUpWeight.ToString(mNumberFormat12, OutputCultureInfo);
-                            sReturn = mRolledUpReturn.ToString(mNumberFormat4, OutputCultureInfo);
-                            CloseGlobals();
-                        }
-                    }
-                    sMsg = sRgsId + "," + sWeight + "," + sReturn;
-                    LogHelper.WriteLine(sMsg);
-                }
-            }
 
 
-            catch(SqlException ex)
-            {
-                LogHelper.WriteLine(ex.Message);
-            }
+        //    catch(SqlException ex)
+        //    {
+        //        LogHelper.WriteLine(ex.Message);
+        //    }
 
-            finally
-            {
-                //swLogFile.Flush();
-                //LogHelper.WriteLine(sMsg + "finished " + DateTime.Now);
-            }
+        //    finally
+        //    {
+        //        //swLogFile.Flush();
+        //        //LogHelper.WriteLine(sMsg + "finished " + DateTime.Now);
+        //    }
 
-            return (GetNext);
-        }
+        //    return (GetNext);
+        //}
 
         private double CalculateAdventTotalReturnForDate(string sDate, string sIndexName, bool bSaveReturnInDb)
         {
@@ -2519,8 +2450,7 @@ namespace IndexDataEngineLibrary
                         {
                             foreach(string vendorFormat in Enum.GetNames(typeof(IndexRow.VendorFormat)))
                             {
-                                if(vendorFormat.Equals("SECTOR_LEVEL4") == false)  // Russell only has 3 sector levels (Snp has 4)
-                                    sharedData.AddTotalReturn(oDate, sIndexName, Vendors.Russell.ToString(), vendorFormat, dReturn, "AdvReturnDb");
+                                sharedData.AddTotalReturn(oDate, sIndexName, Vendors.Russell.ToString(), vendorFormat, dReturn, "AdvReturnDb");
                             }
                         }
                     }
@@ -2793,8 +2723,7 @@ namespace IndexDataEngineLibrary
 
                             foreach(string vendorFormat in Enum.GetNames(typeof(IndexRow.VendorFormat)))
                             {
-                                if(vendorFormat.Equals("SECTOR_LEVEL4") == false)  // Russell only has 3 sector levels (Snp has 4)
-                                    sharedData.AddTotalReturn(date, sIndexName, Vendors.Russell.ToString(), vendorFormat, CalculatedTotalReturn, "VendorReturn");
+                                sharedData.AddTotalReturn(date, sIndexName, Vendors.Russell.ToString(), vendorFormat, CalculatedTotalReturn, "VendorReturn");
                             }
                         }
                     }
@@ -2872,8 +2801,7 @@ namespace IndexDataEngineLibrary
                                 dDiff = Math.Round((dVendorReturn - dAdvReturn), iTotalReturnPrecision, MidpointRounding.AwayFromZero);
 
                                 foreach(string vendorFormat in Enum.GetNames(typeof(IndexRow.VendorFormat)))
-                                    if(vendorFormat.Equals("SECTOR_LEVEL4") == false)  // Russell only has 3 sector levels (Snp has 4)
-                                        sharedData.AddTotalReturn(date, sIndexName, Vendors.Russell.ToString(), vendorFormat, dDiff, "DiffDb");
+                                    sharedData.AddTotalReturn(date, sIndexName, Vendors.Russell.ToString(), vendorFormat, dDiff, "DiffDb");
 
                                 //double dTest = Math.Round((dAdvReturn + dDiff), iTotalReturnPrecision, MidpointRounding.AwayFromZero);
                             }

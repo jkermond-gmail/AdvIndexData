@@ -733,13 +733,19 @@ namespace IndexDataEngineLibrary
                 prefix = "ix-";
                 accountProvider = "<AccountProvider name=\"StandardAndPoors\" code=\"ix\">";
             }
-            else if (vendor.Equals(Vendors.Russell) || vendor.Equals(Vendors.RussellIcb))
+            else if( vendor.Equals(Vendors.Russell))
             {
                 prefix = "rl-";
                 accountProvider = "<AccountProvider name=\"Russell\" code=\"rl\">";
             }
+            else if( vendor.Equals(Vendors.RussellIcb))
+            {
+                prefix = "rli-";
+                accountProvider = "<AccountProvider name=\"RussellICB\" code=\"rli\">";
+            }
 
-            if (IsFirstDate && IsLastDate)
+
+            if(IsFirstDate && IsLastDate)
             {
                 addDummyEndOfMonthAxmlAfter = DateHelper.IsEndofMonthOnWeekend(sBusinessDate);
 
@@ -912,8 +918,8 @@ namespace IndexDataEngineLibrary
             }
             else if(vendor.Equals(Vendors.RussellIcb))
             {
-                prefix = "rl-";
-                accountProvider = "<AccountProvider name=\"Russell\" code=\"rl\">";
+                prefix = "rli-";
+                accountProvider = "<AccountProvider name=\"RussellICB\" code=\"rli\">";
                 level1Class = "class=\"ICBIndustry\"";
                 level2Class = "class=\"ICBSuperSector\"";
                 level3Class = "class=\"ICBSector\"";

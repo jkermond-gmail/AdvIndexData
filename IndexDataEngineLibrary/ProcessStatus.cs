@@ -353,6 +353,12 @@ namespace IndexDataEngineLibrary
                                     GenerateReturns = (bOpenData.Equals(true) && bCloseData.Equals(true)
                                                        && bTotalReturnData.Equals(true) && bSymbolChangeData.Equals(true));
                                 }
+                                else if(Vendor.Equals(Vendors.RussellIcb.ToString()))
+                                {
+                                    GenerateReturns = (bOpenData.Equals(true) && bCloseData.Equals(true)
+                                                       && bTotalReturnData.Equals(true) /*&& bSymbolChangeData.Equals(true)*/);
+                                }
+
                                 else if (Vendor.Equals(Vendors.Snp.ToString()))
                                 {
                                     GenerateReturns = (bOpenData.Equals(true) && bCloseData.Equals(true));

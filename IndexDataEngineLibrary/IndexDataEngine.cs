@@ -192,6 +192,18 @@ namespace IndexDataEngineLibrary
                         ProcessStatus.Add(sProcessDate, Vendors.Russell.ToString(), Dataset, IndexName);
                     }
                 }
+                else if(Vendor.Equals("RussellICB"))
+                {
+                    RussellIcbData russellIcbData = new RussellIcbData();
+                    string[] Indices = null;
+                    Indices = russellIcbData.GetIndices();
+                    for(int i = 0; i < Indices.Length; i++)
+                    {
+                        IndexName = Indices[i];
+                        ProcessStatus.Add(sProcessDate, Vendors.RussellIcb.ToString(), Dataset, IndexName);
+                    }
+                }
+
                 else if (Vendor.Equals("StandardAndPoors"))
                 {
                     IndexName = Dataset;

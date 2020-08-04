@@ -48,12 +48,12 @@ namespace IndexDataEngineLibrary
             ALL
         }
 
-        private int[] VendorFileRecLengths = new int[]
-        {
-            605,    //  H_OPEN_ICB
-            591,    //  H_CLOSE_ICB
-            153    //  ALL
-        };
+        //private int[] VendorFileRecLengths = new int[]
+        //{
+        //    605,    //  H_OPEN_ICB
+        //    591,    //  H_CLOSE_ICB
+        //    153    //  ALL
+        //};
 
         private const string TOTAL_COUNT = "Total Count:";
         private bool logReturnData = false;
@@ -77,7 +77,7 @@ namespace IndexDataEngineLibrary
             //LogHelper.Info("RussellData()", "RussellData");
             sharedData = new SharedData();
             DateHelper.ConnectionString = sharedData.ConnectionStringAmdVifs;
-            sharedData.Vendor = Vendors.Russell;
+            sharedData.Vendor = Vendors.RussellIcb;
         }
 
         //public void SetConnectionString(string ConnectionString)
@@ -165,19 +165,19 @@ namespace IndexDataEngineLibrary
                 for(int i = 0; i < Indices.Length; i++)
                 {
                     IndexName = Indices[i];
-                    if(ProcessStatus.GenerateReturns(sProcessDate, Vendors.Russell.ToString(), Dataset, IndexName))
+                    if(ProcessStatus.GenerateReturns(sProcessDate, Vendors.RussellIcb.ToString(), Dataset, IndexName))
                     {
                         GenerateReturnsForDateRange(sProcessDate, sProcessDate, IndexName, AdventOutputType.Constituent, false);
-                        ProcessStatus.Update(sProcessDate, Vendors.Russell.ToString(), Dataset, IndexName, ProcessStatus.WhichStatus.AxmlConstituentData, ProcessStatus.StatusValue.Pass);
+                        ProcessStatus.Update(sProcessDate, Vendors.RussellIcb.ToString(), Dataset, IndexName, ProcessStatus.WhichStatus.AxmlConstituentData, ProcessStatus.StatusValue.Pass);
                         GenerateReturnsForDateRange(sProcessDate, sProcessDate, IndexName, AdventOutputType.Sector, false);
-                        ProcessStatus.Update(sProcessDate, Vendors.Russell.ToString(), Dataset, IndexName, ProcessStatus.WhichStatus.AxmlSectorData, ProcessStatus.StatusValue.Pass);
-                        sharedData.CopyFilesToFtpFolder(sProcessDate, Vendors.Russell, Dataset, IndexName, AdventOutputType.Constituent);
-                        sharedData.CopyFilesToFtpFolder(sProcessDate, Vendors.Russell, Dataset, IndexName, AdventOutputType.Sector);
+                        ProcessStatus.Update(sProcessDate, Vendors.RussellIcb.ToString(), Dataset, IndexName, ProcessStatus.WhichStatus.AxmlSectorData, ProcessStatus.StatusValue.Pass);
+                        sharedData.CopyFilesToFtpFolder(sProcessDate, Vendors.RussellIcb, Dataset, IndexName, AdventOutputType.Constituent);
+                        sharedData.CopyFilesToFtpFolder(sProcessDate, Vendors.RussellIcb, Dataset, IndexName, AdventOutputType.Sector);
                     }
                 }
-                sharedData.VendorDatasetJobsUpdateProcessDate(Vendors.Russell.ToString(), Dataset, sProcessDate);
+                sharedData.VendorDatasetJobsUpdateProcessDate(Vendors.RussellIcb.ToString(), Dataset, sProcessDate);
                 Mail mail = new Mail();
-                mail.SendMail("AdvIndexData: VendorDatasetJobs complete  " + Vendors.Russell.ToString() + " " + Dataset + " " + sProcessDate);
+                mail.SendMail("AdvIndexData: VendorDatasetJobs complete  " + Vendors.RussellIcb.ToString() + " " + Dataset + " " + sProcessDate);
                 IndexDataEngine indexDataEngine = new IndexDataEngine();
                 indexDataEngine.GenerateSecurityMasterChangesDataAndReport(sProcessDate);
             }
@@ -313,14 +313,14 @@ namespace IndexDataEngineLibrary
                             if(bOpenFiles)
                             {
                                 AddRussellOpeningData(VendorFileFormats.H_OPEN_ICB, FileName, oProcessDate);
-                                ProcessStatus.Update(oProcessDate, Vendors.Russell.ToString(), Dataset, "", ProcessStatus.WhichStatus.OpenData, ProcessStatus.StatusValue.Pass);
-                                ProcessStatus.Update(oProcessDate, Vendors.Russell.ToString(), Dataset, "", ProcessStatus.WhichStatus.SecurityMasterData, ProcessStatus.StatusValue.Pass);
+                                ProcessStatus.Update(oProcessDate, Vendors.RussellIcb.ToString(), Dataset, "", ProcessStatus.WhichStatus.OpenData, ProcessStatus.StatusValue.Pass);
+                                ProcessStatus.Update(oProcessDate, Vendors.RussellIcb.ToString(), Dataset, "", ProcessStatus.WhichStatus.SecurityMasterData, ProcessStatus.StatusValue.Pass);
 
                             }
                             //if(bSymbolChanges)
                             //{
                             //    AddRussellSymbolChangeData(VendorFileFormats.H_OPEN_ICB, FileName, oProcessDate);
-                            //    ProcessStatus.Update(oProcessDate, Vendors.Russell.ToString(), Dataset, "", ProcessStatus.WhichStatus.SymbolChangeData, ProcessStatus.StatusValue.Pass);
+                            //    ProcessStatus.Update(oProcessDate, Vendors.RussellIcb.ToString(), Dataset, "", ProcessStatus.WhichStatus.SymbolChangeData, ProcessStatus.StatusValue.Pass);
                             //}
                             LogHelper.WriteLine("Done      : " + FileName + " " + DateTime.Now);
                         }
@@ -335,13 +335,13 @@ namespace IndexDataEngineLibrary
                             if(bCloseFiles)
                             {
                                 AddRussellClosingData(VendorFileFormats.H_CLOSE_ICB, FileName, oProcessDate);
-                                ProcessStatus.Update(oProcessDate, Vendors.Russell.ToString(), Dataset, "", ProcessStatus.WhichStatus.CloseData, ProcessStatus.StatusValue.Pass);
+                                ProcessStatus.Update(oProcessDate, Vendors.RussellIcb.ToString(), Dataset, "", ProcessStatus.WhichStatus.CloseData, ProcessStatus.StatusValue.Pass);
                             }
                             /*
                             if(bSymbolChanges)
                             {
                                 AddRussellSymbolChangeData(VendorFileFormats.H_CLOSE_RGS, FileName, oProcessDate);
-                                ProcessStatus.Update(oProcessDate, Vendors.Russell.ToString(), Dataset, "", ProcessStatus.WhichStatus.SymbolChangeData, ProcessStatus.StatusValue.Pass);
+                                ProcessStatus.Update(oProcessDate, Vendors.RussellIcb.ToString(), Dataset, "", ProcessStatus.WhichStatus.SymbolChangeData, ProcessStatus.StatusValue.Pass);
                             }
                             */
 
@@ -355,7 +355,7 @@ namespace IndexDataEngineLibrary
                         {
                             LogHelper.WriteLine("Processing: " + FileName + " " + DateTime.Now);
                             AddRussellTotalReturnData(VendorFileFormats.ALL, FileName, oProcessDate);
-                            ProcessStatus.Update(oProcessDate, Vendors.Russell.ToString(), Dataset, "", ProcessStatus.WhichStatus.TotalReturnData, ProcessStatus.StatusValue.Pass);
+                            ProcessStatus.Update(oProcessDate, Vendors.RussellIcb.ToString(), Dataset, "", ProcessStatus.WhichStatus.TotalReturnData, ProcessStatus.StatusValue.Pass);
                             LogHelper.WriteLine("Done      : " + FileName + " " + DateTime.Now);
                         }
                     }
@@ -1684,7 +1684,7 @@ namespace IndexDataEngineLibrary
 
         public string[] GetIndices()
         {
-            sharedData.Vendor = Vendors.Russell;
+            sharedData.Vendor = Vendors.RussellIcb;
             return (sharedData.GetIndices());
         }
 
@@ -2846,6 +2846,8 @@ namespace IndexDataEngineLibrary
 
             if(sVendor.Equals("Russell"))
                 vendor = Vendors.Russell;
+            else if(sVendor.Equals("RussellIcb"))
+                vendor = Vendors.RussellIcb;
             else if(sVendor.Equals("Snp"))
                 vendor = Vendors.Snp;
             else
@@ -2874,6 +2876,8 @@ namespace IndexDataEngineLibrary
 
                 if(sVendor.Equals("Russell"))
                     vendor = Vendors.Russell;
+                else if(sVendor.Equals("RussellIcb"))
+                    vendor = Vendors.RussellIcb;
                 else if(sVendor.Equals("Snp"))
                     vendor = Vendors.Snp;
                 else

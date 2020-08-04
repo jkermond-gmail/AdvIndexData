@@ -436,6 +436,8 @@ namespace IndexDataEngineLibrary
                 string SqlWhere = "";
                 if (mVendor.Equals(Vendors.Russell))
                     SqlWhere = "where Vendor = 'Russell' and Supported = 'Yes' ";
+                else if(mVendor.Equals(Vendors.RussellIcb))
+                    SqlWhere = "where Vendor = 'RussellIcb' and Supported = 'Yes' ";
                 else if (mVendor.Equals(Vendors.Snp))
                     SqlWhere = "where Vendor = 'StandardAndPoors' and Supported = 'Yes' ";
                 //string SqlOrderBy = "order by AdventIndexName";
@@ -487,6 +489,8 @@ namespace IndexDataEngineLibrary
                 string SqlWhere = "";
                 if (mVendor.Equals(Vendors.Russell))
                     SqlWhere = "where Vendor = 'Russell' and Supported = 'Yes' ";
+                else if(mVendor.Equals(Vendors.RussellIcb))
+                    SqlWhere = "where Vendor = 'RussellIcb' and Supported = 'Yes' ";
                 else if (mVendor.Equals(Vendors.Snp))
                     SqlWhere = "where Vendor = 'StandardAndPoors' and Supported = 'Yes' ";
                 //string SqlOrderBy = "order by AdventIndexName";

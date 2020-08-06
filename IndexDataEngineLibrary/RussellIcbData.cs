@@ -811,21 +811,32 @@ namespace IndexDataEngineLibrary
                     Fld = ParseColumn(dr, "Shares", 14); // 14
                     double dShares = Convert.ToDouble(Fld);
                     drHoldings1["SharesDenominator"] = Fld;
-                    if(Convert.ToInt32(Fld.ToString()) == 0)
+                    if(Convert.ToInt64(Fld.ToString()) == 0)
                         SharesDenominatorZeroCount += 1;
 
+                    double dMultiplier = 0;
                     // value and growth are multipliers rather than an amount
                     Fld = ParseColumn(dr, "Value Probability", 17); // 17
-                    double dMultiplier = Convert.ToDouble(Fld);
-                    double dValueShares = dShares * dMultiplier;
-                    dValueShares = Math.Round(dValueShares, MidpointRounding.AwayFromZero);
-                    sSharesValue = Convert.ToString(Convert.ToInt32(dValueShares));
+                    if( Fld.Length > 0)
+                    { 
+                        dMultiplier = Convert.ToDouble(Fld);
+                        double dValueShares = dShares * dMultiplier;
+                        dValueShares = Math.Round(dValueShares, MidpointRounding.AwayFromZero);
+                        sSharesValue = Convert.ToString(Convert.ToInt64(dValueShares));
+                    }
+                    else
+                        sSharesValue = "0";
 
                     Fld = ParseColumn(dr, "Growth Probability", 18); // 18
-                    dMultiplier = Convert.ToDouble(Fld);
-                    double dGrowthShares = dShares * dMultiplier;
-                    dGrowthShares = Math.Round(dGrowthShares, MidpointRounding.AwayFromZero);
-                    sSharesGrowth = Convert.ToString(Convert.ToInt32(dGrowthShares));
+                    if(Fld.Length > 0)
+                    {
+                        dMultiplier = Convert.ToDouble(Fld);
+                        double dGrowthShares = dShares * dMultiplier;
+                        dGrowthShares = Math.Round(dGrowthShares, MidpointRounding.AwayFromZero);
+                        sSharesGrowth = Convert.ToString(Convert.ToInt64(dGrowthShares));
+                    }
+                    else
+                        sSharesGrowth = "0";
 
                     r1000 = ParseColumn(dr, "R1000", 25); // 25
                     r2000 = ParseColumn(dr, "R2000", 26); // 26
@@ -858,7 +869,7 @@ namespace IndexDataEngineLibrary
                             drHoldings2["SharesNumerator"] = drHoldings1["SharesDenominator"];
                             drHoldings2["IndexName"] = "r1000";
                             dtHoldings2.Rows.Add(drHoldings2);
-                            if(Convert.ToInt32(sSharesGrowth) > 0)
+                            if(Convert.ToInt64(sSharesGrowth) > 0)
                             {
                                 drHoldings2 = dtHoldings2.NewRow();
                                 drHoldings2["FileDate"] = drHoldings1["FileDate"];
@@ -867,7 +878,7 @@ namespace IndexDataEngineLibrary
                                 drHoldings2["IndexName"] = "r1000g";
                                 dtHoldings2.Rows.Add(drHoldings2);
                             }
-                            if(Convert.ToInt32(sSharesValue) > 0)
+                            if(Convert.ToInt64(sSharesValue) > 0)
                             {
                                 drHoldings2 = dtHoldings2.NewRow();
                                 drHoldings2["FileDate"] = drHoldings1["FileDate"];
@@ -885,7 +896,7 @@ namespace IndexDataEngineLibrary
                             drHoldings2["SharesNumerator"] = drHoldings1["SharesDenominator"];
                             drHoldings2["IndexName"] = "r2000";
                             dtHoldings2.Rows.Add(drHoldings2);
-                            if(Convert.ToInt32(sSharesGrowth) > 0)
+                            if(Convert.ToInt64(sSharesGrowth) > 0)
                             {
                                 drHoldings2 = dtHoldings2.NewRow();
                                 drHoldings2["FileDate"] = drHoldings1["FileDate"];
@@ -894,7 +905,7 @@ namespace IndexDataEngineLibrary
                                 drHoldings2["IndexName"] = "r2000g";
                                 dtHoldings2.Rows.Add(drHoldings2);
                             }
-                            if(Convert.ToInt32(sSharesValue) > 0)
+                            if(Convert.ToInt64(sSharesValue) > 0)
                             {
                                 drHoldings2 = dtHoldings2.NewRow();
                                 drHoldings2["FileDate"] = drHoldings1["FileDate"];
@@ -912,7 +923,7 @@ namespace IndexDataEngineLibrary
                             drHoldings2["SharesNumerator"] = drHoldings1["SharesDenominator"];
                             drHoldings2["IndexName"] = "r2500";
                             dtHoldings2.Rows.Add(drHoldings2);
-                            if(Convert.ToInt32(sSharesGrowth) > 0)
+                            if(Convert.ToInt64(sSharesGrowth) > 0)
                             {
                                 drHoldings2 = dtHoldings2.NewRow();
                                 drHoldings2["FileDate"] = drHoldings1["FileDate"];
@@ -921,7 +932,7 @@ namespace IndexDataEngineLibrary
                                 drHoldings2["IndexName"] = "r2500g";
                                 dtHoldings2.Rows.Add(drHoldings2);
                             }
-                            if(Convert.ToInt32(sSharesValue) > 0)
+                            if(Convert.ToInt64(sSharesValue) > 0)
                             {
                                 drHoldings2 = dtHoldings2.NewRow();
                                 drHoldings2["FileDate"] = drHoldings1["FileDate"];
@@ -939,7 +950,7 @@ namespace IndexDataEngineLibrary
                             drHoldings2["SharesNumerator"] = drHoldings1["SharesDenominator"];
                             drHoldings2["IndexName"] = "rmid";
                             dtHoldings2.Rows.Add(drHoldings2);
-                            if(Convert.ToInt32(sSharesGrowth) > 0)
+                            if(Convert.ToInt64(sSharesGrowth) > 0)
                             {
                                 drHoldings2 = dtHoldings2.NewRow();
                                 drHoldings2["FileDate"] = drHoldings1["FileDate"];
@@ -948,7 +959,7 @@ namespace IndexDataEngineLibrary
                                 drHoldings2["IndexName"] = "rmidg";
                                 dtHoldings2.Rows.Add(drHoldings2);
                             }
-                            if(Convert.ToInt32(sSharesValue) > 0)
+                            if(Convert.ToInt64(sSharesValue) > 0)
                             {
                                 drHoldings2 = dtHoldings2.NewRow();
                                 drHoldings2["FileDate"] = drHoldings1["FileDate"];
@@ -966,7 +977,7 @@ namespace IndexDataEngineLibrary
                             drHoldings2["SharesNumerator"] = drHoldings1["SharesDenominator"];
                             drHoldings2["IndexName"] = "rtop200";
                             dtHoldings2.Rows.Add(drHoldings2);
-                            if(Convert.ToInt32(sSharesGrowth) > 0)
+                            if(Convert.ToInt64(sSharesGrowth) > 0)
                             {
                                 drHoldings2 = dtHoldings2.NewRow();
                                 drHoldings2["FileDate"] = drHoldings1["FileDate"];
@@ -975,7 +986,7 @@ namespace IndexDataEngineLibrary
                                 drHoldings2["IndexName"] = "rtop200g";
                                 dtHoldings2.Rows.Add(drHoldings2);
                             }
-                            if(Convert.ToInt32(sSharesValue) > 0)
+                            if(Convert.ToInt64(sSharesValue) > 0)
                             {
                                 drHoldings2 = dtHoldings2.NewRow();
                                 drHoldings2["FileDate"] = drHoldings1["FileDate"];
@@ -993,7 +1004,7 @@ namespace IndexDataEngineLibrary
                             drHoldings2["SharesNumerator"] = drHoldings1["SharesDenominator"];
                             drHoldings2["IndexName"] = "rsmallc";
                             dtHoldings2.Rows.Add(drHoldings2);
-                            if(Convert.ToInt32(sSharesGrowth) > 0)
+                            if(Convert.ToInt64(sSharesGrowth) > 0)
                             {
                                 drHoldings2 = dtHoldings2.NewRow();
                                 drHoldings2["FileDate"] = drHoldings1["FileDate"];
@@ -1002,7 +1013,7 @@ namespace IndexDataEngineLibrary
                                 drHoldings2["IndexName"] = "rsmallcg";
                                 dtHoldings2.Rows.Add(drHoldings2);
                             }
-                            if(Convert.ToInt32(sSharesValue) > 0)
+                            if(Convert.ToInt64(sSharesValue) > 0)
                             {
                                 drHoldings2 = dtHoldings2.NewRow();
                                 drHoldings2["FileDate"] = drHoldings1["FileDate"];
@@ -1020,7 +1031,7 @@ namespace IndexDataEngineLibrary
                             drHoldings2["SharesNumerator"] = drHoldings1["SharesDenominator"];
                             drHoldings2["IndexName"] = "r3000";
                             dtHoldings2.Rows.Add(drHoldings2);
-                            if(Convert.ToInt32(sSharesGrowth) > 0)
+                            if(Convert.ToInt64(sSharesGrowth) > 0)
                             {
                                 drHoldings2 = dtHoldings2.NewRow();
                                 drHoldings2["FileDate"] = drHoldings1["FileDate"];
@@ -1029,7 +1040,7 @@ namespace IndexDataEngineLibrary
                                 drHoldings2["IndexName"] = "r3000g";
                                 dtHoldings2.Rows.Add(drHoldings2);
                             }
-                            if(Convert.ToInt32(sSharesValue) > 0)
+                            if(Convert.ToInt64(sSharesValue) > 0)
                             {
                                 drHoldings2 = dtHoldings2.NewRow();
                                 drHoldings2["FileDate"] = drHoldings1["FileDate"];
@@ -1047,7 +1058,7 @@ namespace IndexDataEngineLibrary
                             drHoldings2["SharesNumerator"] = drHoldings1["SharesDenominator"];
                             drHoldings2["IndexName"] = "rmicro";
                             dtHoldings2.Rows.Add(drHoldings2);
-                            if(Convert.ToInt32(sSharesGrowth) > 0)
+                            if(Convert.ToInt64(sSharesGrowth) > 0)
                             {
                                 drHoldings2 = dtHoldings2.NewRow();
                                 drHoldings2["FileDate"] = drHoldings1["FileDate"];
@@ -1056,7 +1067,7 @@ namespace IndexDataEngineLibrary
                                 drHoldings2["IndexName"] = "rmicrog";
                                 dtHoldings2.Rows.Add(drHoldings2);
                             }
-                            if(Convert.ToInt32(sSharesValue) > 0)
+                            if(Convert.ToInt64(sSharesValue) > 0)
                             {
                                 drHoldings2 = dtHoldings2.NewRow();
                                 drHoldings2["FileDate"] = drHoldings1["FileDate"];
@@ -1183,7 +1194,7 @@ namespace IndexDataEngineLibrary
 
                     Fld = ParseColumn(dr, "Shares", 10);
                     sShares = Fld;
-                    if(Convert.ToInt32(sShares.ToString()) == 0)
+                    if(Convert.ToInt64(sShares.ToString()) == 0)
                         SharesDenominatorZeroCount += 1;
                 }
 
@@ -1621,7 +1632,7 @@ namespace IndexDataEngineLibrary
                 //        "update TotalReturns set " + sWhichReturn + " = @" + sWhichReturn + " " +
                 //        "where IndexName = @IndexName and FileDate = @FileDate and VendorFormat = @VendorFormat";
                 //}
-                cmd.ExecuteNonQuery();
+                cmd.ExecuteNonQuery();                 
             }
             catch(SqlException ex)
             {
@@ -2747,6 +2758,7 @@ namespace IndexDataEngineLibrary
 
             for(DateTime date = startDate; date <= endDate; date = DateHelper.NextBusinessDay(date))
             {
+                SqlDataReader dr = null;
                 try
                 {
                     if(mSqlConn == null)
@@ -2754,7 +2766,6 @@ namespace IndexDataEngineLibrary
                         mSqlConn = new SqlConnection(sharedData.ConnectionStringIndexData);
                         mSqlConn.Open();
                     }
-                    SqlDataReader dr = null;
                     double dVendorReturn = double.MinValue;
                     double dAdvReturn = double.MinValue;
                     //double dAdvAdjFactor = double.MinValue;
@@ -2816,6 +2827,7 @@ namespace IndexDataEngineLibrary
                 }
                 finally
                 {
+                    dr.Close();
                 }
             }
         }

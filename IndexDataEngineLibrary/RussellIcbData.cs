@@ -23,10 +23,6 @@ namespace IndexDataEngineLibrary
         private SqlDataReader mSqlDr = null;
         private int ConstituentCount = 0;
         private string mPrevId;
-        private double mRolledUpWeight;
-        private double mRolledUpReturn;
-        private string mNumberFormat12 = "0.############";
-        private string mNumberFormat4 = "0.####";
 
         private CultureInfo mCultureInfo = new CultureInfo("en-US");
 
@@ -48,51 +44,26 @@ namespace IndexDataEngineLibrary
             ALL
         }
 
-        //private int[] VendorFileRecLengths = new int[]
-        //{
-        //    605,    //  H_OPEN_ICB
-        //    591,    //  H_CLOSE_ICB
-        //    153    //  ALL
-        //};
-
         private const string TOTAL_COUNT = "Total Count:";
         private bool logReturnData = false;
 
         #endregion End privates, enums, constants
 
-        #region Production Code used by processor.process2()
-        /***************************************************/
+        #region Production Code
+        /***********************/
 
         #region Constructor / Finish 
-        //public RussellData()
-        //{
-        //    //private const string SQL_CONN = "server=JKERMOND\\JKERMOND;database=AdvIndexData;uid=sa;pwd=M@gichat!";
-        //    // mConnectionString = ConfigurationManager.AppSettings["AdoConnectionString"];
-        //    OpenLogFile();
-        //}
 
         public RussellIcbData()
         {
-            //dateHelper = 
-            //LogHelper.Info("RussellData()", "RussellData");
             sharedData = new SharedData();
             DateHelper.ConnectionString = sharedData.ConnectionStringAmdVifs;
             sharedData.Vendor = Vendors.RussellIcb;
         }
 
-        //public void SetConnectionString(string ConnectionString)
-        //{
-        //    mConnectionString = ConnectionString;
-        //}
-
-
         private void OpenLogFile()
         {
-            //private const string PATH = @"D:\IndexData\Russell\Test\";
-            //private const string LOG_FILE = "RussellData.txt";
             LogFileName = AppSettings.Get<string>("RussellLogFile");
-            //if (File.Exists(LogFileName))
-            //    File.Delete(LogFileName);
             if(swLogFile == null)
             {
                 if(!File.Exists(LogFileName))
@@ -135,10 +106,7 @@ namespace IndexDataEngineLibrary
                 mSqlConn.Close();
                 mSqlConn = null;
             }
-            //ConstituentCount = 0;
             mPrevId = "";
-            mRolledUpWeight = 0.0;
-            mRolledUpReturn = 0.0;
 
         }
 
@@ -391,19 +359,6 @@ namespace IndexDataEngineLibrary
             int AdventTotal = SecuritiesTotal - ZeroSharesTotal;
             LogHelper.WriteLine(FileName + ": SecurityCount " + AdventTotal +
                                 " VendorTotalCount " + VendorTotal + " Zero Shares " + ZeroSharesTotal);
-            //CREATE TABLE dbo.RussellIcbDailyTotals
-            //(
-            //    FileType        varchar(50)   COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
-            //    FileDate        DateOnly_Type NOT NULL,
-            //    FileName        varchar(80)   COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
-            //    VendorTotal     int           NOT NULL,
-            //    AdventTotal     int           NOT NULL,
-            //    ZeroSharesTotal int           CONSTRAINT DF_RussellIcbDailyTotals_ZeroSharesTotal DEFAULT 0 NOT NULL,
-            //    dateModified    datetime      CONSTRAINT DF_RussellIcbDailyTotals_dateModified DEFAULT getdate() NOT NULL,
-            //    CONSTRAINT PK_RussellIcbDailyTotals
-            //    PRIMARY KEY CLUSTERED (FileType,FileDate)
-            //)
-
             SqlConnection cnSql = new SqlConnection(sharedData.ConnectionStringIndexData);
             try
             {
@@ -693,7 +648,6 @@ namespace IndexDataEngineLibrary
             SqlCommand cmdHoldings = null;
             string Fld;
             DateTime oDate = DateTime.MinValue;
-            StreamReader srHoldingsFile = null;
 
             cnSql1.Open();
             cnSql2.Open();
@@ -1096,15 +1050,6 @@ namespace IndexDataEngineLibrary
                         }
                     }
                 }
-                //else if(FoundTotalCount)
-                //{
-                //    AddTotalConstituentCounts(FileDate, FileFormat, FileName, TextLine, SecurityCount, SharesDenominatorZeroCount);
-                //    break;
-                //}
-                //if(!add && !IsHeader1 && !IsHeader2 && (TextLine.Length > 0))
-                //{
-                //    LogHelper.WriteLine("Skipping line:" + TextLine.ToString());
-                //}
             }
             try
             {
@@ -1471,23 +1416,6 @@ namespace IndexDataEngineLibrary
 
         public void GenerateHistSecMasterList(string sClientID, string sVendor, string sIndexId, string sBeginDate)
         {
-            /*
-            SELECT     sm.Ticker, sm.Cusip, sm.Description, sm.Vendor, sm.IndexId, sm.BeginDate, sm.EndDate, sc.SectorCode, sc.SectorDesc, sc.IndustryGroupCode, 
-                                  sc.IndustryGroupDesc, sc.IndustryCode, sc.IndustryDesc, sc.SubIndustryCode, sc.SubIndustryDesc
-            FROM         HistoricalSecurityMasterFull sm INNER JOIN
-                                  SectorCodesGICS sc ON sm.IndustryGroup = sc.SubIndustryCode
-            WHERE     (sm.Vendor = 'StandardAndPoors') AND (sm.IndexId = 'sp500') AND (sm.BeginDate >= '11/01/2012') AND (sm.EndDate <= '01/24/2014')
-            ORDER BY sm.Ticker 
-             * 
-            SELECT     sm.Ticker, sm.Cusip, sm.Description, sm.Vendor, sm.IndexId, sm.BeginDate, sm.EndDate, sc.SectorCode, sc.SectorDesc, sc.SubSectorCode, 
-                                  sc.SubSectorDesc, sc.IndustryCode, sc.IndustryDesc
-            FROM         HistoricalSecurityMasterFull sm INNER JOIN
-                                  SectorCodesRGS sc ON sm.IndustryGroup = sc.IndustryCode
-            WHERE     (sm.Vendor = 'Russell') AND (sm.IndexId = 'r3000') AND (sm.BeginDate >= '11/01/2000') AND (sm.EndDate <= '01/24/2014')
-            ORDER BY sm.Ticker 
-             * * 
-             */
-
             try
             {
                 SqlConnection SqlConn = new SqlConnection(sharedData.ConnectionStringIndexData);
@@ -1592,13 +1520,6 @@ namespace IndexDataEngineLibrary
         #region Total Return
         public void AddRussellTotalReturnForIndex(DateTime oDate, string sIndexName, string sTotalReturn)
         {
-            /*
-            CREATE TABLE[dbo].[RussellIcbDailyIndexReturns] (
-	        [IndexName] [varchar] (9) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
-            [FileDate] [DateOnly_Type] NOT NULL,
-            [TotalReturn] [varchar] (12) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL 
-            ) ON[PRIMARY]
-            */
             try
             {
                 if(mSqlConn == null)
@@ -1649,8 +1570,8 @@ namespace IndexDataEngineLibrary
 
         #endregion End Total Return
 
-        /***************************************************/
-        #endregion  End Production Code used by processor.process2()
+        /*******************************/
+        #endregion  End Production Code
 
 
         #region Testing Code used by Form2.Russell Tab
@@ -2374,22 +2295,6 @@ namespace IndexDataEngineLibrary
             return (GetNext);
         }
 
-
-
-        //    catch(SqlException ex)
-        //    {
-        //        LogHelper.WriteLine(ex.Message);
-        //    }
-
-        //    finally
-        //    {
-        //        //swLogFile.Flush();
-        //        //LogHelper.WriteLine(sMsg + "finished " + DateTime.Now);
-        //    }
-
-        //    return (GetNext);
-        //}
-
         private double CalculateAdventTotalReturnForDate(string sDate, string sIndexName, bool bSaveReturnInDb)
         {
             SqlConnection conn = new SqlConnection(sharedData.ConnectionStringIndexData);
@@ -2657,8 +2562,6 @@ namespace IndexDataEngineLibrary
         }
 
 
-
-
         public void CalculateVendorTotalReturnsForPeriod(string sStartDate, string sEndDate, string sIndexName)
         {
             DateTime startDate = DateTime.Parse(sStartDate);
@@ -2686,10 +2589,8 @@ namespace IndexDataEngineLibrary
                     SqlCommand cmd = new SqlCommand(SqlSelect, mSqlConn);
                     cmd.Parameters.Add("@IndexName", SqlDbType.VarChar);
                     cmd.Parameters.Add("@FileDate", SqlDbType.DateTime);
-                    //cmd.Parameters.Add("@TotalReturn", SqlDbType.VarChar);
                     cmd.Parameters["@IndexName"].Value = sIndexName;
                     cmd.Parameters["@FileDate"].Value = prevDate;
-                    //cmd.Parameters["@TotalReturn"].Value = sTotalReturn;
 
                     int iCountPrev = (int)cmd.ExecuteScalar();
                     if(iCountPrev == 1)
@@ -2770,13 +2671,7 @@ namespace IndexDataEngineLibrary
                     }
                     double dVendorReturn = double.MinValue;
                     double dAdvReturn = double.MinValue;
-                    //double dAdvAdjFactor = double.MinValue;
-                    //double dAdvReturnAdj = double.MinValue;
-                    //double dAdvReturnDb = double.MinValue;
                     double dDiff = double.MinValue;
-                    //double dDiffAdj = double.MinValue;
-                    //double dDiffDb = double.MinValue;
-                    //double dCumltDiff = double.MinValue;
                     int iTotalReturnPrecision = 9;
 
 

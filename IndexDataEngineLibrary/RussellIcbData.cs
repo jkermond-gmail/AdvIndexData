@@ -703,7 +703,7 @@ namespace IndexDataEngineLibrary
             cmdHoldings = new SqlCommand();
             cmdHoldings.Connection = cnSql1;
             cmdHoldings.CommandText = SqlDelete + SqlWhere;
-            cmdHoldings.Parameters.Add("@FileDate", SqlDbType.DateTime);
+            cmdHoldings.Parameters.Add("@FileDate", SqlDbType.Date);
             cmdHoldings.Parameters["@FileDate"].Value = FileDate;
             cmdHoldings.ExecuteNonQuery();
             SqlDelete = "delete FROM RussellIcbDailyHoldings2 ";
@@ -1961,6 +1961,8 @@ namespace IndexDataEngineLibrary
             indexRowsSectorLevel1RollUp.Clear();
             indexRowsSectorLevel2RollUp.Clear();
             indexRowsSectorLevel3RollUp.Clear();
+            indexRowsSectorLevel4RollUp.Clear();
+
         }
 
 
@@ -2209,7 +2211,7 @@ namespace IndexDataEngineLibrary
 
                 string SqlSelect = @"
                     SELECT h1.FileDate, h2.IndexName, h1.CUSIP, lower(h1.Ticker) as Ticker, h1.SecurityReturn, 
-                    LEFT(h1.Sector,2) As Industry, LEFT(h1.Sector,4) As SuperSector, LEFT(h1.Sector,6) As Sector, h1.Sector As SubSector,
+                    LEFT(h1.Sector,2) As IcbIndustry, LEFT(h1.Sector,4) As IcbSuperSector, LEFT(h1.Sector,6) As IcbSector, h1.Sector As IcbSubSector,
                         ROUND((( (cast(h1.MktValue as float) * 
                                     (cast(h2.SharesNumerator as float)/h1.SharesDenominator))/
                         (SELECT     
@@ -2245,7 +2247,7 @@ namespace IndexDataEngineLibrary
                         break;
                     case AdventOutputType.Sector:
                         SqlOrderBy = @"
-                        ORDER BY SubSector
+                        ORDER BY Sector
                         ";
                         break;
                     default:
@@ -2313,10 +2315,10 @@ namespace IndexDataEngineLibrary
                         sOriginalTicker = sOriginalTicker.ToLower();
                         sWeight = mSqlDr["Weight"].ToString();
                         sSecurityReturn = mSqlDr["SecurityReturn"].ToString();
-                        sIndustry = mSqlDr["Industry"].ToString(); 
-                        sSuperSector = mSqlDr["SuperSector"].ToString();
-                        sSector = mSqlDr["Sector"].ToString();
-                        sSubSector = mSqlDr["SubSector"].ToString();
+                        sIndustry = mSqlDr["IcbIndustry"].ToString(); 
+                        sSuperSector = mSqlDr["IcbSuperSector"].ToString();
+                        sSector = mSqlDr["IcbSector"].ToString();
+                        sSubSector = mSqlDr["IcbSubSector"].ToString();
 
                         string sFileDate = mSqlDr["FileDate"].ToString(); ;
 

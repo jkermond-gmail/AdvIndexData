@@ -1753,7 +1753,8 @@ namespace IndexDataEngineLibrary
 
             finally
             {
-                dr.Close();
+                if(dr != null)
+                    dr.Close();
                 conn.Close();
                 LogHelper.WriteLine(sMsg + "finished " + DateTime.Now);
                 //LogHelper.Flush();

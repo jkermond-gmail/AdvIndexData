@@ -272,7 +272,7 @@ namespace IndexDataEngineLibrary
                    ; (DateCompare = oProcessDate.CompareTo(oEndDate)) <= 0
                    ; oProcessDate = oProcessDate.AddDays(1))
                 {
-                    if(bOpenFiles || bSymbolChanges)
+                    if(bOpenFiles)
                     {
                         FileName = FilePath + "H_OPEN_R3000E_" + oProcessDate.ToString("yyyyMMdd") + ".csv";
                         if(File.Exists(FileName))
@@ -285,11 +285,6 @@ namespace IndexDataEngineLibrary
                                 ProcessStatus.Update(oProcessDate, Vendors.RussellIcb.ToString(), Dataset, "", ProcessStatus.WhichStatus.SecurityMasterData, ProcessStatus.StatusValue.Pass);
 
                             }
-                            //if(bSymbolChanges)
-                            //{
-                            //    AddRussellSymbolChangeData(VendorFileFormats.H_OPEN_ICB, FileName, oProcessDate);
-                            //    ProcessStatus.Update(oProcessDate, Vendors.RussellIcb.ToString(), Dataset, "", ProcessStatus.WhichStatus.SymbolChangeData, ProcessStatus.StatusValue.Pass);
-                            //}
                             LogHelper.WriteLine("Done      : " + FileName + " " + DateTime.Now);
                         }
                     }
@@ -305,13 +300,6 @@ namespace IndexDataEngineLibrary
                                 AddRussellClosingData(VendorFileFormats.H_CLOSE_ICB, FileName, oProcessDate);
                                 ProcessStatus.Update(oProcessDate, Vendors.RussellIcb.ToString(), Dataset, "", ProcessStatus.WhichStatus.CloseData, ProcessStatus.StatusValue.Pass);
                             }
-                            /*
-                            if(bSymbolChanges)
-                            {
-                                AddRussellSymbolChangeData(VendorFileFormats.H_CLOSE_RGS, FileName, oProcessDate);
-                                ProcessStatus.Update(oProcessDate, Vendors.RussellIcb.ToString(), Dataset, "", ProcessStatus.WhichStatus.SymbolChangeData, ProcessStatus.StatusValue.Pass);
-                            }
-                            */
 
                             LogHelper.WriteLine("Done      : " + FileName + " " + DateTime.Now);
                         }
@@ -327,6 +315,22 @@ namespace IndexDataEngineLibrary
                             LogHelper.WriteLine("Done      : " + FileName + " " + DateTime.Now);
                         }
                     }
+
+                    if(bSymbolChanges)
+                    {
+                        FileName = FilePath + "Updates_" + oProcessDate.ToString("yyyyMMdd") + "_R3000E.csv.csv";
+                        if(File.Exists(FileName))
+                        {
+                            LogHelper.WriteLine("Processing: " + FileName + " " + DateTime.Now);
+                            if(bSymbolChanges)
+                            {
+                                AddRussellSymbolChangeData(VendorFileFormats.H_OPEN_ICB, FileName, oProcessDate);
+                                ProcessStatus.Update(oProcessDate, Vendors.RussellIcb.ToString(), Dataset, "", ProcessStatus.WhichStatus.SymbolChangeData, ProcessStatus.StatusValue.Pass);
+                            }
+                            LogHelper.WriteLine("Done      : " + FileName + " " + DateTime.Now);
+                        }
+                    }
+
                 }
             }
             catch(SqlException ex)
@@ -462,48 +466,51 @@ namespace IndexDataEngineLibrary
             bool bTotalCount = false;
             bool bHeader1 = false;
             bool bHeader2 = false;
-            StreamReader srFile = null;
+            DataTable dt = ReadCsvIntoTable(FileName);
+            int i = 0;
 
-            for(srFile = new StreamReader(FileName)
-               ; srFile.EndOfStream == false
-               ;)
+            foreach(DataRow dr in dt.Rows)
             {
-                string sDate = "";
-                DateTime oDate = DateTime.MinValue;
-                string sOldSymbol = "";
-                string sNewSymbol = "";
-                string sCompanyName = "";
-                string TextLine = srFile.ReadLine();
-                /*
-                Total Count:                                3526                 
-                Date   Old Identifier    New Identifier         Name
-                -------- --------------    --------------   -------------------
-20170103 831756101         02874P103        AMERICAN OUTDOOR BRANDS
-                20170103 SWHC              AOBC             AMERICAN OUTDOOR BRANDS
-                20170103 385002100         385002308        GRAMERCY PROPERTY TRUST
-                20170103 502424104         502413107        L3 TECHNOLOGIES
-                20170103 26168L205         50189K103        LCI INDUSTRIES
-                20170103 DW                LCII             LCI INDUSTRIES
-                20170103 761283100         74967X103        RH
-                */
-                if(!bTotalCount)
-                    bTotalCount = TextLine.Contains("Total Count:");
-                if(bTotalCount && !bHeader1)
-                    bHeader1 = (TextLine.StartsWith("  Date") == true);
-                if(bTotalCount && bHeader1 && !bHeader2)
-                    bHeader2 = (TextLine.StartsWith("------") == true);
-                if(bTotalCount && bHeader1 && bHeader2 && TextLine.StartsWith("20"))
-                {
-                    sDate = GetField(TextLine, 1, 8);
-                    if(sDate.Length == 8)
-                        DateTime.TryParseExact(sDate, "yyyyMMdd", mCultureInfo, DateTimeStyles.None, out oDate);
-                    sOldSymbol = GetField(TextLine, 10, 8);
-                    sNewSymbol = GetField(TextLine, 28, 8);
-                    sCompanyName = GetField(TextLine, 45, TextLine.Length - 45 + 1);
-                    sharedData.AddSymbolChange("R", oDate, sOldSymbol, sNewSymbol, sCompanyName);
-                }
+                i += 1;
+
+                bool ok = true;
+
+//                string sDate = "";
+//                DateTime oDate = DateTime.MinValue;
+
+//                string sOldSymbol = "";
+//                string sNewSymbol = "";
+//                string sCompanyName = "";
+//                string TextLine = srFile.ReadLine();
+//                /*
+//                Total Count:                                3526                 
+//                Date   Old Identifier    New Identifier         Name
+//                -------- --------------    --------------   -------------------
+//20170103 831756101         02874P103        AMERICAN OUTDOOR BRANDS
+//                20170103 SWHC              AOBC             AMERICAN OUTDOOR BRANDS
+//                20170103 385002100         385002308        GRAMERCY PROPERTY TRUST
+//                20170103 502424104         502413107        L3 TECHNOLOGIES
+//                20170103 26168L205         50189K103        LCI INDUSTRIES
+//                20170103 DW                LCII             LCI INDUSTRIES
+//                20170103 761283100         74967X103        RH
+//                */
+//                if(!bTotalCount)
+//                    bTotalCount = TextLine.Contains("Total Count:");
+//                if(bTotalCount && !bHeader1)
+//                    bHeader1 = (TextLine.StartsWith("  Date") == true);
+//                if(bTotalCount && bHeader1 && !bHeader2)
+//                    bHeader2 = (TextLine.StartsWith("------") == true);
+//                if(bTotalCount && bHeader1 && bHeader2 && TextLine.StartsWith("20"))
+//                {
+//                    sDate = GetField(TextLine, 1, 8);
+//                    if(sDate.Length == 8)
+//                        DateTime.TryParseExact(sDate, "yyyyMMdd", mCultureInfo, DateTimeStyles.None, out oDate);
+//                    sOldSymbol = GetField(TextLine, 10, 8);
+//                    sNewSymbol = GetField(TextLine, 28, 8);
+//                    sCompanyName = GetField(TextLine, 45, TextLine.Length - 45 + 1);
+//                    sharedData.AddSymbolChange("R", oDate, sOldSymbol, sNewSymbol, sCompanyName);
+//                }
             }
-            srFile.Close();
         }
 
 

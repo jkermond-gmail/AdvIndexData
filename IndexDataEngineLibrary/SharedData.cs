@@ -744,8 +744,8 @@ namespace IndexDataEngineLibrary
             }
             else if( vendor.Equals(Vendors.RussellIcb))
             {
-                prefix = "rli-";
-                accountProvider = "<AccountProvider name=\"RussellICB\" code=\"rli\">";
+                prefix = "4rl-";
+                accountProvider = "<AccountProvider name=\"RussellICB\" code=\"4rl\">";
             }
 
 
@@ -922,8 +922,8 @@ namespace IndexDataEngineLibrary
             }
             else if(vendor.Equals(Vendors.RussellIcb))
             {
-                prefix = "rli-";
-                accountProvider = "<AccountProvider name=\"RussellICB\" code=\"rli\">";
+                prefix = "4rl-";
+                accountProvider = "<AccountProvider name=\"RussellICB\" code=\"4rl\">";
                 level1Class = "class=\"ICBIndustry\"";
                 level2Class = "class=\"ICBSuperSector\"";
                 level3Class = "class=\"ICBSector\"";

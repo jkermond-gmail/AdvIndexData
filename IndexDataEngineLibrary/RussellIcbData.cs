@@ -12,7 +12,7 @@ using AdventUtilityLibrary;
 using LumenWorks.Framework.IO.Csv;
 
 
-namespace IndexDataEngineLibrary
+namespace IndexDataEngineLibrary 
 {
     public sealed class RussellIcbData
     {

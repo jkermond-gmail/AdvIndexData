@@ -794,29 +794,41 @@ namespace IndexDataEngineLibrary
                     if(Convert.ToInt64(Fld.ToString()) == 0)
                         SharesDenominatorZeroCount += 1;
 
-                    double dMultiplier = 0;
-                    // value and growth are multipliers rather than an amount
-                    Fld = ParseColumn(dr, "Value Probability", 17); // 17
-                    if( Fld.Length > 0)
-                    { 
-                        dMultiplier = Convert.ToDouble(Fld);
-                        double dValueShares = dShares * dMultiplier;
-                        dValueShares = Math.Round(dValueShares, MidpointRounding.AwayFromZero);
-                        sSharesValue = Convert.ToString(Convert.ToInt64(dValueShares));
-                    }
+                    Fld = ParseColumn(dr, "Value Shares", 17); // 17
+                    if(Fld.Length > 0)
+                        sSharesValue = Fld;
                     else
                         sSharesValue = "0";
 
-                    Fld = ParseColumn(dr, "Growth Probability", 18); // 18
+                    Fld = ParseColumn(dr, "Growth Shares", 18); // 18
                     if(Fld.Length > 0)
-                    {
-                        dMultiplier = Convert.ToDouble(Fld);
-                        double dGrowthShares = dShares * dMultiplier;
-                        dGrowthShares = Math.Round(dGrowthShares, MidpointRounding.AwayFromZero);
-                        sSharesGrowth = Convert.ToString(Convert.ToInt64(dGrowthShares));
-                    }
+                        sSharesGrowth = Fld;
                     else
                         sSharesGrowth = "0";
+
+                    //double dMultiplier = 0;
+                    //// value and growth are multipliers rather than an amount
+                    //Fld = ParseColumn(dr, "Value Probability", 17); // 17
+                    //if( Fld.Length > 0 && !Fld.Equals("0"))
+                    //{ 
+                    //    dMultiplier = Convert.ToDouble(Fld);
+                    //    double dValueShares = dShares * dMultiplier;
+                    //    dValueShares = Math.Round(dValueShares, MidpointRounding.AwayFromZero);
+                    //    sSharesValue = Convert.ToString(Convert.ToInt64(dValueShares));
+                    //}
+                    //else
+                    //    sSharesValue = "0";
+
+                    //Fld = ParseColumn(dr, "Growth Probability", 18); // 18
+                    //if(Fld.Length > 0 && !Fld.Equals("0"))
+                    //{
+                    //    dMultiplier = Convert.ToDouble(Fld);
+                    //    double dGrowthShares = dShares * dMultiplier;
+                    //    dGrowthShares = Math.Round(dGrowthShares, MidpointRounding.AwayFromZero);
+                    //    sSharesGrowth = Convert.ToString(Convert.ToInt64(dGrowthShares));
+                    //}
+                    //else
+                    //    sSharesGrowth = "0";
 
                     r1000 = ParseColumn(dr, "R1000", 25); // 25
                     r2000 = ParseColumn(dr, "R2000", 26); // 26

@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Diagnostics;
+using System.Globalization;
 
 using IndexDataEngineLibrary;
 using AdventUtilityLibrary;
@@ -104,17 +105,19 @@ namespace IndexDataForm
 
         private void monthCalendar1_DateSelected(object sender, DateRangeEventArgs e)
         {
+            CultureInfo enUS = new CultureInfo("en-US");
             string selectedDate = monthCalendar1.SelectionEnd.ToShortDateString();
-            if (calendarCaller == lnkStartDate)
+
+            if(calendarCaller == lnkStartDate)
             {
                 lnkStartDate.Text = selectedDate;
-                startDate = monthCalendar1.SelectionEnd;
+                DateTime.TryParseExact(selectedDate, "M/d/yyyy", enUS, DateTimeStyles.None, out startDate);
                 bStartDateSelected = true;
             }
             else if (calendarCaller == lnkEndDate)
             {
                 lnkEndDate.Text = selectedDate;
-                endDate = monthCalendar1.SelectionEnd;
+                DateTime.TryParseExact(selectedDate, "M/d/yyyy", enUS, DateTimeStyles.None, out endDate);
                 bEndDateSelected = true;
             }
             monthCalendar1.Hide();

@@ -289,7 +289,7 @@ namespace IndexDataEngineLibrary
                         }
                     }
 
-                    if(bCloseFiles /*|| bSymbolChanges */)
+                    if(bCloseFiles)
                     {
                         FileName = FilePath + "H_" + oProcessDate.ToString("yyyyMMdd") + "_R3000E.csv";
                         if(File.Exists(FileName))
@@ -318,13 +318,13 @@ namespace IndexDataEngineLibrary
 
                     if(bSymbolChanges)
                     {
-                        FileName = FilePath + "Updates_" + oProcessDate.ToString("yyyyMMdd") + "_R3000E.csv.csv";
+                        FileName = FilePath + "Updates_" + oProcessDate.ToString("yyyyMMdd") + "_R3000E.csv";
                         if(File.Exists(FileName))
                         {
                             LogHelper.WriteLine("Processing: " + FileName + " " + DateTime.Now);
                             if(bSymbolChanges)
                             {
-                                AddRussellSymbolChangeData(VendorFileFormats.H_OPEN_ICB, FileName, oProcessDate);
+                                AddRussellSymbolChangeData(FileName, oProcessDate);
                                 ProcessStatus.Update(oProcessDate, Vendors.RussellIcb.ToString(), Dataset, "", ProcessStatus.WhichStatus.SymbolChangeData, ProcessStatus.StatusValue.Pass);
                             }
                             LogHelper.WriteLine("Done      : " + FileName + " " + DateTime.Now);
@@ -460,56 +460,75 @@ namespace IndexDataEngineLibrary
             }
         }
 
-        private void AddRussellSymbolChangeData(VendorFileFormats FileFormat, string FileName, DateTime FileDate)
+        private void AddRussellSymbolChangeData(string FileName, DateTime FileDate)
         {
-            string[] sIndices = GetVendorIndices();
-            bool bTotalCount = false;
-            bool bHeader1 = false;
-            bool bHeader2 = false;
             DataTable dt = ReadCsvIntoTable(FileName);
             int i = 0;
 
-            foreach(DataRow dr in dt.Rows)
+            try
             {
-                i += 1;
+                foreach(DataRow dr in dt.Rows)
+                {
+                    i += 1;
 
-                bool ok = true;
+                    DateTime oDate = DateTime.MinValue;
+                    CultureInfo enUS = new CultureInfo("en-US");
+                    string sOldCusip = "";
+                    string sNewCusip = "";
+                    string sOldTicker = "";
+                    string sNewTicker = "";
+                    string sOldCompanyName = "";
+                    string sNewCompanyName = "";
+                    string sCompanyName = "";
 
-//                string sDate = "";
-//                DateTime oDate = DateTime.MinValue;
+                    string Fld = ParseColumn(dr, "DATE", 1);
+                    if(Fld.Length == 10 && DateTime.TryParseExact(Fld, "MM/dd/yyyy", enUS, DateTimeStyles.None, out oDate))
+                    {
+                        if(oDate.Equals(FileDate))
+                        {
+                            Fld = ParseColumn(dr, "CUR CUSIP", 4);
+                            if(Fld.Length == 9)
+                            {
+                                Fld = Fld.Substring(0, 8);
+                                sOldCusip = Fld;
+                            }
+                            else
+                                sOldCusip = "";
 
-//                string sOldSymbol = "";
-//                string sNewSymbol = "";
-//                string sCompanyName = "";
-//                string TextLine = srFile.ReadLine();
-//                /*
-//                Total Count:                                3526                 
-//                Date   Old Identifier    New Identifier         Name
-//                -------- --------------    --------------   -------------------
-//20170103 831756101         02874P103        AMERICAN OUTDOOR BRANDS
-//                20170103 SWHC              AOBC             AMERICAN OUTDOOR BRANDS
-//                20170103 385002100         385002308        GRAMERCY PROPERTY TRUST
-//                20170103 502424104         502413107        L3 TECHNOLOGIES
-//                20170103 26168L205         50189K103        LCI INDUSTRIES
-//                20170103 DW                LCII             LCI INDUSTRIES
-//                20170103 761283100         74967X103        RH
-//                */
-//                if(!bTotalCount)
-//                    bTotalCount = TextLine.Contains("Total Count:");
-//                if(bTotalCount && !bHeader1)
-//                    bHeader1 = (TextLine.StartsWith("  Date") == true);
-//                if(bTotalCount && bHeader1 && !bHeader2)
-//                    bHeader2 = (TextLine.StartsWith("------") == true);
-//                if(bTotalCount && bHeader1 && bHeader2 && TextLine.StartsWith("20"))
-//                {
-//                    sDate = GetField(TextLine, 1, 8);
-//                    if(sDate.Length == 8)
-//                        DateTime.TryParseExact(sDate, "yyyyMMdd", mCultureInfo, DateTimeStyles.None, out oDate);
-//                    sOldSymbol = GetField(TextLine, 10, 8);
-//                    sNewSymbol = GetField(TextLine, 28, 8);
-//                    sCompanyName = GetField(TextLine, 45, TextLine.Length - 45 + 1);
-//                    sharedData.AddSymbolChange("R", oDate, sOldSymbol, sNewSymbol, sCompanyName);
-//                }
+                            Fld = ParseColumn(dr, "NEW CUSIP", 5);
+                            if(Fld.Length == 9)
+                            {
+                                Fld = Fld.Substring(0, 8);
+                                sNewCusip = Fld;
+                            }
+                            else
+                                sNewCusip = "";
+
+                            sOldTicker = ParseColumn(dr, "CUR TICKER", 8);
+                            sNewTicker = ParseColumn(dr, "NEW TICKER", 9);
+
+                            sOldCompanyName = ParseColumn(dr, "CUR COMPANY NAME", 10);
+                            sNewCompanyName = ParseColumn(dr, "NEW COMPANY NAME", 11);
+                            if(sNewCompanyName.Length > 0)
+                                sCompanyName = sNewCompanyName;
+                            else
+                                sCompanyName = sOldCompanyName;
+
+                            if(sOldCusip.Length == 8 && sNewCusip.Length == 8)
+                                sharedData.AddSymbolChange("4", oDate, sOldCusip, sNewCusip, sCompanyName);
+                            if(sOldTicker.Length > 0 && sNewTicker.Length > 0)
+                                sharedData.AddSymbolChange("4", oDate, sOldTicker, sNewTicker, sCompanyName);
+                        }
+                    }
+                }
+            }
+            catch
+            {
+                LogHelper.WriteLine("AddRussellSymbolChangeData " + FileName + " error line: " + i);
+            }
+            finally
+            {
+
             }
         }
 

@@ -146,9 +146,13 @@ namespace IndexDataEngineLibrary
 
             if (testing)
             {
-                ProcessIndexDataDatasets(sVifsProcessDate, true); // A second call will make sure the sp 900, 1000, and 1500 are complete
+                //ProcessIndexDataDatasets(sVifsProcessDate, true); // A second call will make sure the sp 900, 1000, and 1500 are complete
                 string sToday = DateTime.Now.ToString("MM/dd/yyyy");
-                if (sVifsProcessDate.Equals(sToday)) // JK to do change
+
+                DateTime oProcessDate = DateTime.ParseExact(sVifsProcessDate, "MM/dd/yyyy", CultureInfo.InvariantCulture);
+                DateTime oCurrentDate = DateTime.ParseExact(sToday, "MM/dd/yyyy", CultureInfo.InvariantCulture);
+
+                if(oProcessDate >= oCurrentDate)
                 {
                     testing = false;
                 }

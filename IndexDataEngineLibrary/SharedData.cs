@@ -1130,6 +1130,19 @@ namespace IndexDataEngineLibrary
                             break;
                     }
                     break;
+                case Vendors.RussellIcb:
+                    jobVendor = Vendors.Russell.ToString();
+                    switch(outputType)
+                    {
+                        case AdventOutputType.Constituent:
+                            jobInputFormat = "RussellICBSecurity";
+                            break;
+                        case AdventOutputType.Sector:
+                            jobInputFormat = "RussellICB";
+                            break;
+                    }
+                    break;
+
                 case Vendors.Snp:
                     jobVendor = "StandardAndPoors";
                     switch (outputType)
@@ -1446,9 +1459,9 @@ namespace IndexDataEngineLibrary
                 while (dr.Read())
                 {
                     inputFormat = dr["InputFormat"].ToString();
-                    if(inputFormat.Equals("RussellRGS") || inputFormat.Equals("StandardPoorsGICS"))
+                    if(inputFormat.Equals("RussellRGS") || inputFormat.Equals("RussellICB") || inputFormat.Equals("StandardPoorsGICS"))
                         indices.Add("Sector");
-                    else if (inputFormat.Equals("RussellSecurity") || inputFormat.Equals("StandardPoorsSecurity"))
+                    else if (inputFormat.Equals("RussellSecurity") || inputFormat.Equals("RussellICBSecurity") || inputFormat.Equals("StandardPoorsSecurity"))
                         indices.Add("Constituent");
                     i += 1;
                 }

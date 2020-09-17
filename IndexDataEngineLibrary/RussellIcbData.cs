@@ -326,6 +326,7 @@ namespace IndexDataEngineLibrary
                             {
                                 AddRussellSymbolChangeData(FileName, oProcessDate);
                                 ProcessStatus.Update(oProcessDate, Vendors.RussellIcb.ToString(), Dataset, "", ProcessStatus.WhichStatus.SymbolChangeData, ProcessStatus.StatusValue.Pass);
+                                AddRussellSecurityReferenceChangeData(FileName, oProcessDate);
                             }
                             LogHelper.WriteLine("Done      : " + FileName + " " + DateTime.Now);
                         }
@@ -531,6 +532,110 @@ namespace IndexDataEngineLibrary
 
             }
         }
+
+        private void AddRussellSecurityReferenceChangeData(string FileName, DateTime FileDate)
+        {
+            DataTable dt = ReadCsvIntoTable(FileName);
+            int i = 0;
+
+            try
+            {
+                foreach(DataRow dr in dt.Rows)
+                {
+                    i += 1;
+
+                    DateTime oDate = DateTime.MinValue;
+                    CultureInfo enUS = new CultureInfo("en-US");
+                    string sOldCusip = "";
+                    string sNewCusip = "";
+                    string sOldTicker = "";
+                    string sNewTicker = "";
+                    string sOldCompanyName = "";
+                    string sNewCompanyName = "";
+                    string sOldExchange = "";
+                    string sNewExchange = "";
+                    string sOldIndustry = "";
+                    string sNewIndustry = "";
+                    string sTermsDetail = "";
+                    string sAction = "";
+                    string sReason = "";
+
+                    string Fld = ParseColumn(dr, "DATE", 1);
+                    if(Fld.Length == 10 && DateTime.TryParseExact(Fld, "MM/dd/yyyy", enUS, DateTimeStyles.None, out oDate))
+                    {
+                        if(oDate.Equals(FileDate))
+                        {
+                            sAction = ParseColumn(dr, "ACTION", 2);
+                            sReason = ParseColumn(dr, "REASON", 3);
+
+                            Fld = ParseColumn(dr, "CUR CUSIP", 4);
+                            if(Fld.Length == 9)
+                            {
+                                Fld = Fld.Substring(0, 8);
+                                sOldCusip = Fld;
+                            }
+                            else
+                                sOldCusip = "";
+
+                            Fld = ParseColumn(dr, "NEW CUSIP", 5);
+                            if(Fld.Length == 9)
+                            {
+                                Fld = Fld.Substring(0, 8);
+                                sNewCusip = Fld;
+                            }
+                            else
+                                sNewCusip = "";
+
+                            sOldTicker = ParseColumn(dr, "CUR TICKER", 8);
+                            sNewTicker = ParseColumn(dr, "NEW TICKER", 9);
+
+                            sOldCompanyName = ParseColumn(dr, "CUR COMPANY NAME", 10);
+                            sNewCompanyName = ParseColumn(dr, "NEW COMPANY NAME", 11);
+
+                            sOldIndustry = ParseColumn(dr, "CUR SUBSECTOR", 43);                   
+                            sNewIndustry = ParseColumn(dr, "NEW SUBSECTOR", 44);
+
+                            sOldExchange = ParseColumn(dr, "CUR EXCHANGE", 45);
+                            sNewExchange = ParseColumn(dr, "NEW EXCHANGE", 46);
+
+                            sTermsDetail = ParseColumn(dr, "TERMS DETAIL", 47);
+
+
+                            if( sNewCusip.Length > 0 || sNewTicker.Length > 0 || sNewCompanyName.Length > 0 || sNewIndustry.Length > 0 || sNewExchange.Length > 0 )
+                            {
+                              
+                                /*
+                                sharedData.AddSecRefChangeData(
+
+                                sOldCusip,
+                                sNewCusip,
+                                sOldTicker,
+                                sNewTicker,
+                                sOldCompanyName,
+                                sNewCompanyName,
+                                sOldExchange,
+                                sNewExchange,
+                                sOldIndustry,
+                                sNewIndustry,
+
+                                    
+                                    );
+                                    */
+                            }
+                        }
+                    }
+                }
+            }
+            catch
+            {
+                LogHelper.WriteLine("AddRussellSecurityReferenceChangeData " + FileName + " error line: " + i);
+            }
+            finally
+            {
+
+            }
+        }
+
 
 
         private void AddRussellTotalReturnData(VendorFileFormats FileFormat, string FileName, DateTime FileDate)

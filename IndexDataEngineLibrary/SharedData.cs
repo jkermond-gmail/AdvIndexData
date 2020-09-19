@@ -1131,7 +1131,7 @@ namespace IndexDataEngineLibrary
                     }
                     break;
                 case Vendors.RussellIcb:
-                    jobVendor = Vendors.Russell.ToString();
+                    jobVendor = Vendors.RussellIcb.ToString();
                     switch(outputType)
                     {
                         case AdventOutputType.Constituent:
@@ -1165,9 +1165,6 @@ namespace IndexDataEngineLibrary
                     mSqlConn = new SqlConnection(ConnectionStringIndexData);
                     mSqlConn.Open();
                 }
-                //                select j.ClientID, j.JobName, j.LastProcessDate, i.IndexName, v.AdventIndexName, v.AxmlConstituentFile, v.AxmlSectorFile
-                //                inner join VendorIndexMap v on v.VendorIndexName = i.VendorIndexName
-                //                  and j.Active = 'Yes' and j.JobType = 'Client'  and j.Vendor = @Vendor and v.AdventIndexName = @AdventIndexName
 
                 string SqlSelect = @"
                  select j.ClientID, j.JobName, j.LastProcessDate, i.IndexName, v.IndexClientName, v.AxmlConstituentFile, v.AxmlSectorFile
@@ -1176,6 +1173,7 @@ namespace IndexDataEngineLibrary
                  inner join VendorIndexMap v on v.IndexName = i.IndexName
                  where j.DataSet = @DataSet and j.InputFormat = @InputFormat
                  and j.Active = 'Yes' and j.JobType = 'Client'  and j.Vendor = @Vendor and v.IndexClientName = @AdventIndexName
+                 and v.Vendor = @Vendor
                 ";
                 string SqlOrderBy = " order by j.ClientID";
 

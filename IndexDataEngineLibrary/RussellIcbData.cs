@@ -147,7 +147,7 @@ namespace IndexDataEngineLibrary
                 Mail mail = new Mail();
                 mail.SendMail("AdvIndexData: VendorDatasetJobs complete  " + Vendors.RussellIcb.ToString() + " " + Dataset + " " + sProcessDate);
                 IndexDataEngine indexDataEngine = new IndexDataEngine();
-                indexDataEngine.GenerateSecurityMasterChangesDataAndReport(sProcessDate);
+                indexDataEngine.GenerateSecurityMasterChangesReport(sProcessDate);
             }
             catch(SqlException ex)
             {
@@ -603,24 +603,8 @@ namespace IndexDataEngineLibrary
 
                             if( sNewCusip.Length > 0 || sNewTicker.Length > 0 || sNewCompanyName.Length > 0 || sNewIndustry.Length > 0 || sNewExchange.Length > 0 )
                             {
-                              
-                                /*
-                                sharedData.AddSecRefChangeData(
-
-                                sOldCusip,
-                                sNewCusip,
-                                sOldTicker,
-                                sNewTicker,
-                                sOldCompanyName,
-                                sNewCompanyName,
-                                sOldExchange,
-                                sNewExchange,
-                                sOldIndustry,
-                                sNewIndustry,
-
-                                    
-                                    );
-                                    */
+                                sharedData.AddSecRefChangeData( FileDate, sOldCusip, sNewCusip, sOldTicker, sNewTicker, sOldCompanyName, sNewCompanyName,
+                                                                sOldExchange, sNewExchange, sOldIndustry, sNewIndustry);                                    
                             }
                         }
                     }

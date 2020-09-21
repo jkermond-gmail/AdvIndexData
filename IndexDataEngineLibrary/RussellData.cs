@@ -176,8 +176,6 @@ namespace IndexDataEngineLibrary
                 sharedData.VendorDatasetJobsUpdateProcessDate(Vendors.Russell.ToString(), Dataset, sProcessDate);
                 Mail mail = new Mail();
                 mail.SendMail("AdvIndexData: VendorDatasetJobs complete  " + Vendors.Russell.ToString() + " " + Dataset + " " + sProcessDate);
-                IndexDataEngine indexDataEngine = new IndexDataEngine();
-                indexDataEngine.GenerateSecurityMasterChangesDataAndReport(sProcessDate);
             }
             catch (SqlException ex)
             {

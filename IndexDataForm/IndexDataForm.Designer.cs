@@ -347,7 +347,7 @@
             this.lnkEndDate.Size = new System.Drawing.Size(65, 13);
             this.lnkEndDate.TabIndex = 3;
             this.lnkEndDate.TabStop = true;
-            this.lnkEndDate.Text = "06/01/2020";
+            this.lnkEndDate.Text = "08/28/2020";
             this.lnkEndDate.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.lnkEndDate_LinkClicked);
             // 
             // lnkStartDate
@@ -358,7 +358,7 @@
             this.lnkStartDate.Size = new System.Drawing.Size(65, 13);
             this.lnkStartDate.TabIndex = 2;
             this.lnkStartDate.TabStop = true;
-            this.lnkStartDate.Text = "06/01/2020";
+            this.lnkStartDate.Text = "03/31/2020";
             this.lnkStartDate.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.lnkStartDate_LinkClicked);
             // 
             // lblEndDate

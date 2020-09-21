@@ -51,18 +51,18 @@ namespace IndexDataEngineLibrary
             EndSql();
         }
 
-        public void ProcessSecurityMasterChanges(string sProcessDate)
-        {
-            DateTime date = DateTime.Parse(sProcessDate);
-            sProcessDate = date.ToString("MM/dd/yyyy");
-            InitializeConnectionStrings();
-            DateHelper.ConnectionString = sConnectionAmdVifs;
-            ProcessStatus.ConnectionString = sConnectionIndexData;
-            BeginSql();
-            IndexDataProcessDate = date;
-            GenerateSecurityMasterChangesData(sProcessDate);
-            EndSql();
-        }
+        //public void ProcessSecurityMasterChanges(string sProcessDate)
+        //{
+        //    DateTime date = DateTime.Parse(sProcessDate);
+        //    sProcessDate = date.ToString("MM/dd/yyyy");
+        //    InitializeConnectionStrings();
+        //    DateHelper.ConnectionString = sConnectionAmdVifs;
+        //    ProcessStatus.ConnectionString = sConnectionIndexData;
+        //    BeginSql();
+        //    IndexDataProcessDate = date;
+        //    GenerateSecurityMasterChangesData(sProcessDate);
+        //    EndSql();
+        //}
 
         public void ProcessSecurityMasterReport(string sProcessDate)
         {
@@ -78,20 +78,20 @@ namespace IndexDataEngineLibrary
             EndSql();
         }
 
-        public void GenerateSecurityMasterChangesDataAndReport(string sProcessDate)
-        {
-            DateTime date = DateTime.Parse(sProcessDate);
-            sProcessDate = date.ToString("MM/dd/yyyy");
-            InitializeConnectionStrings();
-            DateHelper.ConnectionString = sConnectionAmdVifs;
-            ProcessStatus.ConnectionString = sConnectionIndexData;
-            BeginSql();
-            IndexDataProcessDate = date;
-            GenerateSecurityMasterChangesData(sProcessDate);
-            GenerateSecurityMasterChangesReport(sProcessDate);
-            CopySecurityMasterChangesToFtpFolders(sProcessDate);
-            EndSql();
-        }
+        //public void GenerateSecurityMasterChangesDataAndReport(string sProcessDate)
+        //{
+        //    DateTime date = DateTime.Parse(sProcessDate);
+        //    sProcessDate = date.ToString("MM/dd/yyyy");
+        //    InitializeConnectionStrings();
+        //    DateHelper.ConnectionString = sConnectionAmdVifs;
+        //    ProcessStatus.ConnectionString = sConnectionIndexData;
+        //    BeginSql();
+        //    IndexDataProcessDate = date;
+        //    //GenerateSecurityMasterChangesData(sProcessDate);
+        //    GenerateSecurityMasterChangesReport(sProcessDate);
+        //    CopySecurityMasterChangesToFtpFolders(sProcessDate);
+        //    EndSql();
+        //}
 
 
         public void Run(string sVifsProcessDate)
@@ -137,7 +137,7 @@ namespace IndexDataEngineLibrary
                 InitializeProcessStatus(sVifsProcessDate);
                 setIndexDataProcessDate(sVifsProcessDate);
                 DeleteFilesInFtpFolders();
-                InitializeHistoricalSecurityMasterCopy();
+                //InitializeHistoricalSecurityMasterCopy();
                 Mail mail = new Mail();
                 mail.SendMail("AdvIndexData: New business day started " + sVifsProcessDate);
             }
@@ -1035,196 +1035,196 @@ namespace IndexDataEngineLibrary
             return;
         }
 
-        public void InitializeHistoricalSecurityMasterCopy()
-        {
-            bool endSql = false;
-            try
-            {
-                LogHelper.WriteLine("InitializeHistoricalSecurityMasterCopy");
-                if (String.IsNullOrEmpty(sConnectionIndexData))
-                {
-                    LogHelper.WriteLine("sConnectionIndexData is null");
+        //public void InitializeHistoricalSecurityMasterCopy()
+        //{
+        //    bool endSql = false;
+        //    try
+        //    {
+        //        LogHelper.WriteLine("InitializeHistoricalSecurityMasterCopy");
+        //        if (String.IsNullOrEmpty(sConnectionIndexData))
+        //        {
+        //            LogHelper.WriteLine("sConnectionIndexData is null");
 
-                    InitializeConnectionStrings();
-                    BeginSql();
-                    endSql = true;
-                }
+        //            InitializeConnectionStrings();
+        //            BeginSql();
+        //            endSql = true;
+        //        }
 
-                string sqlDelete = "DELETE FROM HistoricalSecurityMasterFullCopy";
+        //        string sqlDelete = "DELETE FROM HistoricalSecurityMasterFullCopy";
 
-                SqlCommand cmd = new SqlCommand
-                {
-                    Connection = cnSqlIndexData,
-                    CommandText = sqlDelete
-                };
-                cmd.ExecuteNonQuery();
-                LogHelper.WriteLine("Delete is done");
+        //        SqlCommand cmd = new SqlCommand
+        //        {
+        //            Connection = cnSqlIndexData,
+        //            CommandText = sqlDelete
+        //        };
+        //        cmd.ExecuteNonQuery();
+        //        LogHelper.WriteLine("Delete is done");
 
-                cmd.CommandText = @"
-                    INSERT INTO HistoricalSecurityMasterFullCopy (
-	                id, Ticker, Cusip, Vendor, StockKey, CompanyName, SectorCode, Exchange, BeginDate, EndDate)
-	                SELECT id, Ticker, Cusip, Vendor, StockKey, CompanyName, SectorCode, Exchange, BeginDate, EndDate
-	                FROM HistoricalSecurityMasterFull  
-                    WHERE Vendor = 'R' 
-                    ORDER BY id
-                ";
-                cmd.ExecuteNonQuery();
-                LogHelper.WriteLine("Insert is done");
+        //        cmd.CommandText = @"
+        //            INSERT INTO HistoricalSecurityMasterFullCopy (
+	       //         id, Ticker, Cusip, Vendor, StockKey, CompanyName, SectorCode, Exchange, BeginDate, EndDate)
+	       //         SELECT id, Ticker, Cusip, Vendor, StockKey, CompanyName, SectorCode, Exchange, BeginDate, EndDate
+	       //         FROM HistoricalSecurityMasterFull  
+        //            WHERE Vendor = 'R' 
+        //            ORDER BY id
+        //        ";
+        //        cmd.ExecuteNonQuery();
+        //        LogHelper.WriteLine("Insert is done");
 
-            }
-            catch (SqlException ex)
-            {
-                LogHelper.WriteLine("InitializeHistoricalSecurityMasterCopy Sql Exception " + ex.Message);
+        //    }
+        //    catch (SqlException ex)
+        //    {
+        //        LogHelper.WriteLine("InitializeHistoricalSecurityMasterCopy Sql Exception " + ex.Message);
 
-                if (ex.Number == 2627)
-                {
-                    LogHelper.WriteLine(ex.Message);
-                }
-            }
-            finally
-            {
-                if (endSql)
-                    EndSql();
-            }
+        //        if (ex.Number == 2627)
+        //        {
+        //            LogHelper.WriteLine(ex.Message);
+        //        }
+        //    }
+        //    finally
+        //    {
+        //        if (endSql)
+        //            EndSql();
+        //    }
             
-        return;
+        //return;
 
-        }
+        //}
 
-        public void GenerateSecurityMasterChangesData(string sProcessDate)
-        {
-            LogHelper.WriteLine("GenerateSecurityMasterChangesData " + sProcessDate);
-            SqlCommand cmd = null;
-            SqlCommand cmd2 = null;
-            SqlConnection cnSql2 = null ;
-            // First Get the new adds
-            string selectText = @"
-                select id from HistoricalSecurityMasterFull where id not in 
-                (select id from HistoricalSecurityMasterFullCopy) and Vendor = 'R'
-            ";
-            string insertText = @"
-                insert into HistoricalSecurityMasterFullChanges
-                (id, ProcessDate, ChangeType, CusipNew, TickerNew, CompanyNameNew, SectorCodeNew, ExchangeNew)
-                select id, BeginDate, 'Add', Cusip, Ticker, CompanyName, SectorCode, Exchange from HistoricalSecurityMasterFull where id = @id
-            ";
-            try
-            {
-                cnSql2 = new SqlConnection(sConnectionIndexData);
-                cnSql2.Open();
+        //public void GenerateSecurityMasterChangesData(string sProcessDate)
+        //{
+        //    LogHelper.WriteLine("GenerateSecurityMasterChangesData " + sProcessDate);
+        //    SqlCommand cmd = null;
+        //    SqlCommand cmd2 = null;
+        //    SqlConnection cnSql2 = null ;
+        //    // First Get the new adds
+        //    string selectText = @"
+        //        select id from HistoricalSecurityMasterFull where id not in 
+        //        (select id from HistoricalSecurityMasterFullCopy) and Vendor = 'R'
+        //    ";
+        //    string insertText = @"
+        //        insert into HistoricalSecurityMasterFullChanges
+        //        (id, ProcessDate, ChangeType, CusipNew, TickerNew, CompanyNameNew, SectorCodeNew, ExchangeNew)
+        //        select id, BeginDate, 'Add', Cusip, Ticker, CompanyName, SectorCode, Exchange from HistoricalSecurityMasterFull where id = @id
+        //    ";
+        //    try
+        //    {
+        //        cnSql2 = new SqlConnection(sConnectionIndexData);
+        //        cnSql2.Open();
 
-                cmd = new SqlCommand
-                {
-                    Connection = cnSqlIndexData,
-                    CommandText = selectText
-                };
+        //        cmd = new SqlCommand
+        //        {
+        //            Connection = cnSqlIndexData,
+        //            CommandText = selectText
+        //        };
 
-                cmd2 = new SqlCommand
-                {
-                    Connection = cnSql2,
-                    CommandText = insertText
-                };
-                cmd2.Parameters.Add("@id", SqlDbType.Int);
+        //        cmd2 = new SqlCommand
+        //        {
+        //            Connection = cnSql2,
+        //            CommandText = insertText
+        //        };
+        //        cmd2.Parameters.Add("@id", SqlDbType.Int);
 
-                SqlDataReader dr = null;
-                dr = cmd.ExecuteReader();
-                if (dr.HasRows)
-                {
-                    while (dr.Read())
-                    {
-                        string val = dr["id"].ToString();
-                        int id = Convert.ToInt32(val);
-                        cmd2.Parameters["@id"].Value = id;
-                        cmd2.ExecuteNonQuery();
-                        LogHelper.WriteLine("Insert Add is done");
-                    }
-                }
-                dr.Close();
+        //        SqlDataReader dr = null;
+        //        dr = cmd.ExecuteReader();
+        //        if (dr.HasRows)
+        //        {
+        //            while (dr.Read())
+        //            {
+        //                string val = dr["id"].ToString();
+        //                int id = Convert.ToInt32(val);
+        //                cmd2.Parameters["@id"].Value = id;
+        //                cmd2.ExecuteNonQuery();
+        //                LogHelper.WriteLine("Insert Add is done");
+        //            }
+        //        }
+        //        dr.Close();
 
-                // Next get deletes
-                string sPrevProcessDate = DateHelper.PrevBusinessDayMMDDYYYY_Slash(sProcessDate);
-                selectText = @"
-                    select id from HistoricalSecurityMasterFullCopy where EndDate = @PrevProcessDate and id in
-                    (select id from HistoricalSecurityMasterFull where EndDate = @PrevProcessDate and Vendor = 'R')
-                ";
-                cmd.CommandText = selectText;
-                cmd.Parameters.Add("@PrevProcessDate", SqlDbType.Date);
-                cmd.Parameters["@PrevProcessDate"].Value = sPrevProcessDate;
+        //        // Next get deletes
+        //        string sPrevProcessDate = DateHelper.PrevBusinessDayMMDDYYYY_Slash(sProcessDate);
+        //        selectText = @"
+        //            select id from HistoricalSecurityMasterFullCopy where EndDate = @PrevProcessDate and id in
+        //            (select id from HistoricalSecurityMasterFull where EndDate = @PrevProcessDate and Vendor = 'R')
+        //        ";
+        //        cmd.CommandText = selectText;
+        //        cmd.Parameters.Add("@PrevProcessDate", SqlDbType.Date);
+        //        cmd.Parameters["@PrevProcessDate"].Value = sPrevProcessDate;
 
-                insertText = @"
-                    insert into HistoricalSecurityMasterFullChanges
-                    (id, ProcessDate, ChangeType, Cusip, Ticker, CompanyName, SectorCode, Exchange)
-                    select id, @ProcessDate, 'Delete', Cusip, Ticker, CompanyName, SectorCode, Exchange from HistoricalSecurityMasterFull where id = @id
-                ";
-                cmd2.CommandText = insertText;
-                cmd2.Parameters.Add("@ProcessDate", SqlDbType.Date);
-                cmd2.Parameters["@ProcessDate"].Value = sProcessDate;
+        //        insertText = @"
+        //            insert into HistoricalSecurityMasterFullChanges
+        //            (id, ProcessDate, ChangeType, Cusip, Ticker, CompanyName, SectorCode, Exchange)
+        //            select id, @ProcessDate, 'Delete', Cusip, Ticker, CompanyName, SectorCode, Exchange from HistoricalSecurityMasterFull where id = @id
+        //        ";
+        //        cmd2.CommandText = insertText;
+        //        cmd2.Parameters.Add("@ProcessDate", SqlDbType.Date);
+        //        cmd2.Parameters["@ProcessDate"].Value = sProcessDate;
 
 
-                dr = cmd.ExecuteReader();
-                if (dr.HasRows)
-                {
-                    while (dr.Read())
-                    {
-                        string val = dr["id"].ToString();
-                        int id = Convert.ToInt32(val);
-                        cmd2.Parameters["@id"].Value = id;
-                        cmd2.ExecuteNonQuery();
-                        LogHelper.WriteLine("Insert Delete are done");
-                    }
-                }
-                dr.Close();
+        //        dr = cmd.ExecuteReader();
+        //        if (dr.HasRows)
+        //        {
+        //            while (dr.Read())
+        //            {
+        //                string val = dr["id"].ToString();
+        //                int id = Convert.ToInt32(val);
+        //                cmd2.Parameters["@id"].Value = id;
+        //                cmd2.ExecuteNonQuery();
+        //                LogHelper.WriteLine("Insert Delete are done");
+        //            }
+        //        }
+        //        dr.Close();
 
-                // Lastly, get updates
-                selectText = @"
-                    select h.id from HistoricalSecurityMasterFull h
-                    inner join HistoricalSecurityMasterFullCopy hprev on h.id = hprev.id
-                    where h.EndDate = @ProcessDate and hprev.EndDate = @PrevProcessDate
-                    and h.Vendor = 'R' and hprev.Vendor = 'R' 
-                    and (h.Ticker <> hprev.Ticker OR h.Cusip <> hprev.Cusip or h.CompanyName <> hprev.CompanyName or h.SectorCode <> hprev.SectorCode
-                    or h.Exchange <> hprev.Exchange)
-                ";
-                cmd.CommandText = selectText;
-                cmd.Parameters.Add("@ProcessDate", SqlDbType.Date);
-                cmd.Parameters["@ProcessDate"].Value = sProcessDate;
+        //        // Lastly, get updates
+        //        selectText = @"
+        //            select h.id from HistoricalSecurityMasterFull h
+        //            inner join HistoricalSecurityMasterFullCopy hprev on h.id = hprev.id
+        //            where h.EndDate = @ProcessDate and hprev.EndDate = @PrevProcessDate
+        //            and h.Vendor = 'R' and hprev.Vendor = 'R' 
+        //            and (h.Ticker <> hprev.Ticker OR h.Cusip <> hprev.Cusip or h.CompanyName <> hprev.CompanyName or h.SectorCode <> hprev.SectorCode
+        //            or h.Exchange <> hprev.Exchange)
+        //        ";
+        //        cmd.CommandText = selectText;
+        //        cmd.Parameters.Add("@ProcessDate", SqlDbType.Date);
+        //        cmd.Parameters["@ProcessDate"].Value = sProcessDate;
 
-                insertText = @"
-                    insert into HistoricalSecurityMasterFullChanges
-                    (id, ProcessDate, ChangeType, Cusip, CusipNew, Ticker, TickerNew, CompanyName, CompanyNameNew, SectorCode, SectorCodeNew, Exchange, ExchangeNew)
-                    select h.id, h.EndDate, 'Update', hprev.Cusip, h.Cusip, hprev.Ticker, h.Ticker, hprev.CompanyName, h.CompanyName, 
-                    hprev.SectorCode, h.SectorCode, hprev.Exchange, h.Exchange
-	                from HistoricalSecurityMasterFull h
-                    inner join HistoricalSecurityMasterFullCopy hprev on h.id = hprev.id
-                    where h.id = @id and hprev.id = @id
-                ";
-                cmd2.CommandText = insertText;
+        //        insertText = @"
+        //            insert into HistoricalSecurityMasterFullChanges
+        //            (id, ProcessDate, ChangeType, Cusip, CusipNew, Ticker, TickerNew, CompanyName, CompanyNameNew, SectorCode, SectorCodeNew, Exchange, ExchangeNew)
+        //            select h.id, h.EndDate, 'Update', hprev.Cusip, h.Cusip, hprev.Ticker, h.Ticker, hprev.CompanyName, h.CompanyName, 
+        //            hprev.SectorCode, h.SectorCode, hprev.Exchange, h.Exchange
+	       //         from HistoricalSecurityMasterFull h
+        //            inner join HistoricalSecurityMasterFullCopy hprev on h.id = hprev.id
+        //            where h.id = @id and hprev.id = @id
+        //        ";
+        //        cmd2.CommandText = insertText;
 
-                dr = cmd.ExecuteReader();
-                if (dr.HasRows)
-                {
-                    while (dr.Read())
-                    {
-                        string val = dr["id"].ToString();
-                        int id = Convert.ToInt32(val);
-                        cmd2.Parameters["@id"].Value = id;
-                        cmd2.ExecuteNonQuery();
-                        LogHelper.WriteLine("Insert Updates are done");
-                    }
-                }
-                dr.Close();
-            }
-            catch (SqlException ex)
-            {
-                LogHelper.WriteLine(ex.Message);
-            }
-            finally
-            {
-                if (cnSql2 != null)
-                    cnSql2.Close();
-                LogHelper.WriteLine("GenerateSecurityMasterChangesData Done");
-            }
+        //        dr = cmd.ExecuteReader();
+        //        if (dr.HasRows)
+        //        {
+        //            while (dr.Read())
+        //            {
+        //                string val = dr["id"].ToString();
+        //                int id = Convert.ToInt32(val);
+        //                cmd2.Parameters["@id"].Value = id;
+        //                cmd2.ExecuteNonQuery();
+        //                LogHelper.WriteLine("Insert Updates are done");
+        //            }
+        //        }
+        //        dr.Close();
+        //    }
+        //    catch (SqlException ex)
+        //    {
+        //        LogHelper.WriteLine(ex.Message);
+        //    }
+        //    finally
+        //    {
+        //        if (cnSql2 != null)
+        //            cnSql2.Close();
+        //        LogHelper.WriteLine("GenerateSecurityMasterChangesData Done");
+        //    }
 
-            return;
-        }
+        //    return;
+        //}
 
 
         /*
@@ -1352,9 +1352,9 @@ namespace IndexDataEngineLibrary
                             string CompanyNameNew = GetColString(dr, "CompanyName");
                             CompanyNameNew = CompanyNameNew.PadRight(25 + 1);
                             string SectorCode = "";
-                            SectorCode = SectorCode.PadRight(7 + 1);
+                            SectorCode = SectorCode.PadRight(8 + 1);
                             string SectorCodeNew = "";
-                            SectorCodeNew = SectorCodeNew.PadRight(7 + 4);
+                            SectorCodeNew = SectorCodeNew.PadRight(8 + 4);
                             string Exchange = "";
                             Exchange = Exchange.PadRight(12 + 1);
                             string ExchangeNew = "";

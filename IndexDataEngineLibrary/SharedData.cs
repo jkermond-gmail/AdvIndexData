@@ -193,6 +193,83 @@ namespace IndexDataEngineLibrary
             }
         }
 
+        
+
+
+        public void AddSecRefChangeData(
+            DateTime ProcessDate,
+            string Cusip, string CusipNew,
+            string Ticker, string TickerNew,
+            string CompanyName, string CompanyNameNew,
+            string Exchange, string ExchangeNew,
+            string SectorCode, string SectorCodeNew
+            )
+        {
+            try
+            {
+                string ChangeType = "";
+                if(Cusip.Length.Equals(0))
+                    ChangeType = "Add";
+                else
+                    ChangeType = "Update";
+
+                if(mSqlConn == null)
+                {
+                    mSqlConn = new SqlConnection(ConnectionStringIndexData);
+                    mSqlConn.Open();
+                }
+                CultureInfo enUS = new CultureInfo("en-US");
+
+                string insertText = @"
+                    insert into HistoricalSecurityMasterFullChanges
+                    (ProcessDate, ChangeType, Cusip, CusipNew, Ticker, TickerNew, CompanyName, CompanyNameNew,
+                     SectorCode, SectorCodeNew, Exchange, ExchangeNew)
+                    values 
+                    (@ProcessDate, @ChangeType, @Cusip, @CusipNew, @Ticker, @TickerNew, @CompanyName, @CompanyNameNew,
+                     @SectorCode, @SectorCodeNew, @Exchange, @ExchangeNew)
+                ";
+
+
+                SqlCommand cmd = new SqlCommand(insertText, mSqlConn);
+                cmd.Parameters.Add("@ChangeType", SqlDbType.VarChar);
+                cmd.Parameters.Add("@Cusip", SqlDbType.VarChar);
+                cmd.Parameters.Add("@CusipNew", SqlDbType.VarChar);
+                cmd.Parameters.Add("@Ticker", SqlDbType.VarChar);
+                cmd.Parameters.Add("@TickerNew", SqlDbType.VarChar);
+                cmd.Parameters.Add("@CompanyName", SqlDbType.VarChar);
+                cmd.Parameters.Add("@CompanyNameNew", SqlDbType.VarChar);
+                cmd.Parameters.Add("@SectorCode", SqlDbType.VarChar);
+                cmd.Parameters.Add("@SectorCodeNew", SqlDbType.VarChar);
+                cmd.Parameters.Add("@Exchange", SqlDbType.VarChar);
+                cmd.Parameters.Add("@ExchangeNew", SqlDbType.VarChar);
+                cmd.Parameters["@ChangeType"].Value = ChangeType;
+                cmd.Parameters["@Cusip"].Value = Cusip;
+                cmd.Parameters["@CusipNew"].Value = CusipNew;
+                cmd.Parameters["@Ticker"].Value = Ticker;
+                cmd.Parameters["@TickerNew"].Value = TickerNew;
+                cmd.Parameters["@CompanyName"].Value = CompanyName;
+                cmd.Parameters["@CompanyNameNew"].Value = CompanyNameNew;
+                cmd.Parameters["@SectorCode"].Value = SectorCode;
+                cmd.Parameters["@SectorCodeNew"].Value = SectorCodeNew;
+                cmd.Parameters["@Exchange"].Value = Exchange;
+                cmd.Parameters["@ExchangeNew"].Value = ExchangeNew;
+                cmd.Parameters.Add("@ProcessDate", SqlDbType.DateTime);
+                cmd.Parameters["@ProcessDate"].Value = ProcessDate;
+                cmd.ExecuteNonQuery();
+            }
+            catch(SqlException ex)
+            {
+                if(ex.Number == 2627)
+                {
+                    LogHelper.WriteLine(ex.Message);
+                }
+            }
+            finally
+            {
+            }
+        }
+
+
         public string GetSecurityMasterCurrentCusip(string OriginalCusip, string Vendor, string sDate)
         {
             string currentCusip = OriginalCusip;
@@ -1281,7 +1358,12 @@ namespace IndexDataEngineLibrary
                     {
                         prefix = "rl-";
                     }
-                    if (outputType.Equals(AdventOutputType.Constituent))
+                    else if(vendor.Equals(Vendors.RussellIcb))
+                    {
+                        prefix = "4rl-";
+                    }
+
+                    if(outputType.Equals(AdventOutputType.Constituent))
                     {
                         sourceFilename = sourceDir + prefix + DateHelper.ConvertToYYYYMMDD(sFileDate) + "-xse-" + sIndexName + ".XSX";
                     }

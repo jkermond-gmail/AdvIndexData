@@ -263,8 +263,8 @@ namespace IndexDataForm
 
         private void btnTestFtp_Click(object sender, EventArgs e)
         {
-            indexDataEngine = new IndexDataEngine();
-            indexDataEngine.InitializeHistoricalSecurityMasterCopy();
+            //indexDataEngine = new IndexDataEngine();
+            //indexDataEngine.InitializeHistoricalSecurityMasterCopy();
 
             //indexDataEngine.CreateFtpFolders();
             //snpData.TestFileCopy();
@@ -289,8 +289,8 @@ namespace IndexDataForm
 
         private void btnTestSecMaster_Click(object sender, EventArgs e)
         {
-            indexDataEngine = new IndexDataEngine();
-            indexDataEngine.ProcessSecurityMasterChanges(lnkStartDate.Text);
+            //indexDataEngine = new IndexDataEngine();
+            //indexDataEngine.ProcessSecurityMasterChanges(lnkStartDate.Text);
         }
 
         private void btnTestSecMasterReport_Click(object sender, EventArgs e)

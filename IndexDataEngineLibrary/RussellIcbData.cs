@@ -147,7 +147,7 @@ namespace IndexDataEngineLibrary
                 Mail mail = new Mail();
                 mail.SendMail("AdvIndexData: VendorDatasetJobs complete  " + Vendors.RussellIcb.ToString() + " " + Dataset + " " + sProcessDate);
                 IndexDataEngine indexDataEngine = new IndexDataEngine();
-                indexDataEngine.GenerateSecurityMasterChangesReport(sProcessDate);
+                indexDataEngine.ProcessSecurityMasterReport(sProcessDate);
             }
             catch(SqlException ex)
             {
@@ -1722,7 +1722,7 @@ namespace IndexDataEngineLibrary
             {
                 //string SqlSelect = "select AdventIndexName from VendorIndexMap ";
                 string SqlSelect = "select IndexClientName from VendorIndexMap ";
-                string SqlWhere = "where Vendor = 'Russell' and Supported = 'Yes' and IndexName ='" + VendorIndex + "'";
+                string SqlWhere = "where Vendor = 'RussellICB' and Supported = 'Yes' and IndexName ='" + VendorIndex + "'";
                 //                string SqlWhere = "where Vendor = 'Russell' and Supported = 'Yes' and VendorIndexName ='" + VendorIndex + "'";
                 conn.Open();
                 SqlCommand cmd = new SqlCommand(SqlSelect + SqlWhere, conn);
@@ -1766,7 +1766,7 @@ namespace IndexDataEngineLibrary
                 string SqlSelectCount = "select count(IndexName) from VendorIndexMap ";
                 //string SqlSelect = "select VendorIndexName from VendorIndexMap ";
                 string SqlSelect = "select IndexName from VendorIndexMap ";
-                string SqlWhere = "where Vendor = 'Russell' and Supported = 'Yes' ";
+                string SqlWhere = "where Vendor = 'RussellICB' and Supported = 'Yes' ";
                 //string SqlOrderBy = "order by VendorIndexName";
                 string SqlOrderBy = "order by IndexName";
 
@@ -2660,7 +2660,7 @@ namespace IndexDataEngineLibrary
                 string SqlSelect = @"
                     select VendorReturn from TotalReturns
                     where IndexName = @IndexName and ReturnDate = @ReturnDate 
-                    and Vendor = 'Russell' and VendorFormat = 'CONSTITUENT'
+                    and Vendor = 'RussellICB' and VendorFormat = 'CONSTITUENT'
                     ";
 
                 SqlCommand cmd = new SqlCommand(SqlSelect, cnSql);
@@ -2813,7 +2813,7 @@ namespace IndexDataEngineLibrary
                     string SqlSelect = @"
                     select VendorReturn, AdvReturnDb from TotalReturns
                     where IndexName = @IndexName and ReturnDate = @ReturnDate 
-                    and Vendor = 'Russell' and VendorFormat = 'CONSTITUENT'
+                    and Vendor = 'RussellICB' and VendorFormat = 'CONSTITUENT'
                     ";
 
                     SqlCommand cmd = new SqlCommand(SqlSelect, mSqlConn);

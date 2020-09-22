@@ -1365,7 +1365,7 @@ namespace IndexDataEngineLibrary
                         }
                     }
                     else
-                    {
+                {
                         //file.WriteLine(DateHelper.ConvertToYYYYMMDD(sProcessDate) + " No Ticker or CUSIP Changes");
                     }
                 }

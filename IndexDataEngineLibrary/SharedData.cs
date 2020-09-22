@@ -782,7 +782,7 @@ namespace IndexDataEngineLibrary
             foreach (IndexRow indexRow in indexRowsTickerSort)
             {
                 double rateOfReturn = 0.0;
-                if (vendor.Equals(Vendors.Russell))
+                if (vendor.Equals(Vendors.Russell) || vendor.Equals(Vendors.RussellIcb))
                     rateOfReturn = indexRow.RateOfReturnAdjusted;
                 else if(vendor.Equals(Vendors.Snp))
                     rateOfReturn = indexRow.RateOfReturn;

@@ -94,6 +94,21 @@ namespace IndexDataEngineLibrary
         //}
 
 
+        public void Run(string sStartDate, string sEndDate)
+        {
+            DateTime startDate = Convert.ToDateTime(sStartDate);
+            DateTime endDate = Convert.ToDateTime(sEndDate);
+            DateTime processDate;
+            int DateCompare;
+
+            for(processDate = startDate
+            ; (DateCompare = processDate.CompareTo(endDate)) <= 0
+            ; processDate = DateHelper.NextBusinessDay(processDate))
+            {
+                Run(processDate.ToString("MM/dd/yyyy"));
+            }
+        }
+
         public void Run(string sVifsProcessDate)
         {
             DateTime date = DateTime.Parse(sVifsProcessDate);

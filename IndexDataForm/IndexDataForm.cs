@@ -248,7 +248,7 @@ namespace IndexDataForm
         private void btnProcessAllForDate_Click(object sender, EventArgs e)
         {
             IndexDataEngine indexDataEngine = new IndexDataEngine();
-            indexDataEngine.Run(lnkStartDate.Text);
+            indexDataEngine.Run(lnkStartDate.Text, lnkEndDate.Text);
         }
         #endregion RunIndexDataFunctionality
 

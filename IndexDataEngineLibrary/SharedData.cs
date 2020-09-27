@@ -348,13 +348,16 @@ namespace IndexDataEngineLibrary
                 }
 
                 string SqlSelect = @"
-                    select Ticker from HistoricalSecurityMaster
-                    where Cusip = @Cusip
+                    select Ticker from HistoricalSecurityMasterFull
+                    where Cusip = @Cusip and Vendor = @Vendor
                     ";
                 SqlCommand cmd = new SqlCommand(SqlSelect, mSqlConn);
                 SqlDataReader dr = null;
                 cmd.Parameters.Add("@Cusip", SqlDbType.VarChar);
                 cmd.Parameters["@Cusip"].Value = CurrentCusip;
+                cmd.Parameters.Add("@Vendor", SqlDbType.VarChar);
+                cmd.Parameters["@Vendor"].Value = Vendor;
+
 
                 dr = cmd.ExecuteReader();
                 if (dr.HasRows)

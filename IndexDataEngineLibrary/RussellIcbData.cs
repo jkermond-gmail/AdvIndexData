@@ -535,11 +535,26 @@ namespace IndexDataEngineLibrary
 
         private void AddRussellSecurityReferenceChangeData(string FileName, DateTime FileDate)
         {
+            SqlConnection cnSql = new SqlConnection(sharedData.ConnectionStringIndexData);
+            string SqlDelete;
+            string SqlWhere;
+            SqlCommand cmd = null;
+
+
             DataTable dt = ReadCsvIntoTable(FileName);
             int i = 0;
 
             try
             {
+                SqlDelete = "delete FROM HistoricalSecurityMasterFullChanges ";
+                SqlWhere = "where FileDate = @FileDate";
+                cmd = new SqlCommand();
+                cmd.Connection = cnSql;
+                cmd.CommandText = SqlDelete + SqlWhere;
+                cmd.Parameters.Add("@FileDate", SqlDbType.Date);
+                cmd.Parameters["@FileDate"].Value = FileDate;
+                cmd.ExecuteNonQuery();
+
                 foreach(DataRow dr in dt.Rows)
                 {
                     i += 1;

@@ -2244,7 +2244,8 @@ namespace IndexDataEngineLibrary
                         IndexRow indexRow = new IndexRow(sDate, sIndexName, sCusip, sTicker,
                                                          sIndustry, sSuperSector, sSector, sSubSector,
                                                          sWeight, sSecurityReturn, IndexRow.VendorFormat.CONSTITUENT);
-                        indexRow.CurrentTicker = sharedData.GetSecurityMasterCurrentTickerRussell(sTicker, sCusip, sDate);
+                        //indexRow.CurrentTicker = sharedData.GetSecurityMasterCurrentTickerRussell(sTicker, sCusip, sDate);
+                        indexRow.CurrentTicker = sTicker;
                         indexRowsTickerSort.Add(indexRow);
                     }
                 }

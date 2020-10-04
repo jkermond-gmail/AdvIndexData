@@ -844,6 +844,7 @@ namespace IndexDataEngineLibrary
                 string sCompanyName = "";
                 string sSector = "";
                 string sExchange = "";
+                string sStockKey = "";
 
                 if(i == 1)
                     ok = false;
@@ -960,9 +961,12 @@ namespace IndexDataEngineLibrary
                     Fld = ParseColumn(dr, "Exchange", 6); // 6
                     sExchange = Fld;
 
+                    Fld = ParseColumn(dr, "Cons Code", 1); // 1
+                    sStockKey = Fld;
+
                     if(ok)
                     {
-                        sharedData.AddSecurityMasterFull(sTicker, sCUSIP, "I", sCompanyName, sSector, sExchange, oDate);
+                        sharedData.AddSecurityMasterFull(sStockKey, sTicker, sCUSIP, "4", sCompanyName, sSector, sExchange, oDate);
 
                         if(r1000.Equals("Y"))
                         {

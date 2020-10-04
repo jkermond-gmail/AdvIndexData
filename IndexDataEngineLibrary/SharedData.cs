@@ -287,14 +287,17 @@ namespace IndexDataEngineLibrary
                 string SqlSelect = @"
                     select NewSymbol, ChangeDate from HistoricalSymbolChanges
                     where OldSymbol = @Cusip and
-                    ChangeDate > @ChangeDate
+                    ChangeDate > @ChangeDate and 
+                    Vendor = @Vendor
                     ";
                 SqlCommand cmd = new SqlCommand(SqlSelect, mSqlConn);
                 SqlDataReader dr = null;
                 cmd.Parameters.Add("@Cusip", SqlDbType.VarChar);
                 cmd.Parameters.Add("@ChangeDate", SqlDbType.DateTime);
+                cmd.Parameters.Add("@Vendor", SqlDbType.VarChar);
+                cmd.Parameters["@Vendor"].Value = Vendor;
 
-                while ( found.Equals(false))
+                while( found.Equals(false))
                 {
                     cmd.Parameters["@Cusip"].Value = currentCusip;
                     cmd.Parameters["@ChangeDate"].Value = sChangeDate;
@@ -335,7 +338,7 @@ namespace IndexDataEngineLibrary
         public string GetSecurityMasterCurrentTickerRussell(string Ticker, string Cusip, string sDate  )
         {
             string SecurityMasterCurrentTicker = Ticker;
-            string Vendor = "R";
+            string Vendor = "4";
 
             string CurrentCusip = GetSecurityMasterCurrentCusip(Cusip, Vendor, sDate);
 

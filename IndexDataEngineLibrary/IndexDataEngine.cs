@@ -1267,7 +1267,7 @@ namespace IndexDataEngineLibrary
         {
             LogHelper.WriteLine("GenerateSecurityMasterChangesReport " + sProcessDate);
             string sAxmlOutputPath = AppSettings.Get<string>("AxmlOutputPath");
-            string filename = sAxmlOutputPath + "rl_" + DateHelper.ConvertToYYYYMMDD(sProcessDate) + "_RefData.txt";
+            string filename = sAxmlOutputPath + "4rl_" + DateHelper.ConvertToYYYYMMDD(sProcessDate) + "_RefData.txt";
 
             if (File.Exists(filename))
                 File.Delete(filename);
@@ -1544,7 +1544,7 @@ namespace IndexDataEngineLibrary
                         {
                             string sourceFilename = "";
 
-                            sourceFilename = sourceDir + "rl_" + DateHelper.ConvertToYYYYMMDD(sFileDate) + "_RefData.txt";
+                            sourceFilename = sourceDir + "4rl_" + DateHelper.ConvertToYYYYMMDD(sFileDate) + "_RefData.txt";
 
                             if (File.Exists(sourceFilename))
                             {

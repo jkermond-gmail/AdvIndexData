@@ -147,7 +147,8 @@
             this.cboVendor.Items.AddRange(new object[] {
             "RussellIcb",
             "Snp",
-            "Russell"});
+            "Russell",
+            "RussellIcbHist"});
             this.cboVendor.Location = new System.Drawing.Point(48, 248);
             this.cboVendor.Name = "cboVendor";
             this.cboVendor.Size = new System.Drawing.Size(121, 21);
@@ -201,7 +202,7 @@
             this.btnProcessAllForDate.Name = "btnProcessAllForDate";
             this.btnProcessAllForDate.Size = new System.Drawing.Size(384, 23);
             this.btnProcessAllForDate.TabIndex = 17;
-            this.btnProcessAllForDate.Text = "Process Vendor Files, Generate AXML Files, Distribute to FTP for Start Date";
+            this.btnProcessAllForDate.Text = "Process Vendor Files, Generate AXML Files, Distribute to FTP for Date Range";
             this.btnProcessAllForDate.UseVisualStyleBackColor = true;
             this.btnProcessAllForDate.Click += new System.EventHandler(this.btnProcessAllForDate_Click);
             // 

@@ -2105,7 +2105,7 @@ namespace IndexDataEngineLibrary
                 if(logReturnData)
                     LogHelper.WriteLine("Advent Total Return " + AdventTotalReturn.ToString());
 
-                sharedData.AddTotalReturn(sDate, sIndexName, Vendors.RussellIcb.ToString(), sVendorFormat, AdventTotalReturn, "AdvReturn");
+                sharedData.AddTotalReturn(sDate, sIndexName, Vendors.Russell.ToString(), sVendorFormat, AdventTotalReturn, "AdvReturn");
 
                 double AdventVsVendorDiff = VendorTotalReturn - AdventTotalReturn;
 
@@ -2113,7 +2113,7 @@ namespace IndexDataEngineLibrary
                 if(logReturnData)
                     LogHelper.WriteLine("Advent Vs Vendor Diff " + AdventVsVendorDiff.ToString());
 
-                sharedData.AddTotalReturn(sDate, sIndexName, Vendors.RussellIcb.ToString(), sVendorFormat, AdventVsVendorDiff, "Diff");
+                sharedData.AddTotalReturn(sDate, sIndexName, Vendors.Russell.ToString(), sVendorFormat, AdventVsVendorDiff, "Diff");
 
                 IndexRows.CalculateAddlContribution(AdventVsVendorDiff, sVendorFormat, logReturnData);
 
@@ -2132,7 +2132,7 @@ namespace IndexDataEngineLibrary
                 if(logReturnData)
                     LogHelper.WriteLine("Advent Total Return Adjusted " + AdventTotalReturnAdjusted.ToString());
 
-                sharedData.AddTotalReturn(sDate, sIndexName, Vendors.RussellIcb.ToString(), sVendorFormat, AdventTotalReturnAdjusted, "AdvReturnAdj");
+                sharedData.AddTotalReturn(sDate, sIndexName, Vendors.Russell.ToString(), sVendorFormat, AdventTotalReturnAdjusted, "AdvReturnAdj");
 
                 if(logReturnData)
                     LogHelper.WriteLine("----------------------------------------------------------------------------------------------");
@@ -2650,10 +2650,10 @@ namespace IndexDataEngineLibrary
                         else
                             smCusip = sNewCusip;
 
-                        string smTicker = GetSecurityMasterTicker(smCusip, sFileDate);
-                        if(smTicker.Length > 0)
-                            sTicker = smTicker;
-                        else
+                        //string smTicker = GetSecurityMasterTicker(smCusip, sFileDate);
+                        //if(smTicker.Length > 0)
+                        //    sTicker = smTicker;
+                        //else
                             sTicker = sOriginalTicker;
 
                         sMsg = sTicker + "," + sWeight + "," + sSecurityReturn + "," + sCusip;
@@ -2764,7 +2764,7 @@ namespace IndexDataEngineLibrary
                         {
                             foreach(string vendorFormat in Enum.GetNames(typeof(IndexRow.VendorFormat)))
                             {
-                                sharedData.AddTotalReturn(oDate, sIndexName, Vendors.RussellIcb.ToString(), vendorFormat, dReturn, "AdvReturnDb");
+                                sharedData.AddTotalReturn(oDate, sIndexName, Vendors.Russell.ToString(), vendorFormat, dReturn, "AdvReturnDb");
                             }
                         }
                     }
@@ -3033,7 +3033,7 @@ namespace IndexDataEngineLibrary
 
                             foreach(string vendorFormat in Enum.GetNames(typeof(IndexRow.VendorFormat)))
                             {
-                                sharedData.AddTotalReturn(date, sIndexName, Vendors.RussellIcb.ToString(), vendorFormat, CalculatedTotalReturn, "VendorReturn");
+                                sharedData.AddTotalReturn(date, sIndexName, Vendors.Russell.ToString(), vendorFormat, CalculatedTotalReturn, "VendorReturn");
                             }
                         }
                     }
@@ -3105,7 +3105,7 @@ namespace IndexDataEngineLibrary
                                 dDiff = Math.Round((dVendorReturn - dAdvReturn), iTotalReturnPrecision, MidpointRounding.AwayFromZero);
 
                                 foreach(string vendorFormat in Enum.GetNames(typeof(IndexRow.VendorFormat)))
-                                    sharedData.AddTotalReturn(date, sIndexName, Vendors.RussellIcb.ToString(), vendorFormat, dDiff, "DiffDb");
+                                    sharedData.AddTotalReturn(date, sIndexName, Vendors.Russell.ToString(), vendorFormat, dDiff, "DiffDb");
 
                                 //double dTest = Math.Round((dAdvReturn + dDiff), iTotalReturnPrecision, MidpointRounding.AwayFromZero);
                             }

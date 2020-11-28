@@ -11,7 +11,6 @@ using System.Globalization;
 using AdventUtilityLibrary;
 using LumenWorks.Framework.IO.Csv;
 
-
 namespace IndexDataEngineLibrary 
 {
     public sealed class RussellIcbData

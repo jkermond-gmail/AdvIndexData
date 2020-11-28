@@ -326,7 +326,9 @@ namespace IndexDataEngineLibrary
                             {
                                 AddRussellSymbolChangeData(FileName, oProcessDate);
                                 ProcessStatus.Update(oProcessDate, Vendors.RussellIcb.ToString(), Dataset, "", ProcessStatus.WhichStatus.SymbolChangeData, ProcessStatus.StatusValue.Pass);
+#if Commented
                                 AddRussellSecurityReferenceChangeData(FileName, oProcessDate);
+#endif
                             }
                             LogHelper.WriteLine("Done      : " + FileName + " " + DateTime.Now);
                         }
@@ -583,6 +585,7 @@ namespace IndexDataEngineLibrary
             }
         }
 
+#if Commented
         private void AddRussellSecurityReferenceChangeData(string FileName, DateTime FileDate)
         {
             SqlConnection cnSql = new SqlConnection(sharedData.ConnectionStringIndexData);
@@ -684,7 +687,7 @@ namespace IndexDataEngineLibrary
 
             }
         }
-
+#endif
 
 
         private void AddRussellTotalReturnData(VendorFileFormats FileFormat, string FileName, DateTime FileDate)
@@ -1578,9 +1581,9 @@ namespace IndexDataEngineLibrary
 
 
 
-        #endregion End Daily Holdings File Processing
+#endregion End Daily Holdings File Processing
 
-        #region Get Security Return
+#region Get Security Return
         public string GetSecurityReturn(DateTime FileDate, string CUSIP)
         {
             SqlDataReader dr = null;
@@ -1632,9 +1635,9 @@ namespace IndexDataEngineLibrary
 
             return (sSecurityReturn);
         }
-        #endregion End Get Security Return
+#endregion End Get Security Return
 
-        #region Security Master
+#region Security Master
 
         public void GenerateHistSecMasterLists(string sListDate)
         {
@@ -1818,9 +1821,9 @@ namespace IndexDataEngineLibrary
         }
 
 
-        #endregion End Security Master
+#endregion End Security Master
 
-        #region Total Return
+#region Total Return
         public void AddRussellTotalReturnForIndex(DateTime oDate, string sIndexName, string sTotalReturn)
         {
             try
@@ -1871,13 +1874,13 @@ namespace IndexDataEngineLibrary
 
         }
 
-        #endregion End Total Return
+#endregion End Total Return
 
         /*******************************/
-        #endregion  End Production Code
+#endregion  End Production Code
 
 
-        #region Testing Code used by Form2.Russell Tab
+#region Testing Code used by Form2.Russell Tab
         /***************************************************/
 
 
@@ -3128,7 +3131,7 @@ namespace IndexDataEngineLibrary
         }
 
         /***************************************************/
-        #endregion Testing Code used by Form2.Russell Tab
+#endregion Testing Code used by Form2.Russell Tab
 
 
         public List<string> GetClients()

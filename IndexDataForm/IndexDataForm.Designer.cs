@@ -183,6 +183,7 @@
             this.btnTestSecMasterReport.TabIndex = 19;
             this.btnTestSecMasterReport.Text = "Test Sec Master Report";
             this.btnTestSecMasterReport.UseVisualStyleBackColor = true;
+            this.btnTestSecMasterReport.Visible = false;
             this.btnTestSecMasterReport.Click += new System.EventHandler(this.btnTestSecMasterReport_Click);
             // 
             // btnTestSecMaster
@@ -193,7 +194,6 @@
             this.btnTestSecMaster.TabIndex = 18;
             this.btnTestSecMaster.Text = "Test Sec Master Changes";
             this.btnTestSecMaster.UseVisualStyleBackColor = true;
-            this.btnTestSecMaster.Visible = false;
             this.btnTestSecMaster.Click += new System.EventHandler(this.btnTestSecMaster_Click);
             // 
             // btnProcessAllForDate
@@ -348,7 +348,7 @@
             this.lnkEndDate.Size = new System.Drawing.Size(65, 13);
             this.lnkEndDate.TabIndex = 3;
             this.lnkEndDate.TabStop = true;
-            this.lnkEndDate.Text = "06/30/2020";
+            this.lnkEndDate.Text = "11/17/2020";
             this.lnkEndDate.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.lnkEndDate_LinkClicked);
             // 
             // lnkStartDate
@@ -359,7 +359,7 @@
             this.lnkStartDate.Size = new System.Drawing.Size(65, 13);
             this.lnkStartDate.TabIndex = 2;
             this.lnkStartDate.TabStop = true;
-            this.lnkStartDate.Text = "01/02/2020";
+            this.lnkStartDate.Text = "09/21/2020";
             this.lnkStartDate.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.lnkStartDate_LinkClicked);
             // 
             // lblEndDate

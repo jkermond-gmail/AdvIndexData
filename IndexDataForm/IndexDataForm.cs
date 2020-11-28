@@ -206,14 +206,19 @@ namespace IndexDataForm
             }
             else if(cboVendor.SelectedItem.Equals("RussellIcbHist"))
             {
-                russellIcbHistData.LogReturnData = chkLogReturnData.Checked;
+                //russellIcbHistData.LogReturnData = chkLogReturnData.Checked;
 
-                if(cboOutputType.Text.Equals("Constituent"))
-                    russellIcbHistData.GenerateReturnsForDateRange(lnkStartDate.Text, lnkEndDate.Text, Indexname, AdventOutputType.Constituent, chkHistoricalAxmlFile.Checked);
-                else if(cboOutputType.Text.Equals("Sector"))
-                    russellIcbHistData.GenerateReturnsForDateRange(lnkStartDate.Text, lnkEndDate.Text, Indexname, AdventOutputType.Sector, chkHistoricalAxmlFile.Checked);
+                string[] Indices = null;
+                Indices = russellData.GetIndices();
+                for(int i = 0; i < Indices.Length; i++)
+                {
+                    Indexname  = Indices[i];
+                    if(cboOutputType.Text.Equals("Constituent"))
+                        russellIcbHistData.GenerateReturnsForDateRange(lnkStartDate.Text, lnkEndDate.Text, Indexname, AdventOutputType.Constituent, chkHistoricalAxmlFile.Checked);
+                    else if(cboOutputType.Text.Equals("Sector"))
+                        russellIcbHistData.GenerateReturnsForDateRange(lnkStartDate.Text, lnkEndDate.Text, Indexname, AdventOutputType.Sector, chkHistoricalAxmlFile.Checked);
+                }
             }
-
         }
         #endregion GenerateReturnsFunctionality
 
@@ -299,14 +304,12 @@ namespace IndexDataForm
 
         private void btnTestSecMaster_Click(object sender, EventArgs e)
         {
-            //indexDataEngine = new IndexDataEngine();
-            //indexDataEngine.ProcessSecurityMasterChanges(lnkStartDate.Text);
+            indexDataEngine = new IndexDataEngine();
+            indexDataEngine.ProcessSecurityMasterReport(lnkStartDate.Text, lnkEndDate.Text);
         }
 
         private void btnTestSecMasterReport_Click(object sender, EventArgs e)
         {
-            indexDataEngine = new IndexDataEngine();
-            indexDataEngine.ProcessSecurityMasterReport(lnkStartDate.Text);
         }
 
         private void btnCalculateTotalReturns_Click(object sender, EventArgs e)

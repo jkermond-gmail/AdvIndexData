@@ -64,6 +64,21 @@ namespace IndexDataEngineLibrary
         //    EndSql();
         //}
 
+        public void ProcessSecurityMasterReport(string sStartDate, string sEndDate)
+        {
+            DateTime startDate = Convert.ToDateTime(sStartDate);
+            DateTime endDate = Convert.ToDateTime(sEndDate);
+            DateTime processDate;
+            int DateCompare;
+
+            for(processDate = startDate
+            ; (DateCompare = processDate.CompareTo(endDate)) <= 0
+            ; processDate = DateHelper.NextBusinessDay(processDate))
+            {
+                ProcessSecurityMasterReport(processDate.ToString("MM/dd/yyyy"));
+            }
+
+        }
         public void ProcessSecurityMasterReport(string sProcessDate)
         {
             DateTime date = DateTime.Parse(sProcessDate);
@@ -73,25 +88,10 @@ namespace IndexDataEngineLibrary
             ProcessStatus.ConnectionString = sConnectionIndexData;
             BeginSql();
             IndexDataProcessDate = date;
-            GenerateSecurityMasterChangesReport(sProcessDate);
+            GenerateSecurityMasterChangesReport(sProcessDate, "4");
             CopySecurityMasterChangesToFtpFolders(sProcessDate);
             EndSql();
         }
-
-        //public void GenerateSecurityMasterChangesDataAndReport(string sProcessDate)
-        //{
-        //    DateTime date = DateTime.Parse(sProcessDate);
-        //    sProcessDate = date.ToString("MM/dd/yyyy");
-        //    InitializeConnectionStrings();
-        //    DateHelper.ConnectionString = sConnectionAmdVifs;
-        //    ProcessStatus.ConnectionString = sConnectionIndexData;
-        //    BeginSql();
-        //    IndexDataProcessDate = date;
-        //    //GenerateSecurityMasterChangesData(sProcessDate);
-        //    GenerateSecurityMasterChangesReport(sProcessDate);
-        //    CopySecurityMasterChangesToFtpFolders(sProcessDate);
-        //    EndSql();
-        //}
 
 
         public void Run(string sStartDate, string sEndDate)
@@ -1050,220 +1050,8 @@ namespace IndexDataEngineLibrary
             return;
         }
 
-        //public void InitializeHistoricalSecurityMasterCopy()
-        //{
-        //    bool endSql = false;
-        //    try
-        //    {
-        //        LogHelper.WriteLine("InitializeHistoricalSecurityMasterCopy");
-        //        if (String.IsNullOrEmpty(sConnectionIndexData))
-        //        {
-        //            LogHelper.WriteLine("sConnectionIndexData is null");
 
-        //            InitializeConnectionStrings();
-        //            BeginSql();
-        //            endSql = true;
-        //        }
-
-        //        string sqlDelete = "DELETE FROM HistoricalSecurityMasterFullCopy";
-
-        //        SqlCommand cmd = new SqlCommand
-        //        {
-        //            Connection = cnSqlIndexData,
-        //            CommandText = sqlDelete
-        //        };
-        //        cmd.ExecuteNonQuery();
-        //        LogHelper.WriteLine("Delete is done");
-
-        //        cmd.CommandText = @"
-        //            INSERT INTO HistoricalSecurityMasterFullCopy (
-	       //         id, Ticker, Cusip, Vendor, StockKey, CompanyName, SectorCode, Exchange, BeginDate, EndDate)
-	       //         SELECT id, Ticker, Cusip, Vendor, StockKey, CompanyName, SectorCode, Exchange, BeginDate, EndDate
-	       //         FROM HistoricalSecurityMasterFull  
-        //            WHERE Vendor = 'R' 
-        //            ORDER BY id
-        //        ";
-        //        cmd.ExecuteNonQuery();
-        //        LogHelper.WriteLine("Insert is done");
-
-        //    }
-        //    catch (SqlException ex)
-        //    {
-        //        LogHelper.WriteLine("InitializeHistoricalSecurityMasterCopy Sql Exception " + ex.Message);
-
-        //        if (ex.Number == 2627)
-        //        {
-        //            LogHelper.WriteLine(ex.Message);
-        //        }
-        //    }
-        //    finally
-        //    {
-        //        if (endSql)
-        //            EndSql();
-        //    }
-            
-        //return;
-
-        //}
-
-        //public void GenerateSecurityMasterChangesData(string sProcessDate)
-        //{
-        //    LogHelper.WriteLine("GenerateSecurityMasterChangesData " + sProcessDate);
-        //    SqlCommand cmd = null;
-        //    SqlCommand cmd2 = null;
-        //    SqlConnection cnSql2 = null ;
-        //    // First Get the new adds
-        //    string selectText = @"
-        //        select id from HistoricalSecurityMasterFull where id not in 
-        //        (select id from HistoricalSecurityMasterFullCopy) and Vendor = 'R'
-        //    ";
-        //    string insertText = @"
-        //        insert into HistoricalSecurityMasterFullChanges
-        //        (id, ProcessDate, ChangeType, CusipNew, TickerNew, CompanyNameNew, SectorCodeNew, ExchangeNew)
-        //        select id, BeginDate, 'Add', Cusip, Ticker, CompanyName, SectorCode, Exchange from HistoricalSecurityMasterFull where id = @id
-        //    ";
-        //    try
-        //    {
-        //        cnSql2 = new SqlConnection(sConnectionIndexData);
-        //        cnSql2.Open();
-
-        //        cmd = new SqlCommand
-        //        {
-        //            Connection = cnSqlIndexData,
-        //            CommandText = selectText
-        //        };
-
-        //        cmd2 = new SqlCommand
-        //        {
-        //            Connection = cnSql2,
-        //            CommandText = insertText
-        //        };
-        //        cmd2.Parameters.Add("@id", SqlDbType.Int);
-
-        //        SqlDataReader dr = null;
-        //        dr = cmd.ExecuteReader();
-        //        if (dr.HasRows)
-        //        {
-        //            while (dr.Read())
-        //            {
-        //                string val = dr["id"].ToString();
-        //                int id = Convert.ToInt32(val);
-        //                cmd2.Parameters["@id"].Value = id;
-        //                cmd2.ExecuteNonQuery();
-        //                LogHelper.WriteLine("Insert Add is done");
-        //            }
-        //        }
-        //        dr.Close();
-
-        //        // Next get deletes
-        //        string sPrevProcessDate = DateHelper.PrevBusinessDayMMDDYYYY_Slash(sProcessDate);
-        //        selectText = @"
-        //            select id from HistoricalSecurityMasterFullCopy where EndDate = @PrevProcessDate and id in
-        //            (select id from HistoricalSecurityMasterFull where EndDate = @PrevProcessDate and Vendor = 'R')
-        //        ";
-        //        cmd.CommandText = selectText;
-        //        cmd.Parameters.Add("@PrevProcessDate", SqlDbType.Date);
-        //        cmd.Parameters["@PrevProcessDate"].Value = sPrevProcessDate;
-
-        //        insertText = @"
-        //            insert into HistoricalSecurityMasterFullChanges
-        //            (id, ProcessDate, ChangeType, Cusip, Ticker, CompanyName, SectorCode, Exchange)
-        //            select id, @ProcessDate, 'Delete', Cusip, Ticker, CompanyName, SectorCode, Exchange from HistoricalSecurityMasterFull where id = @id
-        //        ";
-        //        cmd2.CommandText = insertText;
-        //        cmd2.Parameters.Add("@ProcessDate", SqlDbType.Date);
-        //        cmd2.Parameters["@ProcessDate"].Value = sProcessDate;
-
-
-        //        dr = cmd.ExecuteReader();
-        //        if (dr.HasRows)
-        //        {
-        //            while (dr.Read())
-        //            {
-        //                string val = dr["id"].ToString();
-        //                int id = Convert.ToInt32(val);
-        //                cmd2.Parameters["@id"].Value = id;
-        //                cmd2.ExecuteNonQuery();
-        //                LogHelper.WriteLine("Insert Delete are done");
-        //            }
-        //        }
-        //        dr.Close();
-
-        //        // Lastly, get updates
-        //        selectText = @"
-        //            select h.id from HistoricalSecurityMasterFull h
-        //            inner join HistoricalSecurityMasterFullCopy hprev on h.id = hprev.id
-        //            where h.EndDate = @ProcessDate and hprev.EndDate = @PrevProcessDate
-        //            and h.Vendor = 'R' and hprev.Vendor = 'R' 
-        //            and (h.Ticker <> hprev.Ticker OR h.Cusip <> hprev.Cusip or h.CompanyName <> hprev.CompanyName or h.SectorCode <> hprev.SectorCode
-        //            or h.Exchange <> hprev.Exchange)
-        //        ";
-        //        cmd.CommandText = selectText;
-        //        cmd.Parameters.Add("@ProcessDate", SqlDbType.Date);
-        //        cmd.Parameters["@ProcessDate"].Value = sProcessDate;
-
-        //        insertText = @"
-        //            insert into HistoricalSecurityMasterFullChanges
-        //            (id, ProcessDate, ChangeType, Cusip, CusipNew, Ticker, TickerNew, CompanyName, CompanyNameNew, SectorCode, SectorCodeNew, Exchange, ExchangeNew)
-        //            select h.id, h.EndDate, 'Update', hprev.Cusip, h.Cusip, hprev.Ticker, h.Ticker, hprev.CompanyName, h.CompanyName, 
-        //            hprev.SectorCode, h.SectorCode, hprev.Exchange, h.Exchange
-	       //         from HistoricalSecurityMasterFull h
-        //            inner join HistoricalSecurityMasterFullCopy hprev on h.id = hprev.id
-        //            where h.id = @id and hprev.id = @id
-        //        ";
-        //        cmd2.CommandText = insertText;
-
-        //        dr = cmd.ExecuteReader();
-        //        if (dr.HasRows)
-        //        {
-        //            while (dr.Read())
-        //            {
-        //                string val = dr["id"].ToString();
-        //                int id = Convert.ToInt32(val);
-        //                cmd2.Parameters["@id"].Value = id;
-        //                cmd2.ExecuteNonQuery();
-        //                LogHelper.WriteLine("Insert Updates are done");
-        //            }
-        //        }
-        //        dr.Close();
-        //    }
-        //    catch (SqlException ex)
-        //    {
-        //        LogHelper.WriteLine(ex.Message);
-        //    }
-        //    finally
-        //    {
-        //        if (cnSql2 != null)
-        //            cnSql2.Close();
-        //        LogHelper.WriteLine("GenerateSecurityMasterChangesData Done");
-        //    }
-
-        //    return;
-        //}
-
-
-        /*
-         * old report from old production version
-        Date     Action Cusip     New Cusip  Ticker     New Ticker Exchange     New Exchange 1 2 5 M T S 3 MICRO 1 2 5 M T S 3 MICRO Name                      New Name                  ES     New ES SubS     New SubS IND      New IND
-        -------- ------ --------- ---------- ---------- ---------- ------------ ------------ - - - - - - - ----- - - - - - - - ----- ------------------------- ------------------------- ------ ------ -------- -------- -------- --------
-        20190520 Delete 45685L100            HIFR                  NYSE                      N Y Y N N Y Y N                         INFRAREIT INC                                       10            1060              1060914           
-        20190520 Delete 577767106            MXWL                  NASDAQ                    N Y Y N N Y Y Y                         MAXWELL TECHNOLOGIES INC                            08            0820              0820734           
-        20190520 Delete 58409L306            MRT                   NYSE                      N Y Y N N Y Y Y                         MEDEQUITIES REALTY TRUST                            10            1060              1060910           
-        20190520 Update 90539J109  04911A107 UBSH       AUB        NASDAQ                    N Y Y N N Y Y N                         UNION BANKSHARES CORP      ATLANTIC UNION BANKSHARE 10            1010              1010400           
-        20190520 Update 91914N202  91914N301 VLRX                  NASDAQ                    N N N N N N N Y                         VALERITAS HOLDINGS INC                              02            0220              0220471           
-
-            new report from new production version Mar 2020
-
-        Date     Action Cusip     New Cusip  Ticker     New Ticker Name                      New Name                  Sector  New Sector Exchange     New Exchange 
-        -------- ------ --------- ---------- ---------- ---------- ------------------------- ------------------------- ------- ---------- ------------ ------------"
-        20190904 Add              01234567              ATest                                Atest Co                          1234567    NYSE         NASDAQ
-        20190904 Update 12345678  1234567x   DUMMY      DUMMY      NA                        NA                        1234567 1234567 
-        20190904 Update 52603A20  52603A20   LC         LC         LENDINGCLUB CORPORATION   LENDINGCLUB CORPORATIONx  1020489 1020489 
-        20190904 Update 69320M10  69320M10   PCB        PCB        PCB BANCORP               PCB BANCORP               1010400 101040x 
-
-         */
-
-        public void GenerateSecurityMasterChangesReport(string sProcessDate)
+        public void GenerateSecurityMasterChangesReport(string sProcessDate, string Vendor)
         {
             LogHelper.WriteLine("GenerateSecurityMasterChangesReport " + sProcessDate);
             string sAxmlOutputPath = AppSettings.Get<string>("AxmlOutputPath");
@@ -1274,8 +1062,8 @@ namespace IndexDataEngineLibrary
 
             using (StreamWriter file = new StreamWriter(filename))
             {
-                file.WriteLine("Date     Action Cusip      New Cusip   Ticker     New Ticker Name                      New Name                  Sector  New Sector Exchange     New Exchange ");
-                file.WriteLine("-------- ------ ---------- ----------- ---------- ---------- ------------------------- ------------------------- ------- ---------- ------------ ------------");
+                file.WriteLine("Date     Action Cusip      New Cusip   Ticker     New Ticker Name                      New Name                  Sector   New Sector Exchange     New Exchange ");
+                file.WriteLine("-------- ------ ---------- ----------- ---------- ---------- ------------------------- ------------------------- -------- ---------- ------------ ------------");
             }
 
             SqlCommand cmd = null;
@@ -1294,7 +1082,7 @@ namespace IndexDataEngineLibrary
                  */
                 string selectText = @"
                 SELECT * FROM
-                  HistoricalSymbolChanges WHERE ChangeDate = @ProcessDate
+                  HistoricalSymbolChanges WHERE ChangeDate = @ProcessDate and Vendor = @Vendor
                 ";
                 cmd = new SqlCommand
                 {
@@ -1303,6 +1091,8 @@ namespace IndexDataEngineLibrary
                 };
                 cmd.Parameters.Add("@ProcessDate", SqlDbType.Date);
                 cmd.Parameters["@ProcessDate"].Value = sProcessDate;
+                cmd.Parameters.Add("@Vendor", SqlDbType.VarChar);
+                cmd.Parameters["@Vendor"].Value = Vendor;
 
                 SqlDataReader dr = null;
                 dr = cmd.ExecuteReader();
@@ -1369,7 +1159,7 @@ namespace IndexDataEngineLibrary
                             string SectorCode = "";
                             SectorCode = SectorCode.PadRight(8 + 1);
                             string SectorCodeNew = "";
-                            SectorCodeNew = SectorCodeNew.PadRight(8 + 4);
+                            SectorCodeNew = SectorCodeNew.PadRight(8 + 3);
                             string Exchange = "";
                             Exchange = Exchange.PadRight(12 + 1);
                             string ExchangeNew = "";
@@ -1379,13 +1169,10 @@ namespace IndexDataEngineLibrary
                                            + Exchange + ExchangeNew);
                         }
                     }
-                    else
-                {
-                        //file.WriteLine(DateHelper.ConvertToYYYYMMDD(sProcessDate) + " No Ticker or CUSIP Changes");
-                    }
                 }
                 dr.Close();
                 /////////////////////////////////
+#if Commented
                 selectText = @"
                 SELECT *
                   FROM HistoricalSecurityMasterFullChanges
@@ -1403,6 +1190,14 @@ namespace IndexDataEngineLibrary
 		                 or (TickerNew in ( SELECT NewSymbol FROM HistoricalSymbolChanges WHERE ChangeDate = @ProcessDate ))
 		                 )
 	                ))
+                ";
+#endif
+                selectText = @"
+                SELECT *
+                  FROM HistoricalSecurityMasterFullChanges
+                  WHERE 
+	                ProcessDate = @ProcessDate and Vendor = @Vendor
+                  ORDER BY ChangeType desc
                 ";
                 cmd.CommandText = selectText;
 
@@ -1435,9 +1230,9 @@ namespace IndexDataEngineLibrary
                             string CompanyNameNew = GetColString(dr, "CompanyNameNew");
                             CompanyNameNew = CompanyNameNew.PadRight(25 + 1);
                             string SectorCode = GetColString(dr, "SectorCode");
-                            SectorCode = SectorCode.PadRight(7 + 1);
+                            SectorCode = SectorCode.PadRight(8 + 1);
                             string SectorCodeNew = GetColString(dr, "SectorCodeNew");
-                            SectorCodeNew = SectorCodeNew.PadRight(7 + 4);
+                            SectorCodeNew = SectorCodeNew.PadRight(8 + 4);
                             string Exchange = GetColString(dr, "Exchange");
                             Exchange = Exchange.PadRight(12 + 1);
                             string ExchangeNew = GetColString(dr, "ExchangeNew");
@@ -1446,10 +1241,6 @@ namespace IndexDataEngineLibrary
                             file.WriteLine(ProcessDate + ChangeType + Cusip + CusipNew + Ticker + TickerNew + CompanyName + CompanyNameNew + SectorCode + SectorCodeNew
                                            + Exchange + ExchangeNew);
                         }
-                    }
-                    else
-                    {
-                        //file.WriteLine(DateHelper.ConvertToYYYYMMDD(sProcessDate) + " No Other Changes");
                     }
                 }
                 dr.Close();

@@ -157,9 +157,15 @@ namespace IndexDataEngineLibrary
                     cmd.CommandText =
                         "insert into HistoricalSecurityMasterFull (Ticker, Cusip, StockKey, Vendor, CompanyName, SectorCode, Exchange, BeginDate, EndDate) " +
                         "Values ( @Ticker, @Cusip, @StockKey, @Vendor, @CompanyName, @SectorCode, @Exchange, @BeginDate, @EndDate ) ";
+                    if(Vendor.Equals("4"))
+                        AddSecRefChangeData(EndDate, "", Cusip, "", Ticker, "", CompanyName, "", Exchange, "", SectorCode, Vendor);
+
+
                 }
                 else
                 {
+                    if(Vendor.Equals("4"))
+                        UpdateSecRefChangeData(EndDate, Cusip, Ticker, CompanyName, Exchange, SectorCode, Vendor);
                     cmd.CommandText =
                         "update HistoricalSecurityMasterFull  set " +
                         "StockKey = @StockKey, " +
@@ -202,7 +208,8 @@ namespace IndexDataEngineLibrary
             string Ticker, string TickerNew,
             string CompanyName, string CompanyNameNew,
             string Exchange, string ExchangeNew,
-            string SectorCode, string SectorCodeNew
+            string SectorCode, string SectorCodeNew,
+            string Vendor
             )
         {
             try
@@ -223,10 +230,10 @@ namespace IndexDataEngineLibrary
                 string insertText = @"
                     insert into HistoricalSecurityMasterFullChanges
                     (ProcessDate, ChangeType, Cusip, CusipNew, Ticker, TickerNew, CompanyName, CompanyNameNew,
-                     SectorCode, SectorCodeNew, Exchange, ExchangeNew)
+                     SectorCode, SectorCodeNew, Exchange, ExchangeNew, Vendor)
                     values 
                     (@ProcessDate, @ChangeType, @Cusip, @CusipNew, @Ticker, @TickerNew, @CompanyName, @CompanyNameNew,
-                     @SectorCode, @SectorCodeNew, @Exchange, @ExchangeNew)
+                     @SectorCode, @SectorCodeNew, @Exchange, @ExchangeNew, @Vendor)
                 ";
 
 
@@ -242,6 +249,7 @@ namespace IndexDataEngineLibrary
                 cmd.Parameters.Add("@SectorCodeNew", SqlDbType.VarChar);
                 cmd.Parameters.Add("@Exchange", SqlDbType.VarChar);
                 cmd.Parameters.Add("@ExchangeNew", SqlDbType.VarChar);
+                cmd.Parameters.Add("@Vendor", SqlDbType.VarChar);
                 cmd.Parameters["@ChangeType"].Value = ChangeType;
                 cmd.Parameters["@Cusip"].Value = Cusip;
                 cmd.Parameters["@CusipNew"].Value = CusipNew;
@@ -254,6 +262,7 @@ namespace IndexDataEngineLibrary
                 cmd.Parameters["@Exchange"].Value = Exchange;
                 cmd.Parameters["@ExchangeNew"].Value = ExchangeNew;
                 cmd.Parameters.Add("@ProcessDate", SqlDbType.DateTime);
+                cmd.Parameters["@Vendor"].Value = Vendor;
                 cmd.Parameters["@ProcessDate"].Value = ProcessDate;
                 cmd.ExecuteNonQuery();
             }
@@ -266,6 +275,104 @@ namespace IndexDataEngineLibrary
             }
             finally
             {
+            }
+        }
+
+        public void UpdateSecRefChangeData(
+            DateTime ProcessDate,
+            string CusipNew,
+            string TickerNew,
+            string CompanyNameNew,
+            string ExchangeNew,
+            string SectorCodeNew,
+            string Vendor
+            )
+        {
+            string CusipOld = "";
+            string TickerOld = "";
+            string CompanyNameOld = "";
+            string ExchangeOld = "";
+            string SectorCodeOld = "";
+            bool bCompanyName = false;
+            bool bExchange = false;
+            bool bSectorCode = false;
+            SqlDataReader dr = null;
+
+            try
+            {
+                if(mSqlConn == null)
+                {
+                    mSqlConn = new SqlConnection(ConnectionStringIndexData);
+                    mSqlConn.Open();
+                }
+
+                string SqlSelect = @"
+                    select * from HistoricalSecurityMasterFull
+                    where Cusip = @Cusip 
+                    and Ticker = @Ticker
+                    and Vendor = @Vendor
+                    ";
+                SqlCommand cmd = new SqlCommand(SqlSelect, mSqlConn);
+                cmd.Parameters.Add("@Cusip", SqlDbType.VarChar);
+                cmd.Parameters.Add("@Ticker", SqlDbType.VarChar);
+                cmd.Parameters.Add("@Vendor", SqlDbType.VarChar);
+                cmd.Parameters["@Cusip"].Value = CusipNew;
+                cmd.Parameters["@Ticker"].Value = TickerNew;
+                cmd.Parameters["@Vendor"].Value = Vendor;
+
+                dr = cmd.ExecuteReader();
+                if(dr.HasRows)
+                {
+                    if(dr.Read())
+                    {
+                        CusipOld = dr["Cusip"].ToString();
+                        TickerOld = dr["Ticker"].ToString();
+                        CompanyNameOld = dr["CompanyName"].ToString();
+                        ExchangeOld = dr["Exchange"].ToString();
+                        SectorCodeOld = dr["SectorCode"].ToString();
+
+                        if(!CompanyNameNew.Equals(CompanyNameOld))
+                            bCompanyName = true;
+                        if(!ExchangeNew.Equals(ExchangeOld))
+                            bExchange = true;
+                        if(!SectorCodeNew.Equals(SectorCodeOld))
+                            bSectorCode = true;
+                        if(bCompanyName || bExchange || bSectorCode)
+                        {
+                            if(!bCompanyName)
+                            {
+                                CompanyNameNew = "";
+                                CompanyNameOld = "";
+                            }
+                            if(!bExchange)
+                            {
+                                ExchangeNew = "";
+                                ExchangeOld = "";
+                            }
+                            if(!bSectorCode)
+                            {
+                                SectorCodeNew = "";
+                                SectorCodeOld = "";
+                            }
+                            dr.Close();
+                            AddSecRefChangeData(ProcessDate, CusipOld, "", TickerOld, "", CompanyNameOld, CompanyNameNew,
+                                ExchangeOld, ExchangeNew, SectorCodeOld, SectorCodeNew, Vendor);
+                        }
+                    }
+                }
+                else
+                    ;
+            }
+            catch(SqlException ex)
+            {
+                if(ex.Number == 2627)
+                {
+                    LogHelper.WriteLine(ex.Message);
+                }
+            }
+            finally
+            {
+                dr.Close();
             }
         }
 

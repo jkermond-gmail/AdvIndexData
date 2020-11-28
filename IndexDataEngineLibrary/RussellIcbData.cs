@@ -326,7 +326,10 @@ namespace IndexDataEngineLibrary
                             {
                                 AddRussellSymbolChangeData(FileName, oProcessDate);
                                 ProcessStatus.Update(oProcessDate, Vendors.RussellIcb.ToString(), Dataset, "", ProcessStatus.WhichStatus.SymbolChangeData, ProcessStatus.StatusValue.Pass);
+#if Commented
+
                                 AddRussellSecurityReferenceChangeData(FileName, oProcessDate);
+#endif
                             }
                             LogHelper.WriteLine("Done      : " + FileName + " " + DateTime.Now);
                         }
@@ -468,6 +471,8 @@ namespace IndexDataEngineLibrary
 
             try
             {
+                // Look at the Symbol Changes for the previous date
+                DateTime CompareDate = DateHelper.PrevBusinessDay(FileDate);
                 foreach(DataRow dr in dt.Rows)
                 {
                     i += 1;
@@ -485,7 +490,7 @@ namespace IndexDataEngineLibrary
                     string Fld = ParseColumn(dr, "DATE", 1);
                     if(Fld.Length == 10 && DateTime.TryParseExact(Fld, "MM/dd/yyyy", enUS, DateTimeStyles.None, out oDate))
                     {
-                        if(oDate.Equals(FileDate))
+                        if(oDate.Equals(CompareDate))
                         {
                             Fld = ParseColumn(dr, "CUR CUSIP", 4);
                             if(Fld.Length == 9)
@@ -516,9 +521,9 @@ namespace IndexDataEngineLibrary
                                 sCompanyName = sOldCompanyName;
 
                             if(sOldCusip.Length == 8 && sNewCusip.Length == 8)
-                                sharedData.AddSymbolChange("4", oDate, sOldCusip, sNewCusip, sCompanyName);
+                                sharedData.AddSymbolChange("4", FileDate, sOldCusip, sNewCusip, sCompanyName);
                             if(sOldTicker.Length > 0 && sNewTicker.Length > 0)
-                                sharedData.AddSymbolChange("4", oDate, sOldTicker, sNewTicker, sCompanyName);
+                                sharedData.AddSymbolChange("4", FileDate, sOldTicker, sNewTicker, sCompanyName);
                         }
                     }
                 }
@@ -533,6 +538,8 @@ namespace IndexDataEngineLibrary
             }
         }
 
+
+#if Commented
         private void AddRussellSecurityReferenceChangeData(string FileName, DateTime FileDate)
         {
             SqlConnection cnSql = new SqlConnection(sharedData.ConnectionStringIndexData);
@@ -634,7 +641,7 @@ namespace IndexDataEngineLibrary
 
             }
         }
-
+#endif
 
 
         private void AddRussellTotalReturnData(VendorFileFormats FileFormat, string FileName, DateTime FileDate)
@@ -793,7 +800,10 @@ namespace IndexDataEngineLibrary
             SqlDelete = "delete FROM RussellIcbDailyHoldings2 ";
             cmdHoldings.CommandText = SqlDelete + SqlWhere;
             cmdHoldings.ExecuteNonQuery();
-
+            SqlDelete = "delete FROM HistoricalSecurityMasterFullChanges ";
+            SqlWhere = "where ProcessDate = @FileDate";
+            cmdHoldings.CommandText = SqlDelete + SqlWhere;
+            cmdHoldings.ExecuteNonQuery();
 
             string sTable1 = "RussellIcbDailyHoldings1";
             string sTable2 = "RussellIcbDailyHoldings2";
@@ -966,8 +976,7 @@ namespace IndexDataEngineLibrary
 
                     if(ok)
                     {
-                        sharedData.AddSecurityMasterFull(sStockKey, sTicker, sCUSIP, "4", sCompanyName, sSector, sExchange, oDate);
-
+                        sharedData.AddSecurityMasterFull(sStockKey, sTicker, sCUSIP, "4", sCompanyName, sSector, sExchange, oDate);                  
                         if(r1000.Equals("Y"))
                         {
                             drHoldings2 = dtHoldings2.NewRow();
@@ -1428,9 +1437,9 @@ namespace IndexDataEngineLibrary
 
 
 
-        #endregion End Daily Holdings File Processing
+#endregion End Daily Holdings File Processing
 
-        #region Get Security Return
+#region Get Security Return
         public string GetSecurityReturn(DateTime FileDate, string CUSIP)
         {
             SqlDataReader dr = null;
@@ -1482,9 +1491,9 @@ namespace IndexDataEngineLibrary
 
             return (sSecurityReturn);
         }
-        #endregion End Get Security Return
+#endregion End Get Security Return
 
-        #region Security Master
+#region Security Master
 
         public void GenerateHistSecMasterLists(string sListDate)
         {
@@ -1668,9 +1677,9 @@ namespace IndexDataEngineLibrary
         }
 
 
-        #endregion End Security Master
+#endregion End Security Master
 
-        #region Total Return
+#region Total Return
         public void AddRussellTotalReturnForIndex(DateTime oDate, string sIndexName, string sTotalReturn)
         {
             try
@@ -1721,13 +1730,13 @@ namespace IndexDataEngineLibrary
 
         }
 
-        #endregion End Total Return
+#endregion End Total Return
 
         /*******************************/
-        #endregion  End Production Code
+#endregion  End Production Code
 
 
-        #region Testing Code used by Form2.Russell Tab
+#region Testing Code used by Form2.Russell Tab
         /***************************************************/
 
 
@@ -2885,7 +2894,7 @@ namespace IndexDataEngineLibrary
         }
 
         /***************************************************/
-        #endregion Testing Code used by Form2.Russell Tab
+#endregion Testing Code used by Form2.Russell Tab
 
 
         public List<string> GetClients()

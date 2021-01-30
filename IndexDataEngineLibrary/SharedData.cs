@@ -896,7 +896,8 @@ namespace IndexDataEngineLibrary
             {
                 double rateOfReturn = 0.0;
                 if (vendor.Equals(Vendors.Russell) || vendor.Equals(Vendors.RussellIcb))
-                    rateOfReturn = indexRow.RateOfReturnAdjusted;
+                    rateOfReturn = indexRow.RateOfReturn;
+                    //rateOfReturn = indexRow.RateOfReturnAdjusted;
                 else if(vendor.Equals(Vendors.Snp))
                     rateOfReturn = indexRow.RateOfReturn;
 

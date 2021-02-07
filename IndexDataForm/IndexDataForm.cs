@@ -199,6 +199,8 @@ namespace IndexDataForm
             }
             else if (cboVendor.SelectedItem.Equals("Snp"))
             {
+                snpData.LogReturnData = chkLogReturnData.Checked;
+
                 if (cboOutputType.Text.Equals("Constituent"))
                     snpData.GenerateReturnsForDateRange(lnkStartDate.Text, lnkEndDate.Text, Indexname, AdventOutputType.Constituent, chkHistoricalAxmlFile.Checked);
                 else if (cboOutputType.Text.Equals("Sector"))

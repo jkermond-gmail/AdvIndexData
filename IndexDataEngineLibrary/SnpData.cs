@@ -26,6 +26,8 @@ namespace IndexDataEngineLibrary
         private const string NumberFormat = "0.#########";
         private CultureInfo mCultureInfo = new CultureInfo("en-US");
         private bool mUseSnpSecurityMaster = true;
+        private bool logReturnData = false;
+
 
         private List<IndexRow> indexRowsTickerSort = new List<IndexRow>();
         private List<IndexRow> indexRowsIndustrySort = new List<IndexRow>();
@@ -83,6 +85,13 @@ namespace IndexDataEngineLibrary
                 DateHelper.IsPrevEndofMonthOnWeekend(date);
             }
         }
+
+        public bool LogReturnData
+        {
+            get { return logReturnData; }
+            set { logReturnData = value; }
+        }
+
 
 
         #region ProcessVendorDatasetJobs
@@ -1160,26 +1169,8 @@ _SPMLP.SDL
             try
             {
                 sMsg = "GenerateReturnsForDate: " + sDate + " Index: " + sIndexName;
-                LogHelper.WriteLine(sMsg + sDate);
+                LogHelper.WriteLine(sMsg);
 
-
-                string SqlSelectOld = @"
-                    SELECT hclose.EffectiveDate, hclose.IndexCode, hclose.CUSIP, lower(hclose.Ticker) as Ticker, 
-                    cast(hclose.TotalReturn as float) * 100 as TotalReturn, 
-                    LEFT(hclose.GicsCode,2) As Sector, LEFT(hclose.GicsCode,4) As IndustryGroup, LEFT(hclose.GicsCode,6) As Industry, hclose.GicsCode As SubIndustry,
-                        ROUND((( (cast(hclose.MarketCap as float) )/
-                        (SELECT     
-                            sum( cast(hclose.MarketCap as float))
-                            FROM         dbo.SnpDailyClosingHoldings hclose 
-                            WHERE 
-                            hclose.EffectiveDate = @EffectiveDate and 
-                            (hclose.IndexCode = @IndexCode1 OR hclose.IndexCode = @IndexCode2 OR hclose.IndexCode = @IndexCode3))
-                        ) * 100 ),12) As Weight
-                    FROM         SnpDailyClosingHoldings hclose 
-                    WHERE 
-                        hclose.EffectiveDate = @EffectiveDate and 
-                        (hclose.IndexCode = @IndexCode1 OR hclose.IndexCode = @IndexCode2 OR hclose.IndexCode = @IndexCode3)
-                ";
                 string SqlSelect = @"
                 SELECT 
                   c.EffectiveDate, c.IndexCode, c.CUSIP, lower(c.Ticker) as Ticker, cast(c.TotalReturn as float) * 100 as TotalReturn,
@@ -1479,18 +1470,24 @@ _SPMLP.SDL
                         i = i + 1;
                     }
                 }
-                CalculateAdventTotalReturnForDate(indexRowsTickerSort, sDate, sIndexName, IndexRow.VendorFormat.CONSTITUENT.ToString());
+                CalculateAdventTotalReturnForDate(indexRowsTickerSort, sDate, sIndexName, IndexRow.VendorFormat.CONSTITUENT);
             }
         }
 
         private void RollUpRatesOfReturn(List<IndexRow> indexRowsRollUp, List<IndexRow> indexRowsIndustrySort,
             IndexRow.VendorFormat vendorFormat, string sDate, string sIndexName)
         {
-            foreach (IndexRow indexRowRollUp in indexRowsRollUp)
-                foreach (IndexRow indexRowConstituent in indexRowsIndustrySort)
+            double rollUpWeight = 0.0;
+            if(logReturnData)
+                LogHelper.WriteLine(",Ticker,Identifier,Identifier.RateOfReturn,Identifier.Weight,RollUp.Weight,RollUp.RateOfReturn");
+
+            foreach(IndexRow indexRowRollUp in indexRowsRollUp)
+            {
+                rollUpWeight = 0.0;
+                foreach(IndexRow indexRowConstituent in indexRowsIndustrySort)
                 {
                     string CompareIndentifier = "";
-                    switch (vendorFormat)
+                    switch(vendorFormat)
                     {
                         case IndexRow.VendorFormat.SECTOR_LEVEL1:
                             CompareIndentifier = indexRowConstituent.SectorLevel1; break;
@@ -1501,9 +1498,18 @@ _SPMLP.SDL
                         case IndexRow.VendorFormat.SECTOR_LEVEL4:
                             CompareIndentifier = indexRowConstituent.SectorLevel4; break;
                     }
-                    if (CompareIndentifier == indexRowRollUp.Identifier)
-                        indexRowRollUp.RateOfReturn += indexRowConstituent.RateOfReturn * indexRowConstituent.Weight / indexRowRollUp.Weight;
+                    if(CompareIndentifier == indexRowRollUp.Identifier)
+                    {
+
+                        indexRowRollUp.RateOfReturn += indexRowConstituent.RateOfReturn * (indexRowConstituent.Weight / indexRowRollUp.Weight);
+                        if(logReturnData)
+                        {
+                            rollUpWeight += indexRowConstituent.Weight;
+                            LogHelper.WriteLine("," + indexRowConstituent.Ticker + "," + indexRowRollUp.Identifier + "," + indexRowConstituent.RateOfReturn.ToString() + "," + indexRowConstituent.Weight.ToString() + "," + rollUpWeight.ToString() + "," + indexRowRollUp.RateOfReturn);
+                        }
+                    }
                 }
+            }
 
             //LogHelper.WriteLine("---Before---");
             //foreach (IndexRow indexRowRollUp in indexRowsRollUp)
@@ -1636,26 +1642,26 @@ _SPMLP.SDL
                     {
                         case IndexRow.VendorFormat.SECTOR_LEVEL1:
                             RollUpRatesOfReturn(indexRowsSectorLevel1RollUp, indexRowsIndustrySort, vendorFormat, sDate, sIndexName);
-                            CalculateAdventTotalReturnForDate(indexRowsSectorLevel1RollUp, sDate, sIndexName, IndexRow.VendorFormat.SECTOR_LEVEL1.ToString());
+                            CalculateAdventTotalReturnForDate(indexRowsSectorLevel1RollUp, sDate, sIndexName, vendorFormat);
                             break;
                         case IndexRow.VendorFormat.SECTOR_LEVEL2:
                             RollUpRatesOfReturn(indexRowsSectorLevel2RollUp, indexRowsIndustrySort, vendorFormat, sDate, sIndexName);
-                            CalculateAdventTotalReturnForDate(indexRowsSectorLevel2RollUp, sDate, sIndexName, IndexRow.VendorFormat.SECTOR_LEVEL2.ToString());
+                            CalculateAdventTotalReturnForDate(indexRowsSectorLevel2RollUp, sDate, sIndexName, vendorFormat);
                             break;
                         case IndexRow.VendorFormat.SECTOR_LEVEL3:
                             RollUpRatesOfReturn(indexRowsSectorLevel3RollUp, indexRowsIndustrySort, vendorFormat, sDate, sIndexName);
-                            CalculateAdventTotalReturnForDate(indexRowsSectorLevel3RollUp, sDate, sIndexName, IndexRow.VendorFormat.SECTOR_LEVEL3.ToString());
+                            CalculateAdventTotalReturnForDate(indexRowsSectorLevel3RollUp, sDate, sIndexName, vendorFormat);
                             break;
                         case IndexRow.VendorFormat.SECTOR_LEVEL4:
                             RollUpRatesOfReturn(indexRowsSectorLevel4RollUp, indexRowsIndustrySort, vendorFormat, sDate, sIndexName);
-                            CalculateAdventTotalReturnForDate(indexRowsSectorLevel4RollUp, sDate, sIndexName, IndexRow.VendorFormat.SECTOR_LEVEL4.ToString());
+                            CalculateAdventTotalReturnForDate(indexRowsSectorLevel4RollUp, sDate, sIndexName, vendorFormat);
                             break;
                     }
                 }
             }
         }
 
-        private void CalculateAdventTotalReturnForDate(List<IndexRow> indexRows, string sDate, string sIndexName, string sVendorFormat)
+        private void CalculateAdventTotalReturnForDate(List<IndexRow> indexRows, string sDate, string sIndexName, IndexRow.VendorFormat vendorFormat)
         {
             int totalReturnPrecision = 9;
 
@@ -1666,8 +1672,65 @@ _SPMLP.SDL
             double AdventTotalReturn = IndexRows.AdventTotalReturn;
             AdventTotalReturn = AdventTotalReturn * 100;
             AdventTotalReturn = Math.Round(AdventTotalReturn, totalReturnPrecision, MidpointRounding.AwayFromZero);
+            sharedData.AddTotalReturn(sDate, sIndexName, Vendors.Snp.ToString(), vendorFormat.ToString(), AdventTotalReturn, "AdvReturn");
 
-            sharedData.AddTotalReturn(sDate, sIndexName, Vendors.Snp.ToString(), sVendorFormat, AdventTotalReturn, "AdvReturn");
+            if( logReturnData)
+            {
+                double VendorTotalReturn = sharedData.GetVendorTotalReturnForDate(sDate, sIndexName, Vendors.Snp.ToString());
+                switch(vendorFormat)
+                {
+                    case IndexRow.VendorFormat.CONSTITUENT:
+                        LogHelper.WriteLine(",Constituent returns and weights for " + sIndexName + " " + sDate);
+                        LogHelper.WriteLine(",CUSIP,Ticker,Return,Weight,Weight*Return");
+
+                        foreach(IndexRow indexRow in indexRows)
+                            LogHelper.WriteLine("," + indexRow.CUSIP + "," + indexRow.Ticker + "," + indexRow.RateOfReturn.ToString() + "," + indexRow.Weight.ToString() + "," + indexRow.Weight * indexRow.RateOfReturn);
+
+                        LogHelper.WriteLine(",,,,Advs Total Return," + AdventTotalReturn);
+                        LogHelper.WriteLine(",,,,S&P Total Return," + VendorTotalReturn);
+                    break;
+                    case IndexRow.VendorFormat.SECTOR_LEVEL1:
+                        LogHelper.WriteLine(",Level 1 GICS returns and weights for " + sIndexName + " " + sDate);
+                        LogHelper.WriteLine(",,Identifier,Return,Weight,Weight*Return");
+
+                        foreach(IndexRow indexRow in indexRows)
+                            LogHelper.WriteLine("," + "," + indexRow.SectorLevel1 + "," + indexRow.RateOfReturn.ToString() + "," + indexRow.Weight.ToString() + "," + indexRow.Weight * indexRow.RateOfReturn);
+
+                        LogHelper.WriteLine(",,,,Advs Total Return," + AdventTotalReturn);
+                        LogHelper.WriteLine(",,,,S&P Total Return," + VendorTotalReturn);
+                    break;
+                    case IndexRow.VendorFormat.SECTOR_LEVEL2:
+                        LogHelper.WriteLine(",Level 2 GICS returns and weights for " + sIndexName + " " + sDate);
+                        LogHelper.WriteLine(",,Identifier,Return,Weight,Weight*Return");
+
+                        foreach(IndexRow indexRow in indexRows)
+                            LogHelper.WriteLine("," + "," + indexRow.SectorLevel2 + "," + indexRow.RateOfReturn.ToString() + "," + indexRow.Weight.ToString() + "," + indexRow.Weight * indexRow.RateOfReturn);
+
+                        LogHelper.WriteLine(",,,,Advs Total Return," + AdventTotalReturn);
+                        LogHelper.WriteLine(",,,,S&P Total Return," + VendorTotalReturn);
+                    break;
+                    case IndexRow.VendorFormat.SECTOR_LEVEL3:
+                        LogHelper.WriteLine(",Level 3 GICS returns and weights for " + sIndexName + " " + sDate);
+                        LogHelper.WriteLine(",,Identifier,Return,Weight,Weight*Return");
+
+                        foreach(IndexRow indexRow in indexRows)
+                            LogHelper.WriteLine("," + "," + indexRow.SectorLevel3 + "," + indexRow.RateOfReturn.ToString() + "," + indexRow.Weight.ToString() + "," + indexRow.Weight * indexRow.RateOfReturn);
+
+                        LogHelper.WriteLine(",,,,Advs Total Return," + AdventTotalReturn);
+                        LogHelper.WriteLine(",,,,S&P Total Return," + VendorTotalReturn);
+                    break;
+                    case IndexRow.VendorFormat.SECTOR_LEVEL4:
+                        LogHelper.WriteLine(",Level 4 GICS returns and weights for " + sIndexName + " " + sDate);
+                        LogHelper.WriteLine(",,Identifier,Return,Weight,Weight*Return");
+
+                        foreach(IndexRow indexRow in indexRows)
+                            LogHelper.WriteLine("," + "," + indexRow.SectorLevel4 + "," + indexRow.RateOfReturn.ToString() + "," + indexRow.Weight.ToString() + "," + indexRow.Weight * indexRow.RateOfReturn);
+
+                        LogHelper.WriteLine(",,,,Advs Total Return," + AdventTotalReturn);
+                        LogHelper.WriteLine(",,,,S&P Total Return," + VendorTotalReturn);
+                    break;
+                }
+            }
         }
 
 

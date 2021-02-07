@@ -68,6 +68,57 @@ namespace IndexDataEngineLibrary
             mConnectionStringAmdVifs = ConfigurationManager.ConnectionStrings["dbConnectionAmdVifs"].ConnectionString;
         }
 
+        public double GetVendorTotalReturnForDate(string sDate, string sIndexName, string sVendor)
+        {
+            SqlDataReader dr = null;
+            SqlConnection cnSql = new SqlConnection(mConnectionStringIndexData);
+            double dReturn = 0.0;
+            try
+            {
+                cnSql.Open();
+                string SqlSelect = @"
+                    select VendorReturn from TotalReturns
+                    where IndexName = @IndexName and ReturnDate = @ReturnDate 
+                    and Vendor = @Vendor and VendorFormat = 'CONSTITUENT'
+                    ";
+
+                SqlCommand cmd = new SqlCommand(SqlSelect, cnSql);
+                cmd.Parameters.Add("@IndexName", SqlDbType.VarChar, 20);
+                cmd.Parameters.Add("@ReturnDate", SqlDbType.DateTime);
+                cmd.Parameters.Add("@Vendor", SqlDbType.VarChar, 20);
+                cmd.Parameters["@IndexName"].Value = sIndexName;
+                DateTime oDate = DateTime.MinValue;
+                oDate = DateTime.Parse(sDate);
+                cmd.Parameters["@ReturnDate"].Value = oDate;
+                cmd.Parameters["@Vendor"].Value = sVendor;
+
+                dr = cmd.ExecuteReader();
+                if(dr.HasRows)
+                {
+                    if(dr.Read())
+                    {
+                        string s = dr["VendorReturn"].ToString();
+                        if(s.Length > 0 && double.TryParse(s, out double dNum))
+                            dReturn = Convert.ToDouble(dr["VendorReturn"].ToString());
+                    }
+                }
+            }
+            catch(SqlException ex)
+            {
+                if(ex.Number == 2627)
+                {
+                    LogHelper.WriteLine(ex.Message);
+                }
+            }
+            finally
+            {
+                cnSql.Close();
+            }
+            return (dReturn);
+        }
+
+
+
         public void AddSecurityMasterFull(string Ticker, string Cusip, string Vendor, string CompanyName, string SectorCode, string Exchange, DateTime EndDate)
         {
             AddSecurityMasterFull("", Ticker, Cusip, Vendor, CompanyName, SectorCode, Exchange, EndDate);

@@ -142,7 +142,7 @@ namespace AdventUtilityLibrary
 
             string formattedMsg = string.Format("{0}:{1}",
                                   DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
-                                  message);
+                                  "," + message);
 
 
             swLogFile.WriteLine(formattedMsg);

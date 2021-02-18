@@ -1203,17 +1203,28 @@ _SPMLP.SDL
                 LogHelper.WriteLine(sMsg);
 
                 string SqlSelect = @"
-                SELECT 
-                  c.EffectiveDate, c.IndexCode, c.CUSIP, lower(c.Ticker) as Ticker, cast(c.TotalReturn as float) * 100 as TotalReturn,
-                  LEFT(c.GicsCode,2) As Sector, LEFT(c.GicsCode,4) As IndustryGroup, LEFT(c.GicsCode,6) As Industry, c.GicsCode As SubIndustry,
-                  o.[Weight]
-                  FROM SnpDailyOpeningHoldings o
-                  inner join SnpDailyClosingHoldings c
-                  on o.StockKey = c.StockKey and o.EffectiveDate = c.EffectiveDate and o.IndexCode = c.IndexCode
-                  where o.effectivedate = @EffectiveDate  and 
-                  (o.IndexCode = @IndexCode1 OR o.IndexCode = @IndexCode2 OR o.IndexCode = @IndexCode3)
-                ";
-
+                    SELECT hclose.EffectiveDate, hopen.IndexCode, hclose.CUSIP, lower(hclose.Ticker) as Ticker, 
+                    cast(hclose.TotalReturn as float) * 100 as TotalReturn, 
+                    LEFT(hclose.GicsCode,2) As Sector, LEFT(hclose.GicsCode,4) As IndustryGroup, LEFT(hclose.GicsCode,6) As Industry, hclose.GicsCode As SubIndustry,
+                        ROUND((( (cast(hopen.MarketCap as float) )/
+                        (SELECT     
+                            sum( cast(hopen.MarketCap as float))
+                            FROM dbo.SnpDailyClosingHoldings hclose 
+                            inner join dbo.SnpDailyOpeningHoldings hopen on 
+                            hclose.EffectiveDate = hopen.EffectiveDate and 
+                            hclose.StockKey = hopen.StockKey and 
+                            hclose.IndexCode = hopen.IndexCode
+                            WHERE 
+                            hopen.EffectiveDate = @EffectiveDate and 
+                            (hopen.IndexCode = @IndexCode1 OR hopen.IndexCode = @IndexCode2 OR hopen.IndexCode = @IndexCode3))) * 100 ),12) As Weight
+                            FROM SnpDailyClosingHoldings hclose inner join
+                            dbo.SnpDailyOpeningHoldings hopen on 
+                            hclose.EffectiveDate = hopen.EffectiveDate and 
+                            hclose.StockKey = hopen.StockKey and hclose.IndexCode = hopen.IndexCode
+                        WHERE 
+                            hopen.EffectiveDate = @EffectiveDate and 
+                            (hopen.IndexCode = @IndexCode1 OR hopen.IndexCode = @IndexCode2 OR hopen.IndexCode = @IndexCode3)
+                    ";
 
                 string SqlOrderBy = "";
                 switch(OutputType)
@@ -1803,7 +1814,8 @@ _SPMLP.SDL
                 indexRow.CalculateAdventTotalReturn();
 
             double AdventTotalReturn = IndexRows.AdventTotalReturn;
-            AdventTotalReturn = AdventTotalReturn * 100;
+            if(bGenerateReturnsForDateNew.Equals(true))
+                AdventTotalReturn = AdventTotalReturn * 100;
             AdventTotalReturn = Math.Round(AdventTotalReturn, totalReturnPrecision, MidpointRounding.AwayFromZero);
             sharedData.AddTotalReturn(sDate, sIndexName, Vendors.Snp.ToString(), vendorFormat.ToString(), AdventTotalReturn, "AdvReturn");
 

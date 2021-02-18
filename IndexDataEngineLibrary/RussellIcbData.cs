@@ -279,7 +279,7 @@ namespace IndexDataEngineLibrary
                             LogHelper.WriteLine("Processing: " + FileName + " " + DateTime.Now);
                             if(bOpenFiles)
                             {
-                                AddRussellOpeningData(VendorFileFormats.H_OPEN_ICB, FileName, oProcessDate);
+                                AddRussellOpeningDataNew(VendorFileFormats.H_OPEN_ICB, FileName, oProcessDate);
                                 ProcessStatus.Update(oProcessDate, Vendors.RussellIcb.ToString(), Dataset, "", ProcessStatus.WhichStatus.OpenData, ProcessStatus.StatusValue.Pass);
                                 ProcessStatus.Update(oProcessDate, Vendors.RussellIcb.ToString(), Dataset, "", ProcessStatus.WhichStatus.SecurityMasterData, ProcessStatus.StatusValue.Pass);
 
@@ -1229,7 +1229,521 @@ namespace IndexDataEngineLibrary
             }
         }
 
+        /*
+                Date
+                Cons Code
+                Reserved
+        Cusip
+        ISIN
+        Ticker
+        Exchange
+        Constituent Name
+        Industry Code
+        Supersector Code
+        Sector Code
+        Subsector Code
+        Cash Dividend
+        ShareChg
+        Shares
+        Reserved
+        Investability Weight
+        Value Shares
+        Growth Shares
+        Defensive Shares
+        Dynamic Shares
+        Return
+        MTD Return
+        Mkt Cap(USD) after investability weight
+        Reserved
+        R1000
+        R2000
+        R2500
+        RMID
+        RTOP200
+        RSCC
+        RTOP50
+        R3000
+        RMICRO
+        WT-R3E
+        WT-R3EG
+        WT-R3EV
+        WT-R1
+        WT-R1G
+        WT-R1V
+        WT-R2
+        WT-R2G
+        WT-R2V
+        WT-R25
+        WT-R25G
+        WT-R25V
+        WT-RMID
+        WT-MIDG
+        WT-MIDV
+        WT-RT2
+        WT-RT2G
+        WT-RT2V
+        WT-RSSC
+        WT-RSSCG
+        WT-RSSCV
+        WT-R3
+        WT-R3G
+        WT-R3V
+        WT-MICRO
+        WT-MICROG
+        WT-MICROV
+        */
 
+        private void AddRussellOpeningDataNew(VendorFileFormats FileFormat, string FileName, DateTime FileDate)
+        {
+            SqlConnection cnSql1 = new SqlConnection(sharedData.ConnectionStringIndexData);
+            SqlConnection cnSql2 = new SqlConnection(sharedData.ConnectionStringIndexData);
+            string SqlDelete;
+            string SqlWhere;
+            SqlCommand cmdHoldings = null;
+            string Fld;
+            DateTime oDate = DateTime.MinValue;
+
+            cnSql1.Open();
+            cnSql2.Open();
+
+            SqlDelete = "delete FROM RussellIcbDailyHoldings1 ";
+            SqlWhere = "where FileDate = @FileDate";
+            cmdHoldings = new SqlCommand();
+            cmdHoldings.Connection = cnSql1;
+            cmdHoldings.CommandText = SqlDelete + SqlWhere;
+            cmdHoldings.Parameters.Add("@FileDate", SqlDbType.Date);
+            cmdHoldings.Parameters["@FileDate"].Value = FileDate;
+            cmdHoldings.ExecuteNonQuery();
+            SqlDelete = "delete FROM RussellIcbDailyHoldings2 ";
+            cmdHoldings.CommandText = SqlDelete + SqlWhere;
+            cmdHoldings.ExecuteNonQuery();
+            SqlDelete = "delete FROM HistoricalSecurityMasterFullChanges ";
+            SqlWhere = "where ProcessDate = @FileDate";
+            cmdHoldings.CommandText = SqlDelete + SqlWhere;
+            cmdHoldings.ExecuteNonQuery();
+
+            string sTable1 = "RussellIcbDailyHoldings1";
+            string sTable2 = "RussellIcbDailyHoldings2";
+
+            SqlDataAdapter daAdvIndexData1 = new SqlDataAdapter(
+                    "select * from " + sTable1 + " where FileDate = '" + FileDate + "'", cnSql1);
+            SqlDataAdapter daAdvIndexData2 = new SqlDataAdapter(
+                    "select * from " + sTable2 + " where FileDate = '" + FileDate + "'", cnSql2);
+            // The following lines generates the required SQL INSERT Statement
+            SqlCommandBuilder cbAdvIndexData1 = new SqlCommandBuilder(daAdvIndexData1);
+            SqlCommandBuilder cbAdvIndexData2 = new SqlCommandBuilder(daAdvIndexData2);
+            DataSet dsHoldings1 = new DataSet();
+            DataSet dsHoldings2 = new DataSet();
+            daAdvIndexData1.Fill(dsHoldings1, sTable1);
+            daAdvIndexData2.Fill(dsHoldings2, sTable2);
+            DataTable dtHoldings1 = dsHoldings1.Tables[sTable1];
+            DataTable dtHoldings2 = dsHoldings2.Tables[sTable2];
+            DataRow drHoldings1 = null;
+            DataRow drHoldings2 = null;
+
+            CultureInfo enUS = new CultureInfo("en-US");
+            string r1000 = "";
+            string r2000 = "";
+            string r2500 = "";
+            string rmid = "";
+            string rtop200 = "";
+            string rsmallc = "";
+            string r3000 = "";
+            string rmicro = "";
+            string r1000_wt = "";
+            string r1000_wtg = "";
+            string r1000_wtv = "";
+            string r2000_wt = "";
+            string r2000_wtg = "";
+            string r2000_wtv = "";
+            string r2500_wt = "";
+            string r2500_wtg = "";
+            string r2500_wtv = "";
+            string rmid_wt = "";
+            string rmid_wtg = "";
+            string rmid_wtv = "";
+            string rtop200_wt = "";
+            string rtop200_wtg = "";
+            string rtop200_wtv = "";
+            string rsmallc_wt = "";
+            string rsmallc_wtg = "";
+            string rsmallc_wtv = "";
+            string r3000_wt = "";
+            string r3000_wtg = "";
+            string r3000_wtv = "";
+            string rmicro_wt = "";
+            string rmicro_wtg = "";
+            string rmicro_wtv = "";
+
+            int SecurityCount = 0;
+
+            DataTable dt = ReadCsvIntoTable(FileName);
+            int i = 0;
+
+            // Date Cons Code Reserved    Cusip ISIN    Ticker Exchange    Constituent Name    Industry Code   Supersector Code    Sector Code Subsector Code  Cash Dividend   ShareChg Shares  Reserved Investability Weight Value Probability Growth Probability Defensive Probability Dynamic Probability Return  MTD Return  Mkt Cap(USD) after investability weight Reserved    R1000 R2000   R2500 RMID    RTOP200 RSCC    RTOP50 R3000   RMICRO WT-R3E  WT - R3EG WT - R3EV WT - R1   WT - R1G  WT - R1V  WT - R2   WT - R2G  WT - R2V  WT - R25  WT - R25G WT - R25V WT - RMID WT - MIDG WT - MIDV WT - RT2  WT - RT2G WT - RT2V WT - RSSC WT - RSSCG    WT - RSSCV    WT - R3   WT - R3G  WT - R3V  WT - MICRO    WT - MICROG   WT - MICROV
+
+            foreach(DataRow dr in dt.Rows)
+            {
+                i += 1;
+
+                bool ok = true;
+
+                string sCUSIP = "";
+                string sTicker = "";
+                string sCompanyName = "";
+                string sSector = "";
+                string sExchange = "";
+                string sStockKey = "";
+
+                if(i == 1)
+                    ok = false;
+                else
+                {
+                    Fld = ParseColumn(dr, "Date", 0);  // 0
+                    if(Fld.StartsWith("XX")) // EOF
+                        ok = false;
+                    else
+                        ok = true;
+                }
+
+                if(ok)
+                {
+                    drHoldings1 = dtHoldings1.NewRow();
+
+                    Fld = ParseColumn(dr, "Date", 0);  // 0
+                    if(Fld.Length == 8 && DateTime.TryParseExact(Fld, "yyyyMMdd", enUS, DateTimeStyles.None, out oDate))
+                    {
+                        Fld = oDate.ToString("MM/dd/yyyy");
+                        drHoldings1["FileDate"] = Fld;
+                    }
+                    else
+                        ok = false;
+
+                    Fld = ParseColumn(dr, "Cusip", 3); // 3
+                    if(Fld.Length == 9)
+                    {
+                        Fld = Fld.Substring(0, 8);
+                        drHoldings1["CUSIP"] = Fld;
+                        sCUSIP = Fld;
+                    }
+                    else
+                        ok = false;
+
+                    Fld = ParseColumn(dr, "Ticker", 5);    // 5        
+                    if(Fld.Length >= 1)
+                    {
+                        drHoldings1["Ticker"] = Fld;
+                        sTicker = Fld;
+                    }
+                    else
+                        ok = false;
+//                    LogHelper.WriteLine(sCUSIP + "," + sTicker + "," + SecurityCount);
+
+                    r1000 = ParseColumn(dr, "R1000", 25); // 25
+                    r2000 = ParseColumn(dr, "R2000", 26); // 26
+                    r2500 = ParseColumn(dr, "R2500", 27); // 27
+                    rmid = ParseColumn(dr, "RMID", 28);   // 28
+                    rtop200 = ParseColumn(dr, "RTOP200", 29); // 29
+                    rsmallc = ParseColumn(dr, "RSCC", 30); // 30
+                    r3000 = ParseColumn(dr, "R3000", 32);  // 32
+                    rmicro = ParseColumn(dr, "RMICRO", 33);// 33
+
+                    r1000_wt = ParseColumn(dr, "WT - R1", 34);
+                    r1000_wtg = ParseColumn(dr, "WT - R1G", 35);
+                    r1000_wtv = ParseColumn(dr, "WT - R1V", 36);
+                    r2000_wt = ParseColumn(dr, "WT - R2", 37);
+                    r2000_wtg = ParseColumn(dr, "WT - R2G", 38);
+                    r2000_wtv = ParseColumn(dr, "WT - R2V", 39);
+                    r2500_wt = ParseColumn(dr, "WT - R25", 40);
+                    r2500_wtg = ParseColumn(dr, "WT - R25G", 41);
+                    r2500_wtv = ParseColumn(dr, "WT - R25V", 42);
+                    rmid_wt = ParseColumn(dr, "WT - RMID", 43);
+                    rmid_wtg = ParseColumn(dr, "WT - RMIDG", 44);
+                    rmid_wtv = ParseColumn(dr, "WT - RMIDV", 45);
+                    rtop200_wt = ParseColumn(dr, "WT - RT2", 46);
+                    rtop200_wtg = ParseColumn(dr, "WT - RT2G", 47);
+                    rtop200_wtv = ParseColumn(dr, "WT - RT2V", 48);
+                    rsmallc_wt = ParseColumn(dr, "WT - RSSC", 49);
+                    rsmallc_wtg = ParseColumn(dr, "WT - RSSCG", 50);
+                    rsmallc_wtv = ParseColumn(dr, "WT - RSSCV", 51);
+                    r3000_wt = ParseColumn(dr, "WT - R3", 52);
+                    r3000_wtg = ParseColumn(dr, "WT - R3G", 53);
+                    r3000_wtv = ParseColumn(dr, "WT - R3V", 54);
+                    rmicro_wt = ParseColumn(dr, "WT - MICRO", 55);
+                    rmicro_wtg = ParseColumn(dr, "WT - MICROG", 56);
+                    rmicro_wtv = ParseColumn(dr, "WT - MICROV", 57);
+
+                    Fld = ParseColumn(dr, "Constituent Name", 7); // 7
+                    sCompanyName = Fld;
+
+                    Fld = ParseColumn(dr, "Subsector Code", 11); // 11
+                    drHoldings1["Sector"] = Fld;
+                    sSector = Fld;
+
+                    Fld = ParseColumn(dr, "Exchange", 6); // 6
+                    sExchange = Fld;
+
+                    Fld = ParseColumn(dr, "Cons Code", 1); // 1
+                    sStockKey = Fld;
+                    drHoldings1["MktValue"] = "";
+                    drHoldings1["SharesDenominator"] = "0";
+
+
+                    if(ok)
+                    {
+                        sharedData.AddSecurityMasterFull(sStockKey, sTicker, sCUSIP, "4", sCompanyName, sSector, sExchange, oDate);
+                        if(r1000.Equals("Y"))
+                        {
+                            drHoldings2 = dtHoldings2.NewRow();
+                            drHoldings2["FileDate"] = drHoldings1["FileDate"];
+                            drHoldings2["CUSIP"] = drHoldings1["CUSIP"];
+                            drHoldings2["IndexName"] = "r1000";
+                            drHoldings2["Weight"] = r1000_wt;
+                            dtHoldings2.Rows.Add(drHoldings2);
+                            if(r1000_wtg.Length > 0)
+                            {
+                                drHoldings2 = dtHoldings2.NewRow();
+                                drHoldings2["FileDate"] = drHoldings1["FileDate"];
+                                drHoldings2["CUSIP"] = drHoldings1["CUSIP"];
+                                drHoldings2["IndexName"] = "r1000g";
+                                drHoldings2["Weight"] = r1000_wtg;
+                                dtHoldings2.Rows.Add(drHoldings2);
+                            }
+                            if(r1000_wtv.Length > 0)
+                            {
+                                drHoldings2 = dtHoldings2.NewRow();
+                                drHoldings2["FileDate"] = drHoldings1["FileDate"];
+                                drHoldings2["CUSIP"] = drHoldings1["CUSIP"];
+                                drHoldings2["IndexName"] = "r1000v";
+                                drHoldings2["Weight"] = r1000_wtv;
+                                dtHoldings2.Rows.Add(drHoldings2);
+                            }
+                        }
+                        if(r2000.Equals("Y"))
+                        {
+                            drHoldings2 = dtHoldings2.NewRow();
+                            drHoldings2["FileDate"] = drHoldings1["FileDate"];
+                            drHoldings2["CUSIP"] = drHoldings1["CUSIP"];
+                            drHoldings2["IndexName"] = "r2000";
+                            drHoldings2["Weight"] = r2000_wt;
+                            dtHoldings2.Rows.Add(drHoldings2);
+                            if(r2000_wtg.Length > 0)
+                            {
+                                drHoldings2 = dtHoldings2.NewRow();
+                                drHoldings2["FileDate"] = drHoldings1["FileDate"];
+                                drHoldings2["CUSIP"] = drHoldings1["CUSIP"];
+                                drHoldings2["IndexName"] = "r2000g";
+                                drHoldings2["Weight"] = r2000_wtg;
+                                dtHoldings2.Rows.Add(drHoldings2);
+                            }
+                            if(r2000_wtv.Length > 0)
+                            {
+                                drHoldings2 = dtHoldings2.NewRow();
+                                drHoldings2["FileDate"] = drHoldings1["FileDate"];
+                                drHoldings2["CUSIP"] = drHoldings1["CUSIP"];
+                                drHoldings2["IndexName"] = "r2000v";
+                                drHoldings2["Weight"] = r2000_wtv;
+                                dtHoldings2.Rows.Add(drHoldings2);
+                            }
+                        }
+                        if(r2500.Equals("Y"))
+                        {
+                            drHoldings2 = dtHoldings2.NewRow();
+                            drHoldings2["FileDate"] = drHoldings1["FileDate"];
+                            drHoldings2["CUSIP"] = drHoldings1["CUSIP"];
+                            drHoldings2["IndexName"] = "r2500";
+                            drHoldings2["Weight"] = r2500_wt;
+                            dtHoldings2.Rows.Add(drHoldings2);
+                            if(r2500_wtg.Length > 0)
+                            {
+                                drHoldings2 = dtHoldings2.NewRow();
+                                drHoldings2["FileDate"] = drHoldings1["FileDate"];
+                                drHoldings2["CUSIP"] = drHoldings1["CUSIP"];
+                                drHoldings2["IndexName"] = "r2500g";
+                                drHoldings2["Weight"] = r2500_wtg;
+                                dtHoldings2.Rows.Add(drHoldings2);
+                            }
+                            if(r2500_wtv.Length > 0)
+                            {
+                                drHoldings2 = dtHoldings2.NewRow();
+                                drHoldings2["FileDate"] = drHoldings1["FileDate"];
+                                drHoldings2["CUSIP"] = drHoldings1["CUSIP"];
+                                drHoldings2["IndexName"] = "r2500v";
+                                drHoldings2["Weight"] = r2500_wtv;
+                                dtHoldings2.Rows.Add(drHoldings2);
+                            }
+                        }
+                        if(rmid.Equals("Y"))
+                        {
+                            drHoldings2 = dtHoldings2.NewRow();
+                            drHoldings2["FileDate"] = drHoldings1["FileDate"];
+                            drHoldings2["CUSIP"] = drHoldings1["CUSIP"];
+                            drHoldings2["IndexName"] = "rmid";
+                            drHoldings2["Weight"] = rmid_wt;
+                            dtHoldings2.Rows.Add(drHoldings2);
+                            if(rmid_wtg.Length > 0)
+                            {
+                                drHoldings2 = dtHoldings2.NewRow();
+                                drHoldings2["FileDate"] = drHoldings1["FileDate"];
+                                drHoldings2["CUSIP"] = drHoldings1["CUSIP"];
+                                drHoldings2["IndexName"] = "rmidg";
+                                drHoldings2["Weight"] = rmid_wtg;
+                                dtHoldings2.Rows.Add(drHoldings2);
+                            }
+                            if(rmid_wtv.Length > 0)
+                            {
+                                drHoldings2 = dtHoldings2.NewRow();
+                                drHoldings2["FileDate"] = drHoldings1["FileDate"];
+                                drHoldings2["CUSIP"] = drHoldings1["CUSIP"];
+                                drHoldings2["IndexName"] = "rmidv";
+                                drHoldings2["Weight"] = rmid_wtv;
+                                dtHoldings2.Rows.Add(drHoldings2);
+                            }
+                        }
+                        if(rtop200.Equals("Y"))
+                        {
+                            drHoldings2 = dtHoldings2.NewRow();
+                            drHoldings2["FileDate"] = drHoldings1["FileDate"];
+                            drHoldings2["CUSIP"] = drHoldings1["CUSIP"];
+                            drHoldings2["IndexName"] = "rtop200";
+                            drHoldings2["Weight"] = rtop200_wt;
+                            dtHoldings2.Rows.Add(drHoldings2);
+                            if(rtop200_wtg.Length > 0)
+                            {
+                                drHoldings2 = dtHoldings2.NewRow();
+                                drHoldings2["FileDate"] = drHoldings1["FileDate"];
+                                drHoldings2["CUSIP"] = drHoldings1["CUSIP"];
+                                drHoldings2["IndexName"] = "rtop200g";
+                                drHoldings2["Weight"] = rtop200_wtg;
+                                dtHoldings2.Rows.Add(drHoldings2);
+                            }
+                            if(rtop200_wtv.Length > 0)
+                            {
+                                drHoldings2 = dtHoldings2.NewRow();
+                                drHoldings2["FileDate"] = drHoldings1["FileDate"];
+                                drHoldings2["CUSIP"] = drHoldings1["CUSIP"];
+                                drHoldings2["IndexName"] = "rtop200v";
+                                drHoldings2["Weight"] = rtop200_wtv;
+                                dtHoldings2.Rows.Add(drHoldings2);
+                            }
+                        }
+                        if(rsmallc.Equals("Y"))
+                        {
+                            drHoldings2 = dtHoldings2.NewRow();
+                            drHoldings2["FileDate"] = drHoldings1["FileDate"];
+                            drHoldings2["CUSIP"] = drHoldings1["CUSIP"];
+                            drHoldings2["IndexName"] = "rsmallc";
+                            drHoldings2["Weight"] = rsmallc_wt;
+                            dtHoldings2.Rows.Add(drHoldings2);
+                            if(rsmallc_wtg.Length > 0)
+                            {
+                                drHoldings2 = dtHoldings2.NewRow();
+                                drHoldings2["FileDate"] = drHoldings1["FileDate"];
+                                drHoldings2["CUSIP"] = drHoldings1["CUSIP"];
+                                drHoldings2["IndexName"] = "rsmallcg";
+                                drHoldings2["Weight"] = rsmallc_wtg;
+                                dtHoldings2.Rows.Add(drHoldings2);
+                            }
+                            if(rsmallc_wtv.Length > 0)
+                            {
+                                drHoldings2 = dtHoldings2.NewRow();
+                                drHoldings2["FileDate"] = drHoldings1["FileDate"];
+                                drHoldings2["CUSIP"] = drHoldings1["CUSIP"];
+                                drHoldings2["IndexName"] = "rsmallcv";
+                                drHoldings2["Weight"] = rsmallc_wtv;
+                                dtHoldings2.Rows.Add(drHoldings2);
+                            }
+                        }
+                        if(r3000.Equals("Y"))
+                        {
+                            drHoldings2 = dtHoldings2.NewRow();
+                            drHoldings2["FileDate"] = drHoldings1["FileDate"];
+                            drHoldings2["CUSIP"] = drHoldings1["CUSIP"];
+                            drHoldings2["IndexName"] = "r3000";
+                            drHoldings2["Weight"] = r3000_wt;
+                            dtHoldings2.Rows.Add(drHoldings2);
+                            if(r3000_wtg.Length > 0)
+                            {
+                                drHoldings2 = dtHoldings2.NewRow();
+                                drHoldings2["FileDate"] = drHoldings1["FileDate"];
+                                drHoldings2["CUSIP"] = drHoldings1["CUSIP"];
+                                drHoldings2["IndexName"] = "r3000g";
+                                drHoldings2["Weight"] = r3000_wtg;
+                                dtHoldings2.Rows.Add(drHoldings2);
+                            }
+                            if(r3000_wtv.Length > 0)
+                            {
+                                drHoldings2 = dtHoldings2.NewRow();
+                                drHoldings2["FileDate"] = drHoldings1["FileDate"];
+                                drHoldings2["CUSIP"] = drHoldings1["CUSIP"];
+                                drHoldings2["IndexName"] = "r3000v";
+                                drHoldings2["Weight"] = r3000_wtv;
+                                dtHoldings2.Rows.Add(drHoldings2);
+                            }
+                        }
+                        if(rmicro.Equals("Y"))
+                        {
+                            drHoldings2 = dtHoldings2.NewRow();
+                            drHoldings2["FileDate"] = drHoldings1["FileDate"];
+                            drHoldings2["CUSIP"] = drHoldings1["CUSIP"];
+                            drHoldings2["IndexName"] = "rmicro";
+                            drHoldings2["Weight"] = rmicro_wt;
+                            dtHoldings2.Rows.Add(drHoldings2);
+                            if(rmicro_wtg.Length > 0)
+                            {
+                                drHoldings2 = dtHoldings2.NewRow();
+                                drHoldings2["FileDate"] = drHoldings1["FileDate"];
+                                drHoldings2["CUSIP"] = drHoldings1["CUSIP"];
+                                drHoldings2["IndexName"] = "rmicrog";
+                                drHoldings2["Weight"] = rmicro_wtg;
+                                dtHoldings2.Rows.Add(drHoldings2);
+                            }
+                            if(rmicro_wtv.Length > 0)
+                            {
+                                drHoldings2 = dtHoldings2.NewRow();
+                                drHoldings2["FileDate"] = drHoldings1["FileDate"];
+                                drHoldings2["CUSIP"] = drHoldings1["CUSIP"];
+                                drHoldings2["IndexName"] = "rmicrov";
+                                drHoldings2["Weight"] = rmicro_wtv;
+                                dtHoldings2.Rows.Add(drHoldings2);
+                            }
+                        }
+
+                        SecurityCount += 1;
+                        try
+                        {
+                            dtHoldings1.Rows.Add(drHoldings1);
+
+                        }
+                        catch(SqlException ex)
+                        {
+                            if(ex.Number == 2627)
+                            {
+                                LogHelper.WriteLine(ex.Message);
+                            }
+                        }
+                        finally
+                        {
+                        }
+                    }
+                }
+            }
+            try
+            {
+                daAdvIndexData1.Update(dtHoldings1);
+                daAdvIndexData2.Update(dtHoldings2);
+            }
+            catch(SqlException ex)
+            {
+                if(ex.Number == 2627)
+                {
+                    LogHelper.WriteLine(ex.Message);
+                }
+            }
+            finally
+            {
+            }
+        }
 
         private void AddRussellClosingData(VendorFileFormats FileFormat, string FileName, DateTime FileDate)
         {

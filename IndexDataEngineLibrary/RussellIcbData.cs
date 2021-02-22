@@ -1448,30 +1448,30 @@ namespace IndexDataEngineLibrary
                     r3000 = ParseColumn(dr, "R3000", 32);  // 32
                     rmicro = ParseColumn(dr, "RMICRO", 33);// 33
 
-                    r1000_wt = ParseColumn(dr, "WT - R1", 34);
-                    r1000_wtg = ParseColumn(dr, "WT - R1G", 35);
-                    r1000_wtv = ParseColumn(dr, "WT - R1V", 36);
-                    r2000_wt = ParseColumn(dr, "WT - R2", 37);
-                    r2000_wtg = ParseColumn(dr, "WT - R2G", 38);
-                    r2000_wtv = ParseColumn(dr, "WT - R2V", 39);
-                    r2500_wt = ParseColumn(dr, "WT - R25", 40);
-                    r2500_wtg = ParseColumn(dr, "WT - R25G", 41);
-                    r2500_wtv = ParseColumn(dr, "WT - R25V", 42);
-                    rmid_wt = ParseColumn(dr, "WT - RMID", 43);
-                    rmid_wtg = ParseColumn(dr, "WT - RMIDG", 44);
-                    rmid_wtv = ParseColumn(dr, "WT - RMIDV", 45);
-                    rtop200_wt = ParseColumn(dr, "WT - RT2", 46);
-                    rtop200_wtg = ParseColumn(dr, "WT - RT2G", 47);
-                    rtop200_wtv = ParseColumn(dr, "WT - RT2V", 48);
-                    rsmallc_wt = ParseColumn(dr, "WT - RSSC", 49);
-                    rsmallc_wtg = ParseColumn(dr, "WT - RSSCG", 50);
-                    rsmallc_wtv = ParseColumn(dr, "WT - RSSCV", 51);
-                    r3000_wt = ParseColumn(dr, "WT - R3", 52);
-                    r3000_wtg = ParseColumn(dr, "WT - R3G", 53);
-                    r3000_wtv = ParseColumn(dr, "WT - R3V", 54);
-                    rmicro_wt = ParseColumn(dr, "WT - MICRO", 55);
-                    rmicro_wtg = ParseColumn(dr, "WT - MICROG", 56);
-                    rmicro_wtv = ParseColumn(dr, "WT - MICROV", 57);
+                    r1000_wt = ParseColumn(dr, "WT - R1", 37);
+                    r1000_wtg = ParseColumn(dr, "WT - R1G", 38);
+                    r1000_wtv = ParseColumn(dr, "WT - R1V", 39);
+                    r2000_wt = ParseColumn(dr, "WT - R2", 40);
+                    r2000_wtg = ParseColumn(dr, "WT - R2G", 41);
+                    r2000_wtv = ParseColumn(dr, "WT - R2V", 42);
+                    r2500_wt = ParseColumn(dr, "WT - R25", 43);
+                    r2500_wtg = ParseColumn(dr, "WT - R25G", 44);
+                    r2500_wtv = ParseColumn(dr, "WT - R25V", 45);
+                    rmid_wt = ParseColumn(dr, "WT - RMID", 46);
+                    rmid_wtg = ParseColumn(dr, "WT - RMIDG", 47);
+                    rmid_wtv = ParseColumn(dr, "WT - RMIDV", 48);
+                    rtop200_wt = ParseColumn(dr, "WT - RT2", 49);
+                    rtop200_wtg = ParseColumn(dr, "WT - RT2G", 50);
+                    rtop200_wtv = ParseColumn(dr, "WT - RT2V", 51);
+                    rsmallc_wt = ParseColumn(dr, "WT - RSSC", 52);
+                    rsmallc_wtg = ParseColumn(dr, "WT - RSSCG", 53);
+                    rsmallc_wtv = ParseColumn(dr, "WT - RSSCV", 54);
+                    r3000_wt = ParseColumn(dr, "WT - R3", 55);
+                    r3000_wtg = ParseColumn(dr, "WT - R3G", 56);
+                    r3000_wtv = ParseColumn(dr, "WT - R3V", 57);
+                    rmicro_wt = ParseColumn(dr, "WT - MICRO", 58);
+                    rmicro_wtg = ParseColumn(dr, "WT - MICROG", 59);
+                    rmicro_wtv = ParseColumn(dr, "WT - MICROV", 60);
 
                     Fld = ParseColumn(dr, "Constituent Name", 7); // 7
                     sCompanyName = Fld;
@@ -1755,7 +1755,7 @@ namespace IndexDataEngineLibrary
             SqlCommand cmdHoldingsRec = new SqlCommand(SqlUpdate + SqlWhere, cnSql);
             cmdHoldingsRec.Parameters.Add("@FileDate", SqlDbType.DateTime, 8);
             cmdHoldingsRec.Parameters.Add("@CUSIP", SqlDbType.VarChar, 8);
-            cmdHoldingsRec.Parameters.Add("@SecurityReturn", SqlDbType.VarChar, 7);
+            cmdHoldingsRec.Parameters.Add("@SecurityReturn", SqlDbType.VarChar, 30);
 
             CultureInfo enUS = new CultureInfo("en-US");
 
@@ -1849,10 +1849,16 @@ namespace IndexDataEngineLibrary
                         }
                         if(ok)
                         {
+//                            LogHelper.WriteLine(",saving," + sCUSIP.ToString() + "," + sSecurityReturn.ToString());
+
                             cmdHoldingsRec.Parameters["@CUSIP"].Value = sCUSIP;
                             cmdHoldingsRec.Parameters["@FileDate"].Value = oDate;
                             cmdHoldingsRec.Parameters["@SecurityReturn"].Value = sSecurityReturn;
                             cmdHoldingsRec.ExecuteNonQuery();
+
+//                            LogHelper.WriteLine(",reading," + sCUSIP.ToString() + "," + GetSecurityReturn(oDate, sCUSIP));
+                            
+
                         }
                     }
 
@@ -2479,35 +2485,35 @@ namespace IndexDataEngineLibrary
 
                 sharedData.AddTotalReturn(sDate, sIndexName, Vendors.RussellIcb.ToString(), sVendorFormat, AdventTotalReturn, "AdvReturn");
 
-                double AdventVsVendorDiff = VendorTotalReturn - AdventTotalReturn;
+                //double AdventVsVendorDiff = VendorTotalReturn - AdventTotalReturn;
 
-                AdventVsVendorDiff = Math.Round(AdventVsVendorDiff, totalReturnPrecision, MidpointRounding.AwayFromZero);
-                if(logReturnData)
-                    LogHelper.WriteLine("Advent Vs Vendor Diff " + AdventVsVendorDiff.ToString());
+                //AdventVsVendorDiff = Math.Round(AdventVsVendorDiff, totalReturnPrecision, MidpointRounding.AwayFromZero);
+                //if(logReturnData)
+                //    LogHelper.WriteLine("Advent Vs Vendor Diff " + AdventVsVendorDiff.ToString());
 
-                sharedData.AddTotalReturn(sDate, sIndexName, Vendors.RussellIcb.ToString(), sVendorFormat, AdventVsVendorDiff, "Diff");
+                //sharedData.AddTotalReturn(sDate, sIndexName, Vendors.RussellIcb.ToString(), sVendorFormat, AdventVsVendorDiff, "Diff");
 
-                IndexRows.CalculateAddlContribution(AdventVsVendorDiff, sVendorFormat, logReturnData);
+                //IndexRows.CalculateAddlContribution(AdventVsVendorDiff, sVendorFormat, logReturnData);
 
-                LogHelper.WriteLine("Identifier,Weight,RateOfReturn,RateOfReturnAdjustment,RateOfReturnAdjusted");
+                //LogHelper.WriteLine("Identifier,Weight,RateOfReturn,RateOfReturnAdjustment,RateOfReturnAdjusted");
 
-                foreach(IndexRow indexRow in indexRows)
-                {
-                    indexRow.CalculateAdventAdjustedReturn();
-                    if(logReturnData)
-                        LogHelper.WriteLine(indexRow.Identifier + "," + indexRow.Weight.ToString() + "," + indexRow.RateOfReturn.ToString() + "," + indexRow.RateOfReturnAdjustment + "," + indexRow.RateOfReturnAdjusted);
-                }
+                //foreach(IndexRow indexRow in indexRows)
+                //{
+                //    indexRow.CalculateAdventAdjustedReturn();
+                //    if(logReturnData)
+                //        LogHelper.WriteLine(indexRow.Identifier + "," + indexRow.Weight.ToString() + "," + indexRow.RateOfReturn.ToString() + "," + indexRow.RateOfReturnAdjustment + "," + indexRow.RateOfReturnAdjusted);
+                //}
 
 
-                double AdventTotalReturnAdjusted = IndexRows.AdventTotalReturnAdjusted;
-                AdventTotalReturnAdjusted = Math.Round(AdventTotalReturnAdjusted, totalReturnPrecision, MidpointRounding.AwayFromZero);
-                if(logReturnData)
-                    LogHelper.WriteLine("Advent Total Return Adjusted " + AdventTotalReturnAdjusted.ToString());
+                //double AdventTotalReturnAdjusted = IndexRows.AdventTotalReturnAdjusted;
+                //AdventTotalReturnAdjusted = Math.Round(AdventTotalReturnAdjusted, totalReturnPrecision, MidpointRounding.AwayFromZero);
+                //if(logReturnData)
+                //    LogHelper.WriteLine("Advent Total Return Adjusted " + AdventTotalReturnAdjusted.ToString());
 
-                sharedData.AddTotalReturn(sDate, sIndexName, Vendors.RussellIcb.ToString(), sVendorFormat, AdventTotalReturnAdjusted, "AdvReturnAdj");
+                //sharedData.AddTotalReturn(sDate, sIndexName, Vendors.RussellIcb.ToString(), sVendorFormat, AdventTotalReturnAdjusted, "AdvReturnAdj");
 
-                if(logReturnData)
-                    LogHelper.WriteLine("----------------------------------------------------------------------------------------------");
+                //if(logReturnData)
+                //    LogHelper.WriteLine("----------------------------------------------------------------------------------------------");
 
             }
         }
@@ -2540,7 +2546,7 @@ namespace IndexDataEngineLibrary
             //    LogHelper.WriteLine(indexRowRollUp.Identifier + " " + indexRowRollUp.Weight.ToString() + " " + indexRowRollUp.RateOfReturn.ToString());
             //}
 
-            AdjustReturnsToMatchPublishedTotalReturns(indexRowsRollUp, sDate, sIndexName, vendorFormat.ToString());
+            //AdjustReturnsToMatchPublishedTotalReturns(indexRowsRollUp, sDate, sIndexName, vendorFormat.ToString());
             //LogHelper.WriteLine("---After---");
 
             //foreach (IndexRow indexRowRollUp in indexRowsRollUp)
@@ -2806,6 +2812,97 @@ namespace IndexDataEngineLibrary
                     •	ICBIndustry, ICBSuperSector, ICBSector, ICBSubSector
                     •	Example: 50, 5010, 501010, 50101025
                 */
+
+                string SqlSelect = @"
+                    SELECT h1.FileDate, h2.IndexName, h1.CUSIP, lower(h1.Ticker) as Ticker, h1.SecurityReturn, 
+                    LEFT(h1.Sector,2) As IcbIndustry, LEFT(h1.Sector,4) As IcbSuperSector, LEFT(h1.Sector,6) As IcbSector, h1.Sector As IcbSubSector, h2.Weight
+
+                    FROM  RussellIcbDailyHoldings1 h1 inner join
+                          dbo.RussellIcbDailyHoldings2 h2 on 
+                          h1.FileDate = h2.FileDate and 
+                          h1.CUSIP = h2.CUSIP
+                    WHERE 
+                        (h2.FileDate = @FileDate) and 
+                        (h2.IndexName = @IndexName) and 
+						(LEN(h2.[Weight]) > 0)
+                ";
+
+                string SqlOrderBy = "";
+                switch(OutputType)
+                {
+                    case AdventOutputType.Constituent:
+                        SqlOrderBy = @"
+                        ORDER BY Ticker
+                        ";
+                        break;
+                    case AdventOutputType.Sector:
+                        SqlOrderBy = @"
+                        ORDER BY Sector
+                        ";
+                        break;
+                    default:
+                        break;
+                }
+
+                //LogHelper.WriteLine(SqlSelect);
+                mSqlConn.Open();
+                SqlCommand cmd = new SqlCommand(SqlSelect + SqlOrderBy, mSqlConn);
+                cmd.Parameters.Add("@IndexName", SqlDbType.VarChar, 20);
+                cmd.Parameters.Add("@FileDate", SqlDbType.DateTime);
+                cmd.Parameters["@IndexName"].Value = sIndexName;
+                DateTime oDate = DateTime.MinValue;
+                oDate = DateTime.Parse(sDate);
+                cmd.Parameters["@FileDate"].Value = oDate;
+
+                mSqlDr = cmd.ExecuteReader();
+                if(mSqlDr.HasRows)
+                {
+                    ReturnsGenerated = true;
+                    mPrevId = "";
+                    ConstituentCount = 0;
+                }
+            }
+
+            catch(SqlException ex)
+            {
+                LogHelper.WriteLine(ex.Message);
+            }
+
+            finally
+            {
+                //swLogFile.Flush();
+                //LogHelper.WriteLine(sMsg + "finished " + DateTime.Now);
+            }
+
+            return (ReturnsGenerated);
+        }
+
+        private bool GenerateReturnsForDateOld(string sDate, string sIndexName, AdventOutputType OutputType)
+        {
+            string sMsg = null;
+            mSqlConn = new SqlConnection(sharedData.ConnectionStringIndexData);
+            bool ReturnsGenerated = false;
+
+            try
+            {
+                sMsg = "GenerateReturnsForDate: " + sDate + " Index: " + sIndexName;
+                LogHelper.WriteLine(sMsg);
+                /*
+                declare
+                    @FileDate datetime,
+                    @IndexName varchar(12)   
+                    set @FileDate = cast('04/18/2005' as datetime)
+                    set @IndexName = 'r2000'
+                    DECLARE @FileDate nvarchar(10);
+                    DECLARE @IndexName nvarchar(10);
+                    SET @FileDate = '01/04/2017';
+                    SET @IndexName = 'r3000';
+
+                 */
+                /*
+                   •	ICBIndustry, ICBSuperSector, ICBSector, ICBSubSector
+                   •	Example: 50, 5010, 501010, 50101025
+               */
 
                 string SqlSelect = @"
                     SELECT h1.FileDate, h2.IndexName, h1.CUSIP, lower(h1.Ticker) as Ticker, h1.SecurityReturn, 

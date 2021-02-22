@@ -732,6 +732,14 @@ _SPMLP.SDL
                     cmd.Parameters["@MarketCap"].Value = sValue;
 
                     sValue = ParseColumn(dr, "INDEX WEIGHT");
+
+                    decimal numDecimal;
+                    if(Decimal.TryParse(sValue, out numDecimal))
+                    {
+                        numDecimal = Convert.ToDecimal(sValue);
+                        numDecimal *= 100;
+                        sValue = numDecimal.ToString();
+                    }
                     cmd.Parameters["@Weight"].Value = sValue;
 
                     string sCompanyName = ParseColumn(dr, "COMPANY");
@@ -1814,8 +1822,6 @@ _SPMLP.SDL
                 indexRow.CalculateAdventTotalReturn();
 
             double AdventTotalReturn = IndexRows.AdventTotalReturn;
-            if(bGenerateReturnsForDateNew.Equals(true))
-                AdventTotalReturn = AdventTotalReturn * 100;
             AdventTotalReturn = Math.Round(AdventTotalReturn, totalReturnPrecision, MidpointRounding.AwayFromZero);
             sharedData.AddTotalReturn(sDate, sIndexName, Vendors.Snp.ToString(), vendorFormat.ToString(), AdventTotalReturn, "AdvReturn");
 

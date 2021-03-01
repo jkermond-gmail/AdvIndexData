@@ -690,8 +690,8 @@ namespace IndexDataEngineLibrary
                                 AddRussellTotalReturnForIndex(FileDate, sAdventIndex, sTotal);
                                 string sStartAndEndDate = FileDate.ToString("MM/dd/yyyy");
                                 CalculateVendorTotalReturnsForPeriod(sStartAndEndDate, sStartAndEndDate, sAdventIndex);
-                                CalculateAdventTotalReturnsForPeriod(sStartAndEndDate, sStartAndEndDate, sAdventIndex);
-                                CalculateAdjustedTotalReturnsForPeriod(sStartAndEndDate, sStartAndEndDate, sAdventIndex);
+                                //CalculateAdventTotalReturnsForPeriod(sStartAndEndDate, sStartAndEndDate, sAdventIndex);
+                                //CalculateAdjustedTotalReturnsForPeriod(sStartAndEndDate, sStartAndEndDate, sAdventIndex);
                             }
                         }
                     }                      
@@ -2594,6 +2594,9 @@ namespace IndexDataEngineLibrary
                         IndexRow indexRow = new IndexRow(sDate, sIndexName, sCusip, sTicker,
                                                          sIndustry, sSuperSector, sSector, sSubSector,
                                                          sWeight, sSecurityReturn, IndexRow.VendorFormat.CONSTITUENT);
+                        double weight = indexRow.Weight;
+                        weight *= 100;
+                        indexRow.Weight = weight;
                         indexRowsIndustrySort.Add(indexRow);
                     }
                 }
@@ -2679,15 +2682,19 @@ namespace IndexDataEngineLibrary
                     {
                         case IndexRow.VendorFormat.SECTOR_LEVEL1:
                             RollUpRatesOfReturn(indexRowsSectorLevel1RollUp, indexRowsIndustrySort, vendorFormat, sDate, sIndexName);
+                            CalculateAdventTotalReturnForDate(indexRowsSectorLevel1RollUp, sDate, sIndexName, vendorFormat);
                             break;
                         case IndexRow.VendorFormat.SECTOR_LEVEL2:
                             RollUpRatesOfReturn(indexRowsSectorLevel2RollUp, indexRowsIndustrySort, vendorFormat, sDate, sIndexName);
+                            CalculateAdventTotalReturnForDate(indexRowsSectorLevel2RollUp, sDate, sIndexName, vendorFormat);
                             break;
                         case IndexRow.VendorFormat.SECTOR_LEVEL3:
                             RollUpRatesOfReturn(indexRowsSectorLevel3RollUp, indexRowsIndustrySort, vendorFormat, sDate, sIndexName);
+                            CalculateAdventTotalReturnForDate(indexRowsSectorLevel3RollUp, sDate, sIndexName, vendorFormat);
                             break;
                         case IndexRow.VendorFormat.SECTOR_LEVEL4:
                             RollUpRatesOfReturn(indexRowsSectorLevel4RollUp, indexRowsIndustrySort, vendorFormat, sDate, sIndexName);
+                            CalculateAdventTotalReturnForDate(indexRowsSectorLevel4RollUp, sDate, sIndexName, vendorFormat);
                             break;
                     }
                 }
@@ -2778,12 +2785,89 @@ namespace IndexDataEngineLibrary
                                                          sWeight, sSecurityReturn, IndexRow.VendorFormat.CONSTITUENT);
                         //indexRow.CurrentTicker = sharedData.GetSecurityMasterCurrentTickerRussell(sTicker, sCusip, sDate);
                         indexRow.CurrentTicker = sTicker;
+                        double weight = indexRow.Weight;
+                        weight *= 100;
+                        indexRow.Weight = weight;
                         indexRowsTickerSort.Add(indexRow);
                     }
                 }
-                AdjustReturnsToMatchPublishedTotalReturns(indexRowsTickerSort, sDate, sIndexName, IndexRow.VendorFormat.CONSTITUENT.ToString());
+                //AdjustReturnsToMatchPublishedTotalReturns(indexRowsTickerSort, sDate, sIndexName, IndexRow.VendorFormat.CONSTITUENT.ToString());
+                CalculateAdventTotalReturnForDate(indexRowsTickerSort, sDate, sIndexName, IndexRow.VendorFormat.CONSTITUENT);
+
             }
         }
+
+        private void CalculateAdventTotalReturnForDate(List<IndexRow> indexRows, string sDate, string sIndexName, IndexRow.VendorFormat vendorFormat)
+        {
+            int totalReturnPrecision = 9;
+
+            IndexRows.ZeroAdventTotalReturn();
+            foreach(IndexRow indexRow in indexRows)
+                indexRow.CalculateAdventTotalReturn();
+
+            double AdventTotalReturn = IndexRows.AdventTotalReturn;
+            AdventTotalReturn = Math.Round(AdventTotalReturn, totalReturnPrecision, MidpointRounding.AwayFromZero);
+            sharedData.AddTotalReturn(sDate, sIndexName, Vendors.RussellIcb.ToString(), vendorFormat.ToString(), AdventTotalReturn, "AdvReturn");
+
+            if(logReturnData)
+            {
+                double VendorTotalReturn = sharedData.GetVendorTotalReturnForDate(sDate, sIndexName, Vendors.RussellIcb.ToString());
+                switch(vendorFormat)
+                {
+                    case IndexRow.VendorFormat.CONSTITUENT:
+                        LogHelper.WriteLine(",Constituent returns and weights for " + sIndexName + " " + sDate);
+                        LogHelper.WriteLine(",CUSIP,Ticker,Return,Weight,Weight*Return");
+
+                        foreach(IndexRow indexRow in indexRows)
+                            LogHelper.WriteLine("," + indexRow.CUSIP + "," + indexRow.Ticker + "," + indexRow.RateOfReturn.ToString() + "," + indexRow.Weight.ToString() + "," + indexRow.Weight * indexRow.RateOfReturn);
+
+                        LogHelper.WriteLine(",,,,Advs Total Return," + AdventTotalReturn);
+                        LogHelper.WriteLine(",,,,Russell Total Return," + VendorTotalReturn);
+                        break;
+                    case IndexRow.VendorFormat.SECTOR_LEVEL1:
+                        LogHelper.WriteLine(",Level 1 SECTOR returns and weights for " + sIndexName + " " + sDate);
+                        LogHelper.WriteLine(",,Identifier,Return,Weight,Weight*Return");
+
+                        foreach(IndexRow indexRow in indexRows)
+                            LogHelper.WriteLine("," + "," + indexRow.SectorLevel1 + "," + indexRow.RateOfReturn.ToString() + "," + indexRow.Weight.ToString() + "," + indexRow.Weight * indexRow.RateOfReturn);
+
+                        LogHelper.WriteLine(",,,,Advs Total Return," + AdventTotalReturn);
+                        LogHelper.WriteLine(",,,,Russell Total Return," + VendorTotalReturn);
+                        break;
+                    case IndexRow.VendorFormat.SECTOR_LEVEL2:
+                        LogHelper.WriteLine(",Level 2 SECTOR returns and weights for " + sIndexName + " " + sDate);
+                        LogHelper.WriteLine(",,Identifier,Return,Weight,Weight*Return");
+
+                        foreach(IndexRow indexRow in indexRows)
+                            LogHelper.WriteLine("," + "," + indexRow.SectorLevel2 + "," + indexRow.RateOfReturn.ToString() + "," + indexRow.Weight.ToString() + "," + indexRow.Weight * indexRow.RateOfReturn);
+
+                        LogHelper.WriteLine(",,,,Advs Total Return," + AdventTotalReturn);
+                        LogHelper.WriteLine(",,,,Russell Total Return," + VendorTotalReturn);
+                        break;
+                    case IndexRow.VendorFormat.SECTOR_LEVEL3:
+                        LogHelper.WriteLine(",Level 3 SECTOR returns and weights for " + sIndexName + " " + sDate);
+                        LogHelper.WriteLine(",,Identifier,Return,Weight,Weight*Return");
+
+                        foreach(IndexRow indexRow in indexRows)
+                            LogHelper.WriteLine("," + "," + indexRow.SectorLevel3 + "," + indexRow.RateOfReturn.ToString() + "," + indexRow.Weight.ToString() + "," + indexRow.Weight * indexRow.RateOfReturn);
+
+                        LogHelper.WriteLine(",,,,Advs Total Return," + AdventTotalReturn);
+                        LogHelper.WriteLine(",,,,Russell Total Return," + VendorTotalReturn);
+                        break;
+                    case IndexRow.VendorFormat.SECTOR_LEVEL4:
+                        LogHelper.WriteLine(",Level 4 SECTOR returns and weights for " + sIndexName + " " + sDate);
+                        LogHelper.WriteLine(",,Identifier,Return,Weight,Weight*Return");
+
+                        foreach(IndexRow indexRow in indexRows)
+                            LogHelper.WriteLine("," + "," + indexRow.SectorLevel4 + "," + indexRow.RateOfReturn.ToString() + "," + indexRow.Weight.ToString() + "," + indexRow.Weight * indexRow.RateOfReturn);
+
+                        LogHelper.WriteLine(",,,,Advs Total Return," + AdventTotalReturn);
+                        LogHelper.WriteLine(",,,,Russell Total Return," + VendorTotalReturn);
+                        break;
+                }
+            }
+        }
+
 
 
         private bool GenerateReturnsForDate(string sDate, string sIndexName, AdventOutputType OutputType)

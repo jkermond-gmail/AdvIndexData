@@ -2521,6 +2521,11 @@ namespace IndexDataEngineLibrary
         private void RollUpRatesOfReturn(List<IndexRow> indexRowsRollUp, List<IndexRow> indexRowsIndustrySort,
             IndexRow.VendorFormat vendorFormat, string sDate, string sIndexName)
         {
+            double rollUpWeight = 0.0;
+            if(logReturnData)
+                LogHelper.WriteLine(",Ticker,Identifier,Identifier.RateOfReturn,Identifier.Weight,RollUp.Weight,RollUp.RateOfReturn");
+
+
             foreach(IndexRow indexRowRollUp in indexRowsRollUp)
                 foreach(IndexRow indexRowConstituent in indexRowsIndustrySort)
                 {
@@ -2537,7 +2542,15 @@ namespace IndexDataEngineLibrary
                             CompareIndentifier = indexRowConstituent.SectorLevel4; break;
                     }
                     if(CompareIndentifier == indexRowRollUp.Identifier)
+                    { 
                         indexRowRollUp.RateOfReturn += indexRowConstituent.RateOfReturn * indexRowConstituent.Weight / indexRowRollUp.Weight;
+                        if(logReturnData)
+                        {
+                            rollUpWeight += indexRowConstituent.Weight;
+                            LogHelper.WriteLine("," + indexRowConstituent.Ticker + "," + indexRowRollUp.Identifier + "," + indexRowConstituent.RateOfReturn.ToString() + "," + indexRowConstituent.Weight.ToString() + "," + rollUpWeight.ToString() + "," + indexRowRollUp.RateOfReturn);
+                        }
+
+                    }
                 }
 
             //LogHelper.WriteLine("---Before---");

@@ -41,7 +41,7 @@ namespace IndexDataEngineLibrary
         private string mConnectionStringAmdVifs = null;
         private string mConnectionStringIndexData = null;
         private SqlConnection mSqlConn = null;
-        private const string NumberFormat = "0.#########";
+        private const string NumberFormat = "0.##########";
         private CultureInfo mCultureInfo = new CultureInfo("en-US");
 
         Vendors mVendor;
